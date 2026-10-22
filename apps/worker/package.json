@@ -1,0 +1,16 @@
+{
+  "name": "@cuntas/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "tsx src/main.ts", "typecheck": "tsc -p .", "test": "vitest run" },
+  "dependencies": {
+    "@cuntas/api": "workspace:*",
+    "@cuntas/db": "workspace:*",
+    "@cuntas/providers": "workspace:*",
+    "@cuntas/rules": "workspace:*",
+    "drizzle-orm": "^0.36.4",
+    "pg-boss": "^10.1.5"
+  },
+  "devDependencies": { "@electric-sql/pglite": "^0.2.13", "tsx": "^4.19.2" }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@cuntas/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": { ".": "./src/index.ts", "./services": "./src/services/index.ts" },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "seed": "tsx src/seed.ts",
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cuntas/db": "workspace:*",
+    "@cuntas/importers": "workspace:*",
+    "@cuntas/ledger": "workspace:*",
+    "@cuntas/providers": "workspace:*",
+    "@cuntas/rules": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "@hono/zod-openapi": "^0.18.3",
+    "@simplewebauthn/server": "^11.0.0",
+    "drizzle-orm": "^0.36.4",
+    "hono": "^4.6.12",
+    "otplib": "^12.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.13",
+    "tsx": "^4.19.2"
+  }
+}

@@ -11,6 +11,9 @@ function isPack(value: unknown): value is RulePack {
 
 const allPacks: RulePack[] = Object.values(RAW_PACKS).filter(isPack);
 
+export function listPacks(jurisdiction: "IE"): IePack[];
+export function listPacks(jurisdiction: "UK"): UkPack[];
+export function listPacks(jurisdiction?: Jurisdiction): RulePack[];
 export function listPacks(jurisdiction?: Jurisdiction): RulePack[] {
   return allPacks
     .filter((p) => !jurisdiction || p.jurisdiction === jurisdiction)
