@@ -182,7 +182,7 @@ export function createDemoDataset(asOf: IsoDate): Dataset {
   const period = periodOf(asOf, 25);
   const lines = [
     ["cat_rent", 1850], ["cat_groceries", 420], ["cat_energy", 160], ["cat_health_insurance", 124],
-    ["cat_commute", 160], ["cat_phone_internet", 90], ["cat_debt_payments", 480], ["cat_tv_subs", 35],
+    ["cat_commute", 160], ["cat_phone_internet", 90], ["cat_debt_payments", 180], ["cat_tv_subs", 35],
     ["cat_eating_out", 90], ["cat_shopping", 150], ["cat_entertainment", 60],
   ] as const;
   for (const p of [addMonths(`${period}-01`, -1).slice(0, 7), period]) {

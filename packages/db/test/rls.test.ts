@@ -14,8 +14,8 @@ beforeAll(async () => {
   const pg = new PGlite({ extensions: {} });
   await migrate({ exec: (s) => pg.exec(s), query: async (s) => (await pg.query<{ name: string }>(s)).rows });
   db = drizzle(pg, { schema }) as unknown as Db;
-  [{ id: alice }] = (await db.insert(users).values({ displayName: "Alice" }).returning()) as [{ id: string }];
-  [{ id: bob }] = (await db.insert(users).values({ displayName: "Bob" }).returning()) as [{ id: string }];
+  alice = (await db.insert(users).values({ displayName: "Alice" }).returning())[0]!.id;
+  bob = (await db.insert(users).values({ displayName: "Bob" }).returning())[0]!.id;
   for (const [hh, user] of [[A, alice], [B, bob]] as const) {
     await withTenant(db, { householdId: hh, userId: user }, async (tx) => {
       await tx.insert(households).values({ id: hh, name: `HH ${hh.slice(-1)}`, baseCurrency: "EUR", dekEncrypted: "x" });

@@ -504,3 +504,17 @@ Bank data
 - [Actual Budget: Enable Banking setup](https://actualbudget.org/docs/advanced/bank-sync/enable-banking)
 - [GoCardless Bank Account Data sign-ups disabled](https://dev.to/johnfrandsen/gocardless-bank-account-data-alternatives-what-to-use-when-signups-are-disabled-326d)
 - [Open Banking Tracker: aggregators in Ireland](https://openbankingtracker.com/api-aggregators?country=IE)
+
+## Implementation notes (22 Oct 2026)
+
+Decisions taken while building v0.1; revisit as needed.
+
+- **Local-first storage.** The household ledger is a single zod-validated dataset (`packages/ledger/src/schema.ts`) held in the browser's IndexedDB. The server stores it as an envelope-encrypted, versioned document with optimistic concurrency, rather than as 21 relational tables. Server-owned data (users, passkeys, sessions, households, memberships, invites, bank connections, provider transactions, FX rates, notifications, audit) is relational, with row-level security keyed on `app.household_id`.
+- **Rule packs** are compiled from YAML to `packages/rules/src/packs/generated.ts`, so they load the same in Node and the browser. The manifest carries SHA-256 hashes and is Ed25519-signed by the API when `RULES_SIGNING_KEY` is set.
+- **UK income tax bands** are stored on taxable income (basic band 37,700), as HMRC publishes them, rather than total income.
+- **PRSI** is computed per pay date: month-ends for monthly pay, Fridays for weekly and fortnightly. The weekly exemption and the tapered credit (maximum EUR 12, reduced by 1/6 of earnings over EUR 352) are seed values to verify.
+- **Joint assessment** apportions household income tax by share of income for each member's take-home figure.
+- **The emergency fund** counts accounts flagged as emergency fund; if none are flagged, it counts savings and cash accounts.
+- **Credit-card repayments** are internal transfers; card spending counts when it happens.
+- **Browser FX** comes from ECB reference rates via frankfurter.app, which allows browser requests; the worker fetches from the ECB directly.
+- **Not in seed data, so not modelled yet:** the single person child carer credit, Class S PRSI, UK student loans, the UK pension annual allowance.

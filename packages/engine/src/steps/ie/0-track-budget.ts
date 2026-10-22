@@ -13,7 +13,7 @@ export const trackBudget: StepDefinition = {
       id: "ie.track-budget.tracking",
       title: "Track your spending",
       isMet: ({ snapshot }) => snapshot.tracking.transactionsLast30Days > 0,
-      progress: ({ snapshot }) => ({ current: snapshot.tracking.transactionsLast30Days, target: 1, unit: "count" }),
+      progress: ({ snapshot }) => ({ current: Math.min(1, snapshot.tracking.transactionsLast30Days), target: 1, unit: "count" }),
       headline: "Start tracking where your money goes",
       explain: "Every step on the ladder is measured from your real spending. Import a bank file or connect an account to begin.",
       vars: () => ({}),

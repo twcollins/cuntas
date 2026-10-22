@@ -27,7 +27,7 @@ export function netWorthSeries(ds: Dataset, asOf: IsoDate, months = 12): NetWort
   let prevForeign: { currency: string; balance: number }[] | null = null;
   let prevDate: IsoDate | null = null;
 
-  return dates.map((date) => {
+  const points = dates.map((date) => {
     const balances = balancesByAccount(ds, date);
     let assets = 0;
     let liabilities = 0;
@@ -56,4 +56,7 @@ export function netWorthSeries(ds: Dataset, asOf: IsoDate, months = 12): NetWort
     prevDate = date;
     return { date, assetsMinor: assets, liabilitiesMinor: liabilities, netMinor: assets - liabilities, fxEffectMinor: fxEffect, missingFx };
   });
+  // Drop the empty months before the household's history begins.
+  const first = points.findIndex((p) => p.assetsMinor !== 0 || p.liabilitiesMinor !== 0);
+  return first <= 0 ? points : points.slice(first);
 }

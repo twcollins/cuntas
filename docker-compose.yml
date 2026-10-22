@@ -1,0 +1,58 @@
+# Self-hosted stack: web (PWA), api, worker, Postgres. Copy .env.example to .env first.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cuntas
+      POSTGRES_USER: cuntas_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/init-roles.sh:/docker-entrypoint-initdb.d/10-roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cuntas_owner -d cuntas"]
+      interval: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    command: sh -c "pnpm --filter @cuntas/db migrate && pnpm --filter @cuntas/api seed"
+    environment: &server-env
+      DATABASE_URL: postgres://cuntas_api:${APP_DB_PASSWORD}@postgres:5432/cuntas
+      DATABASE_ADMIN_URL: postgres://cuntas_owner:${POSTGRES_PASSWORD}@postgres:5432/cuntas
+      CUNTAS_KEK: ${CUNTAS_KEK:?set CUNTAS_KEK in .env (openssl rand -base64 32)}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
+      API_ORIGIN: ${API_ORIGIN:-http://localhost:8787}
+      BANK_PROVIDER: ${BANK_PROVIDER:-mock}
+      ENABLE_BANKING_APP_ID: ${ENABLE_BANKING_APP_ID:-}
+      ENABLE_BANKING_PRIVATE_KEY: ${ENABLE_BANKING_PRIVATE_KEY:-}
+      RULES_SIGNING_KEY: ${RULES_SIGNING_KEY:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    build: .
+    environment: *server-env
+    ports: ["8787:8787"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8787/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      retries: 10
+
+  worker:
+    build: .
+    command: pnpm --filter @cuntas/worker start
+    environment: *server-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    ports: ["${WEB_PORT:-8080}:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:
