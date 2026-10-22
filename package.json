@@ -1,0 +1,28 @@
+{
+  "name": "cuntas",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:packs": "pnpm --filter @cuntas/rules build:packs",
+    "dev": "pnpm --filter @cuntas/web dev",
+    "dev:api": "pnpm --filter @cuntas/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:e2e": "pnpm --filter @cuntas/web test:e2e",
+    "seed": "pnpm --filter @cuntas/api seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.9.0",
+    "eslint": "^9.39.5",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^2.1.4"
+  }
+}

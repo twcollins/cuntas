@@ -1,0 +1,50 @@
+# Legislated April 2027 changes. Provisional: the Autumn Budget (28 Oct 2026) may change this pack.
+jurisdiction: UK
+taxYear: "2027-28"
+version: "UK-2027-28.1"
+status: provisional
+currency: GBP
+effective: { from: "2027-04-06", to: "2028-04-05" }
+sources:
+  - https://www.richify.ai/uk/autumn-budget-2026
+  - https://uktaxdrag.co.uk/autumn-budget-2026-tracker
+
+incomeTax:
+  source: https://taxscape.deloitte.com/taxtables/deloitte-uk-tax-rates-2026-27.pdf
+  personalAllowance: 12570
+  taper: { above: 100000, divisor: 2 }
+  # Bands are measured on taxable income (after the personal allowance), as HMRC publishes them:
+  # basic rate to GBP 50,270 of total income = 37,700 of taxable income; additional rate above 125,140.
+  bands:
+    - { upTo: 37700, rate: 0.20 }
+    - { upTo: 125140, rate: 0.40 }
+    - { upTo: null, rate: 0.45 }
+
+nationalInsurance:
+  source: https://uktaxdrag.co.uk/rates-and-allowances-2026-27
+  primaryThreshold: 12570
+  upperEarningsLimit: 50270
+  mainRate: 0.08
+  upperRate: 0.02
+
+isa:
+  source: https://www.richify.ai/uk/autumn-budget-2026
+  annualAllowance: 20000
+  lifetimeIsaLimit: 4000
+  juniorIsaLimit: 9000
+  cashCap: { limit: 12000, appliesUnderAge: 65 }
+  cashInStocksIsaInterestCharge: 0.22
+  stocksToCashTransferBlockedUnderAge: 65
+
+savings:
+  source: https://www.taxassist.co.uk/resources/questions-and-answers/tax-on-bank-interest
+  rates: { basic: 0.22, higher: 0.42, additional: 0.47 }
+  personalSavingsAllowance: { basic: 1000, higher: 500, additional: 0 }
+
+pensionsIht:
+  source: https://www.richify.ai/uk/autumn-budget-2026
+  unusedPensionsInEstateFrom: "2027-04-06"
+
+deadlines:
+  source: https://www.gov.uk/self-assessment-tax-returns/deadlines
+  selfAssessmentOnline: { monthDay: "01-31", yearOffset: 1 }

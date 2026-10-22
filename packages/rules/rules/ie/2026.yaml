@@ -1,0 +1,100 @@
+# Seed data from docs/SPEC.md. Verify every value against Revenue before release.
+# Status is provisional because the CGT change from 7 Oct 2026 awaits Finance Act 2026.
+jurisdiction: IE
+taxYear: "2026"
+version: "IE-2026.3"
+status: provisional
+currency: EUR
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://kpmg.com/ie/en/insights/tax/budget-2027/tax-rates-and-credits.html
+  - https://www.grantthornton.ie/insights/budget/how-budget-2027-affects-you-and-your-family/
+
+incomeTax:
+  source: https://kpmg.com/ie/en/insights/tax/budget-2027/tax-rates-and-credits.html
+  standardRateBand: { single: 44000, marriedOneIncome: 53000, marriedTwoIncomesMax: 88000, oneParent: 48000 }
+  rates: { standard: 0.20, higher: 0.40 }
+  credits:
+    personalSingle: 2000
+    personalMarried: 4000
+    employee: 2000
+    earnedIncome: 2000
+    rentSingleMax: 1000
+    rentCoupleMax: 2000
+    rentRate: 0.20
+
+usc:
+  source: https://kpmg.com/ie/en/insights/tax/budget-2027/tax-rates-and-credits.html
+  exemptionThreshold: 13000
+  bands:
+    - { upTo: 12012, rate: 0.005 }
+    - { upTo: 28700, rate: 0.02 }
+    - { upTo: 70044, rate: 0.03 }
+    - { upTo: null, rate: 0.08 }
+  selfEmployedSurcharge: { above: 100000, rate: 0.11 }
+
+prsi:
+  source: https://kpmg.com/ie/en/insights/tax/budget-2027/tax-rates-and-credits.html
+  classA1:
+    - { from: "2026-01-01", rate: 0.042 }
+    - { from: "2026-10-01", rate: 0.0435 }
+  weeklyExemptionThreshold: 352
+  credit: { upperWeeklyThreshold: 424, maxWeekly: 12, taperDivisor: 6 }
+
+pension:
+  source: https://revenue.ie/en/jobs-and-pensions/pension/relief/tax-relief-limits.aspx
+  earningsCap: 115000
+  ageBands:
+    - { minAge: 0, rate: 0.15 }
+    - { minAge: 30, rate: 0.20 }
+    - { minAge: 40, rate: 0.25 }
+    - { minAge: 50, rate: 0.30 }
+    - { minAge: 55, rate: 0.35 }
+    - { minAge: 60, rate: 0.40 }
+  reliefClaimDeadline: { monthDay: "10-31", yearOffset: 1 }
+  statePensionAge: 66
+
+myFutureFund:
+  source: https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/
+  from: "2026-01-01"
+  eligibility: { minAge: 23, maxAge: 60, minEarnings: 20000 }
+  earningsCap: 80000
+  rates: { employee: 0.015, employer: 0.015, state: 0.005 }
+
+cgt:
+  source: https://www.williamfry.com/?p=163326
+  rates:
+    - { from: "2026-01-01", rate: 0.33 }
+    - { from: "2026-10-07", rate: 0.31 }
+  developmentLandRate: 0.33
+  annualExemption: 1270
+  payment:
+    - { disposalsThroughMonth: 11, dueMonthDay: "12-15", yearOffset: 0 }
+    - { disposalsThroughMonth: 12, dueMonthDay: "01-31", yearOffset: 1 }
+
+exitTax:
+  source: https://www.crowe.com/ie/insights/budget-2027-highlights
+  rates:
+    - { from: "2026-01-01", rate: 0.38 }
+  deemedDisposalYears: 8
+  paymentDeadline: { monthDay: "10-31", yearOffset: 1 }
+
+dirt:
+  source: https://etf.ie/tax/
+  rate: 0.33
+
+cat:
+  source: https://kpmg.com/ie/en/insights/tax/budget-2027/tax-rates-and-credits.html
+  rate: 0.33
+  thresholds:
+    - { from: "2026-10-07", groupA: 420000, groupB: 44000, groupC: 22000 }
+
+helpToBuy:
+  source: https://www.irishtaxhub.ie/blog/budget-2027-what-it-means-for-you
+  maxRelief: 30000
+  priceRate: 0.10
+  lookbackYears: 4
+
+deadlines:
+  source: https://revenue.ie/en/jobs-and-pensions/pension/relief/tax-relief-limits.aspx
+  form11: { monthDay: "10-31", yearOffset: 1 }

@@ -1,0 +1,12 @@
+# Default thresholds from the r/irishpersonalfinance flowchart v2.1. Users can override them.
+id: chart-v2.1
+version: "CHART-2.1"
+source: https://www.reddit.com/r/irishpersonalfinance/
+starterFund: { floor: 1500, months: 1 }
+fullFund: { floorLow: 4500, floorHigh: 9000, monthsLow: 3, monthsHigh: 6 }
+debt: { highAprAbove: 0.08, moderateAprFrom: 0.05 }
+retirement: { shareOfAge: 0.5 }
+mortgageOverpay: { rate: 0.10 }
+goals: { savingsHorizonYears: 5 }
+reminders: { renewalDaysAhead: 30, consentDaysAhead: 7 }
+debtPlanner: { extraPaymentProbe: 50 }

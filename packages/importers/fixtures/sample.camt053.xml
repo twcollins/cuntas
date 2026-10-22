@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+  <BkToCstmrStmt>
+    <Stmt>
+      <Id>STMT-2026-09</Id>
+      <Acct><Id><IBAN>IE29AIBK93115212345678</IBAN></Id><Ccy>EUR</Ccy></Acct>
+      <Ntry>
+        <NtryRef>R1</NtryRef>
+        <Amt Ccy="EUR">49.99</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <BookgDt><Dt>2026-09-04</Dt></BookgDt>
+        <NtryDtls><TxDtls><RltdPties><Cdtr><Nm>Virgin Media</Nm></Cdtr></RltdPties><RmtInf><Ustrd>Broadband Sept</Ustrd></RmtInf></TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <AcctSvcrRef>R2</AcctSvcrRef>
+        <Amt Ccy="EUR">3200.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><DtTm>2026-09-25T09:00:00</DtTm></BookgDt>
+        <NtryDtls><TxDtls><RltdPties><Dbtr><Nm>ACME LTD</Nm></Dbtr></RltdPties></TxDtls></NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

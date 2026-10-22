@@ -1,0 +1,16 @@
+# Ireland-UK double taxation treaty and cross-border reliefs.
+id: IE-UK-DTA
+version: "XB-2026.1"
+source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/
+articles:
+  employment: { ref: "DTA Art. 15", source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/ }
+  privatePension: { ref: "DTA Art. 17", source: https://www.irishtaxhub.ie/blog/taxation-of-foreign-pensions-in-ireland }
+  governmentService: { ref: "DTA Art. 18", source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/ }
+  interest: { ref: "DTA Art. 12", source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/ }
+  eliminationOfDoubleTax: { ref: "DTA Art. 21", source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/ }
+transBorderRelief:
+  ref: "TCA 1997 s.825A"
+  source: https://revenue.ie:443/en/tax-professionals/tdm/income-tax-capital-gains-tax-corporation-tax/part-34/34-00-06.pdf
+isa:
+  ref: "No Irish exemption for UK ISAs"
+  source: https://www.expertsforexpats.com/advice/tax/ireland-uk-tax-guide-for-british-expats-in-ireland

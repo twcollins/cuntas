@@ -1,0 +1,101 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { importFile, parseAmount, parseDate, PRESETS } from "../src";
+
+const fixture = (name: string) => readFileSync(join(__dirname, "../fixtures", name), "utf8");
+
+describe("parsing", () => {
+  it("parses amounts", () => {
+    expect(parseAmount("1,234.56")).toBe(123456);
+    expect(parseAmount("-€12.3")).toBe(-1230);
+    expect(parseAmount("(5.00)")).toBe(-500);
+    expect(parseAmount("12,30", true)).toBe(1230);
+    expect(parseAmount("1.234,50", true)).toBe(123450);
+    expect(parseAmount("10.00 DR")).toBe(-1000);
+    expect(parseAmount("")).toBeNull();
+    expect(parseAmount("abc")).toBeNull();
+  });
+  it("parses dates", () => {
+    expect(parseDate("01/09/2026", "DD/MM/YYYY")).toBe("2026-09-01");
+    expect(parseDate("2026-09-01 10:01:02", "YYYY-MM-DD")).toBe("2026-09-01");
+    expect(parseDate("3 Sep 2026", "DD MMM YYYY")).toBe("2026-09-03");
+    expect(parseDate("01/09/26", "DD/MM/YYYY")).toBe("2026-09-01");
+  });
+});
+
+const cases: [string, string, number][] = [
+  ["revolut.csv", "revolut", 4],
+  ["aib.csv", "aib", 3],
+  ["boi.csv", "boi", 3],
+  ["ptsb.csv", "ptsb", 2],
+  ["anpost.csv", "anpost", 2],
+  ["creditunion.csv", "creditunion", 2],
+  ["monzo.csv", "monzo", 2],
+  ["starling.csv", "starling", 2],
+  ["barclays.csv", "barclays", 2],
+  ["danske.csv", "danske", 1],
+];
+
+describe("bank presets", () => {
+  it("has a fixture for every preset", () => {
+    expect(cases.map((c) => c[1]).sort()).toEqual(PRESETS.map((p) => p.id).sort());
+  });
+  for (const [file, preset, count] of cases) {
+    it(`${preset}: detects and parses`, () => {
+      const r = importFile(file, fixture(file));
+      expect(r.preset).toBe(preset);
+      expect(r.transactions).toHaveLength(count);
+      expect(r.warnings).toEqual([]);
+      for (const t of r.transactions) {
+        expect(t.bookedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(Number.isInteger(t.amountMinor)).toBe(true);
+      }
+    });
+    it(`${preset}: re-import produces identical ids`, () => {
+      const a = importFile(file, fixture(file)).transactions.map((t) => t.externalId);
+      const b = importFile(file, fixture(file)).transactions.map((t) => t.externalId);
+      expect(a).toEqual(b);
+      expect(new Set(a).size).toBe(a.length);
+    });
+  }
+
+  it("Revolut: subtracts fees, skips pending, keeps identical same-day rows", () => {
+    const r = importFile("revolut.csv", fixture("revolut.csv"));
+    expect(r.transactions.map((t) => t.amountMinor)).toEqual([-2345, -420, -420, -20100]);
+  });
+  it("AIB: debit/credit columns and quoted thousands", () => {
+    const r = importFile("aib.csv", fixture("aib.csv"));
+    expect(r.transactions.map((t) => t.amountMinor)).toEqual([-4510, 320000, -112000]);
+    expect(r.transactions[0]!.payee).toBe("DUNNES STORES");
+  });
+  it("Monzo: uses the bank's transaction id", () => {
+    expect(importFile("monzo.csv", fixture("monzo.csv")).transactions[0]!.externalId).toBe("tx_0000A1");
+  });
+  it("unknown layouts ask for a column mapping, then import", () => {
+    const text = "When,What,Value\n2026-09-01,Thing,-1.00\n";
+    expect(importFile("x.csv", text).warnings[0]).toMatch(/map the columns/);
+    const r = importFile("x.csv", text, { date: "When", dateFormat: "YYYY-MM-DD", amount: "Value", description: ["What"], defaultCurrency: "GBP" });
+    expect(r.transactions[0]).toMatchObject({ bookedAt: "2026-09-01", amountMinor: -100, currency: "GBP" });
+  });
+});
+
+describe("OFX and CAMT.053", () => {
+  it("parses OFX SGML", () => {
+    const r = importFile("sample.ofx", fixture("sample.ofx"));
+    expect(r.format).toBe("ofx");
+    expect(r.transactions).toMatchObject([
+      { bookedAt: "2026-09-01", amountMinor: -1250, externalId: "ofx:A1", payee: "SPAR" },
+      { bookedAt: "2026-09-02", amountMinor: 10000, externalId: "ofx:A2" },
+    ]);
+  });
+  it("parses camt.053", () => {
+    const r = importFile("s.xml", fixture("sample.camt053.xml"));
+    expect(r.format).toBe("camt053");
+    expect(r.account?.iban).toBe("IE29AIBK93115212345678");
+    expect(r.transactions).toMatchObject([
+      { bookedAt: "2026-09-04", amountMinor: -4999, payee: "Virgin Media", externalId: "camt:R1" },
+      { bookedAt: "2026-09-25", amountMinor: 320000, payee: "ACME LTD", externalId: "camt:R2" },
+    ]);
+  });
+});

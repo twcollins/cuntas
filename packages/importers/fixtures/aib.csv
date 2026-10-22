@@ -1,0 +1,4 @@
+Posted Account, Posted Transactions Date, Description1, Description2, Description3, Debit Amount, Credit Amount,Balance,Posted Currency,Transaction Type,Local Currency Amount,Local Currency
+"93-11-22 12345678",01/09/2026,VDP-DUNNES STORES,,,45.10,,1954.90,EUR,Debit,45.10,EUR
+"93-11-22 12345678",02/09/2026,SALARY ACME LTD,,,,3200.00,5154.90,EUR,Credit,3200.00,EUR
+"93-11-22 12345678",03/09/2026,D/D ELECTRIC IRELAND,,,"1,120.00",,4034.90,EUR,Debit,1120.00,EUR
