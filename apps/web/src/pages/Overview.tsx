@@ -8,9 +8,11 @@ import { NextStep } from "../components/NextStep";
 import { Badge, Card, Disclaimer, PageHeader, Stat } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
 import { money, monthLabel } from "../lib/format";
+import { useChartColors } from "../lib/theme";
 import { useDataset } from "../lib/store";
 
 export function OverviewPage() {
+  const colors = useChartColors();
   const ds = useDataset();
   const { result, snapshot, asOf } = usePlan(ds);
   const base = ds.household.baseCurrency;
@@ -79,13 +81,13 @@ export function OverviewPage() {
             <ResponsiveContainer>
               <AreaChart data={series.map((p) => ({ date: p.date.slice(0, 7), net: p.netMinor / 100, fx: p.fxEffectMinor / 100 }))}>
                 <defs>
-                  <linearGradient id="nw" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#14917f" stopOpacity={0.35} /><stop offset="100%" stopColor="#14917f" stopOpacity={0} /></linearGradient>
+                  <linearGradient id="nw" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={colors.primaryFill} stopOpacity={0.35} /><stop offset="100%" stopColor={colors.primaryFill} stopOpacity={0} /></linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} width={60} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                <Tooltip formatter={(v: number, k: string) => [money(Math.round(v * 100), base), k === "net" ? "Net worth" : "FX effect"]} />
-                <Area type="monotone" dataKey="net" stroke="#0f766e" fill="url(#nw)" strokeWidth={2} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} />
+                <YAxis tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} width={60} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
+                <Tooltip contentStyle={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 8 }} formatter={(v: number, k: string) => [money(Math.round(v * 100), base), k === "net" ? "Net worth" : "FX effect"]} />
+                <Area type="monotone" dataKey="net" stroke={colors.primary} fill="url(#nw)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -96,9 +98,9 @@ export function OverviewPage() {
             <ResponsiveContainer>
               <BarChart data={spending} layout="vertical" margin={{ left: 20 }}>
                 <XAxis type="number" hide />
-                <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => money(Math.round(v * 100), base)} />
-                <Bar dataKey="value" fill="#14917f" radius={[0, 4, 4, 0]} />
+                <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} />
+                <Tooltip contentStyle={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 8 }} formatter={(v: number) => money(Math.round(v * 100), base)} />
+                <Bar dataKey="value" fill={colors.primaryFill} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

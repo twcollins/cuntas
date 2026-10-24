@@ -1,0 +1,23 @@
+# Scottish income tax on non-savings, non-dividend income for Scottish taxpayers. National Insurance,
+# savings and dividend tax stay UK-wide and come from the parent UK pack.
+kind: ukRegion
+region: scotland
+parent: UK
+taxYear: "2026-27"
+version: "UK-SCT-2026-27.1"
+status: provisional
+effective: { from: "2026-04-06", to: "2027-04-05" }
+sources:
+  - https://www.gov.scot/publications/scottish-income-tax-2026-2027/
+
+incomeTax:
+  source: https://www.gov.scot/publications/scottish-income-tax-2026-2027/
+  # Bands on taxable income (after the personal allowance), like the UK pack: starter to GBP 16,537 of
+  # total income = 3,967 taxable; top rate above 125,140.
+  bands:
+    - { upTo: 3967, rate: 0.19, name: starter }
+    - { upTo: 16956, rate: 0.20, name: basic }
+    - { upTo: 31092, rate: 0.21, name: intermediate }
+    - { upTo: 62430, rate: 0.42, name: higher }
+    - { upTo: 125140, rate: 0.45, name: advanced }
+    - { upTo: null, rate: 0.48, name: top }

@@ -7,6 +7,8 @@ export type PackStatus = "provisional" | "verified";
 export type Dated<T> = T & { from: IsoDate };
 export type DeadlineRule = { monthDay: string; yearOffset: number };
 export type Sourced = { source: string };
+/** Sections added without official confirmation carry their own status, even inside a verified pack. */
+export type SectionStatus = { status?: PackStatus };
 
 export interface PackMeta {
   jurisdiction: Jurisdiction;
@@ -42,12 +44,14 @@ export interface IePack extends PackMeta {
     classA1: Dated<{ rate: number }>[];
     weeklyExemptionThreshold: number;
     credit: { upperWeeklyThreshold: number; maxWeekly: number; taperDivisor: number };
+    classS?: Sourced & SectionStatus & { rates: Dated<{ rate: number }>[]; incomeThreshold: number; minimumContribution: number };
   };
   pension: Sourced & {
     earningsCap: number;
     ageBands: { minAge: number; rate: number }[];
     reliefClaimDeadline: DeadlineRule;
     statePensionAge: number;
+    lumpSum?: Sourced & SectionStatus & { share: number; taxFreeMax: number; standardRateTop: number };
   };
   myFutureFund: Sourced & {
     from: IsoDate;
@@ -78,6 +82,12 @@ export interface IePack extends PackMeta {
   helpToBuy: Sourced & { maxRelief: number; priceRate: number; lookbackYears: number };
   minimumWage?: Sourced & { hourly: number };
   deadlines: Sourced & { form11: DeadlineRule };
+  statePension?: Sourced & SectionStatus & { maxWeeklyContributory: number; contributionYearsForMax: number; minimumContributionYears: number };
+  selfAssessment?: Sourced &
+    SectionStatus & {
+      preliminaryTax: { currentYearShare: number; priorYearShare: number; prePrecedingYearShare: number };
+      preliminaryDue: DeadlineRule;
+    };
 }
 
 export interface UkPack extends PackMeta {
@@ -101,10 +111,37 @@ export interface UkPack extends PackMeta {
     personalSavingsAllowance: { basic: number; higher: number; additional: number };
   };
   dividends?: Sourced & { allowance: number; rates: { basic: number; higher: number; additional: number } };
-  statePension?: Sourced & { fullWeekly: number; qualifyingYearsForFull: number; minimumQualifyingYears: number };
+  statePension?: Sourced & { fullWeekly: number; qualifyingYearsForFull: number; minimumQualifyingYears: number; pensionAge?: number };
   niVoluntary?: Sourced & { class2AbroadAbolishedFrom: IsoDate; class3AnnualCost: number; abroadMinimumYearsUkLink: number };
   pensionsIht?: Sourced & { unusedPensionsInEstateFrom: IsoDate };
   deadlines: Sourced & { selfAssessmentOnline: DeadlineRule };
+  studentLoans?: Sourced & SectionStatus & { plans: Record<StudentLoanPlan, { threshold: number; rate: number }> };
+  cgt?: Sourced & SectionStatus & { annualExemptAmount: number; rates: { basic: number; higher: number } };
+  pensionAnnualAllowance?: Sourced &
+    SectionStatus & {
+      annualAllowance: number;
+      taper: { thresholdIncome: number; adjustedIncome: number; divisor: number; minimum: number };
+      moneyPurchaseAnnualAllowance: number;
+      carryForwardYears: number;
+      noEarningsReliefLimit: number;
+    };
+  pensionLumpSum?: Sourced & SectionStatus & { share: number; lumpSumAllowance: number };
+}
+
+export type StudentLoanPlan = "plan1" | "plan2" | "plan4" | "plan5" | "postgraduate";
+export type UkRegion = "rUK" | "scotland";
+
+/** A regional sub-pack that replaces the parent UK pack's income tax bands (Scotland). */
+export interface UkRegionPack {
+  kind: "ukRegion";
+  region: Exclude<UkRegion, "rUK">;
+  parent: "UK";
+  taxYear: string;
+  version: string;
+  status: PackStatus;
+  effective: { from: IsoDate; to: IsoDate };
+  sources: string[];
+  incomeTax: Sourced & { bands: { upTo: number | null; rate: number; name: string }[] };
 }
 
 export interface ChartDefaults {
@@ -119,6 +156,15 @@ export interface ChartDefaults {
   goals: { savingsHorizonYears: number };
   reminders: { renewalDaysAhead: number; consentDaysAhead: number };
   debtPlanner: { extraPaymentProbe: number };
+  projections: {
+    nominalReturn: number;
+    inflation: number;
+    scenarioSpread: number;
+    withdrawalRate: number;
+    depositRate: number;
+    dividendYield: number;
+    years: number;
+  };
 }
 
 export interface TreatyPack {
@@ -131,6 +177,13 @@ export interface TreatyPack {
   >;
   transBorderRelief: { ref: string; source: string };
   isa: { ref: string; source: string };
+  relocation?: { source: string; toUK: RelocationNote[]; toIE: RelocationNote[] };
+}
+
+export interface RelocationNote {
+  topic: string;
+  text: string;
+  source: string;
 }
 
 export type RulePack = IePack | UkPack;

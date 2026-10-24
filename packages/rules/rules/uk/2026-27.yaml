@@ -47,6 +47,8 @@ statePension:
   fullWeekly: 241.30
   qualifyingYearsForFull: 35
   minimumQualifyingYears: 10
+  # Rising from 66 to 67 between May 2026 and March 2028; 67 for anyone born after 5 March 1961.
+  pensionAge: 67
 
 niVoluntary:
   source: https://www.crowe.com/uk/insights/changes-voluntary-national-insurance-abroad
@@ -57,3 +59,35 @@ niVoluntary:
 deadlines:
   source: https://www.gov.uk/self-assessment-tax-returns/deadlines
   selfAssessmentOnline: { monthDay: "01-31", yearOffset: 1 }
+
+studentLoans:
+  source: https://www.gov.uk/repaying-your-student-loan/what-you-pay
+  status: provisional
+  plans:
+    plan1: { threshold: 26900, rate: 0.09 }
+    plan2: { threshold: 29385, rate: 0.09 }
+    plan4: { threshold: 33795, rate: 0.09 }
+    plan5: { threshold: 25000, rate: 0.09 }
+    postgraduate: { threshold: 21000, rate: 0.06 }
+
+cgt:
+  source: https://www.gov.uk/capital-gains-tax/rates
+  status: provisional
+  annualExemptAmount: 3000
+  rates: { basic: 0.18, higher: 0.24 }
+
+pensionAnnualAllowance:
+  source: https://www.gov.uk/tax-on-your-private-pension/annual-allowance
+  status: provisional
+  annualAllowance: 60000
+  taper: { thresholdIncome: 200000, adjustedIncome: 260000, divisor: 2, minimum: 10000 }
+  moneyPurchaseAnnualAllowance: 10000
+  carryForwardYears: 3
+  # Relief on personal contributions is capped at 100% of relevant earnings, or GBP 3,600 gross with none.
+  noEarningsReliefLimit: 3600
+
+pensionLumpSum:
+  source: https://www.gov.uk/tax-on-your-private-pension/lump-sum-allowance
+  status: provisional
+  share: 0.25
+  lumpSumAllowance: 268275

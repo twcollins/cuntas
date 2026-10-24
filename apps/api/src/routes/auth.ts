@@ -13,7 +13,7 @@ type Transports = NonNullable<Parameters<typeof verifyAuthenticationResponse>[0]
 import { authenticator } from "otplib";
 import { z } from "zod";
 import { decrypt, encrypt, passkeyCredentials, randomToken, sessions, totpSecrets, users } from "@cuntas/db";
-import { clearSessionCookie, createSession, requireUser, setSessionCookie } from "../auth";
+import { clearSessionCookie, cookiePolicy, createSession, requireUser, setSessionCookie } from "../auth";
 import type { Env } from "../deps";
 import { audit } from "../services/audit";
 import { withTenant } from "@cuntas/db";
@@ -27,7 +27,7 @@ const challenges = new Map<string, { challenge: string; expires: number; userId?
 function putChallenge(c: Parameters<typeof setCookie>[0], value: { challenge: string; userId?: string; displayName?: string }, secure: boolean) {
   const key = randomToken(16);
   challenges.set(key, { ...value, expires: Date.now() + CHALLENGE_TTL_MS });
-  setCookie(c, CHALLENGE_COOKIE, key, { httpOnly: true, secure, sameSite: "Strict", path: "/auth", maxAge: CHALLENGE_TTL_MS / 1000 });
+  setCookie(c, CHALLENGE_COOKIE, key, { httpOnly: true, ...cookiePolicy(c, secure, "Strict"), path: "/auth", maxAge: CHALLENGE_TTL_MS / 1000 });
 }
 
 function takeChallenge(c: Parameters<typeof getCookie>[0]) {

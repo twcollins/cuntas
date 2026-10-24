@@ -2,10 +2,13 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Native builds (Capacitor) serve files from the app bundle, so they skip the service worker.
+const native = process.env.CAPACITOR === "1";
+
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
+    !native && VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg"],
       manifest: {

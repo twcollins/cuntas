@@ -39,6 +39,11 @@ export interface ColumnMapping {
   decimalComma?: boolean;
   /** Keep only rows where this column equals the value (e.g. Revolut State = COMPLETED). */
   where?: { column: string; equals: string };
+  /**
+   * Zero-amount rows dated the same as the row before carry more detail for it (AIB puts ATM
+   * location, card time and references on follow-on rows). Their text and balance are folded in.
+   */
+  detailRows?: boolean;
 }
 
 export interface CsvPreset extends ColumnMapping {
@@ -47,4 +52,9 @@ export interface CsvPreset extends ColumnMapping {
   country: "IE" | "UK";
   /** Headers that must all be present (normalised) for auto-detection. */
   signature: string[];
+  /**
+   * For exports with no header row: the column names to assume, in order. Detection then needs every
+   * row to have exactly this many cells, a readable date in `date` and an amount in `amount`.
+   */
+  headerless?: string[];
 }

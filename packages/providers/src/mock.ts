@@ -3,6 +3,8 @@ import { assignContentIds } from "@cuntas/importers";
 import type { BankDataProvider, ConsentSession, ProviderAccount, ProviderInstitution } from "./types";
 
 /** In-memory provider for development, demos and tests. */
+const isUk = (ref: string) => ref.includes("monzo") || ref.includes("hsbc-uk");
+
 export class MockProvider implements BankDataProvider {
   readonly id = "mock";
   private sessions = new Map<string, ConsentSession>();
@@ -10,7 +12,7 @@ export class MockProvider implements BankDataProvider {
   async listInstitutions(country: "IE" | "UK"): Promise<ProviderInstitution[]> {
     return country === "IE"
       ? [{ id: "mock:aib", name: "Mock AIB", country: "IE" }, { id: "mock:revolut", name: "Mock Revolut", country: "IE" }]
-      : [{ id: "mock:monzo", name: "Mock Monzo", country: "UK" }];
+      : [{ id: "mock:monzo", name: "Mock Monzo", country: "UK" }, { id: "mock:hsbc-uk", name: "Mock HSBC UK", country: "UK" }];
   }
 
   async startConsent(input: { institution: ProviderInstitution; redirectUrl: string; state: string; validDays: number }) {
@@ -22,7 +24,7 @@ export class MockProvider implements BankDataProvider {
 
   async completeConsent(input: { code: string }): Promise<ConsentSession> {
     const institution = input.code.split(":").slice(1).join(":");
-    const gbp = institution.includes("monzo");
+    const gbp = isUk(institution);
     const session: ConsentSession = {
       sessionId: `mock-session:${institution}:${this.sessions.size + 1}`,
       consentExpiresAt: new Date(Date.now() + 90 * 86_400_000).toISOString(),
@@ -37,7 +39,7 @@ export class MockProvider implements BankDataProvider {
   }
 
   async fetchTransactions(accountRef: string, range: { from: IsoDate; to?: IsoDate }) {
-    const gbp = accountRef.includes("monzo");
+    const gbp = isUk(accountRef);
     const to = range.to ?? new Date().toISOString().slice(0, 10);
     const rows = [];
     // A fixed 3-day grid, so overlapping windows return the same transactions like a real bank would.

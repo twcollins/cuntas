@@ -517,4 +517,26 @@ Decisions taken while building v0.1; revisit as needed.
 - **The emergency fund** counts accounts flagged as emergency fund; if none are flagged, it counts savings and cash accounts.
 - **Credit-card repayments** are internal transfers; card spending counts when it happens.
 - **Browser FX** comes from ECB reference rates via frankfurter.app, which allows browser requests; the worker fetches from the ECB directly.
-- **Not in seed data, so not modelled yet:** the single person child carer credit, Class S PRSI, UK student loans, the UK pension annual allowance.
+- **Not in seed data, so not modelled yet:** the single person child carer credit.
+
+## Implementation notes (23 Oct 2026, v0.2)
+
+- **Figures beyond the spec's seed data** (Class S rates, threshold and minimum; preliminary tax bases; Irish and UK State Pension rates; UK student loan thresholds; annual allowance, taper and MPAA; lump sum allowance; UK CGT; Irish pension lump sum bands; Scottish 2026-27 bands) are in the rule packs with section-level `status: provisional` and a source. Verify before release.
+- **Class S PRSI** applies a mid-year rate change month by month (9 months old rate, 3 months new for a 1 October change), as Revenue did for 2024.
+- **Scotland** is a regional sub-pack (`rules/uk/scotland/2026-27.yaml`, `kind: ukRegion`) replacing only non-savings income tax bands. A tax year without a Scottish pack falls back to the latest earlier one and says so. Savings, dividends, NI and the PSA band stay UK-wide.
+- **Payslip check** compares one payslip with the same pay spread over a year (cumulative basis, one job). Tolerance is EUR/GBP 1.
+- **Recurring bills** need three payments (two for yearly) on a steady rhythm; weekly payments must be fixed-price, and amounts swinging more than 25% only count for essential categories. Bill templates carry no amounts.
+- **Retirement projection** is in today's money: real return = (1 + nominal) / (1 + inflation) - 1, fixed withdrawal rate, State Pensions pro rata to contribution years. No fees or tax on pension income.
+- **Wrapper comparison** gives every wrapper the same yearly cost to you: pensions are grossed up at the marginal rate; ETFs pay exit tax with deemed disposal per yearly lot; investment trusts pay income charges on dividends and CGT at the end; deposits pay DIRT yearly; the Investment Account is shown from the first pack that defines it and stays unavailable until its flag is on.
+- **Residence what-if** builds a copy of the dataset with the member resident elsewhere from today (pay converted at the ECB rate), re-runs `xb.classify` and take-home pay, and shows relocation notes from `rules/xb/ie-uk.yaml`.
+- **Server admin.** `users.is_admin` is writable only by the table owner or a superuser (trigger `users_guard_admin`), so the API role cannot grant it; the `admin` CLI runs as the owner. Admin listing uses the definer function `admin_households()`, which returns nothing for non-admins. Admins never receive a household document. A suspended household is read-only (HTTP 423 on writes) but can still be loaded, exported and deleted by its members. Invites carry a role, so a household created by an admin is handed over with an owner invite.
+- **Native apps** are Capacitor 8 projects in `apps/web/ios` and `apps/web/android`, built from the PWA without its service worker. The API accepts extra CORS origins and optional SameSite=None cookies for them.
+
+## Implementation notes (24 Oct 2026)
+
+- **Personal tool.** Cúntas is a personal, local-first tool, including in the iOS and Android apps: data stays on the device unless the user signs in to their own self-hosted server. No hosted service.
+- **Several households per device.** Each household's dataset is its own IndexedDB entry (`cuntas:household:<localId>`), with an index (`cuntas:households:v2`) of households, the active one and each one's sync state; the server sign-in is stored once (`cuntas:account:v2`). The local id is independent of the dataset's id, so two copies of the demo can coexist. There is no migration from the v1 single-household key: the app is not live, so existing local data is reset.
+- **Never overwrite silently.** Opening a server household adds it as a new local household, or switches to the copy already here. Replacing a local copy with the server's, keeping the server copy in a conflict, stopping sync, removing an unsynced household and deleting on the server all ask first.
+- **Screens.** Households (add, switch, remove, delete on server, who can open it), Account & sync (sign-in, server households, the open household's sync), Settings (export, backup, FX, appearance, delete everything) and Guide. Onboarding offers "I already use Cúntas"; an invite link opened on a device with no household shows the join screen on its own.
+
+- **USA (planned, not built).** Decided 24 Oct 2026: US support launches on the web and both store apps together, with federal tax and all 50 states plus D.C.; US student loans are out of scope. The user checks US tax figures each year: the app ships provisional, unchecked packs, prompts until the federal pack and each member's state pack are checked, and loads new years from a YAML rule file (validated against the pack schema, fingerprinted with SHA-256, stored per device). Phases and the yearly update flow are in the design doc.

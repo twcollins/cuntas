@@ -93,6 +93,16 @@ describe("api", () => {
     expect(((await r.json()) as { schemaVersion: number }).schemaVersion).toBe(1);
   });
 
+  it("native apps: extra CORS origins and SameSite=None cookies when configured", async () => {
+    const native = await testApp({ extraOrigins: ["capacitor://localhost"], crossSiteCookies: true });
+    const r = await native.app.request("/auth/passkey/register/options", { method: "POST", body: JSON.stringify({ displayName: "Dee" }), headers: { "content-type": "application/json", origin: "capacitor://localhost" } });
+    expect(r.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
+    expect(r.headers.get("set-cookie")).toMatch(/SameSite=None/);
+    expect(r.headers.get("set-cookie")).toMatch(/Secure/);
+    const web = await t.app.request("/health", { headers: { origin: "capacitor://localhost" } });
+    expect(web.headers.get("access-control-allow-origin")).not.toBe("capacitor://localhost");
+  });
+
   it("serves the rule-pack manifest", async () => {
     const r = (await (await t.app.request("/rule-packs/manifest")).json()) as { manifest: { key: string }[] };
     expect(r.manifest.map((m) => m.key)).toContain("ie/2027");

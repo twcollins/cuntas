@@ -14,6 +14,7 @@ import { onDate, type ExplainedLine, type IePack, type RuleRef } from "../../pac
 import { bandedTax } from "../shared";
 import { pensionReliefLimit } from "./pensionRelief";
 import { myFutureFundContributions } from "./myFutureFund";
+import { ieClassS } from "./selfEmployed";
 
 export type PayFrequency = "weekly" | "fortnightly" | "monthly";
 export type IeAssessment = "single" | "oneParent" | "marriedOneIncome" | "marriedTwoIncomes";
@@ -154,7 +155,8 @@ export function ieUsc(
   return { amountMinor, lines };
 }
 
-function standardBandMinor(pack: IePack, input: IePayrollInput): number {
+/** The standard-rate band for an assessment; with two incomes it grows by the lower income, up to the maximum. */
+export function standardBandMinor(pack: IePack, input: Pick<IePayrollInput, "assessment" | "grossAnnualMinor" | "spouseGrossAnnualMinor">): number {
   const band = pack.incomeTax.standardRateBand;
   switch (input.assessment) {
     case "single":
@@ -240,18 +242,22 @@ export function iePayroll(pack: IePack, input: IePayrollInput): IePayrollResult 
   lines.push(...usc.lines);
 
   let prsiPeriods: PrsiPeriod[] = [];
+  let prsiMinor: number;
   if (input.employment === "employee") {
     prsiPeriods = iePrsi(pack, gross, input.frequency);
+    prsiMinor = sumMinor(prsiPeriods.map((p) => p.prsiMinor));
+    const rates = [...new Set(prsiPeriods.map((p) => p.rate))];
+    lines.push({
+      label: `PRSI Class A1 by pay date (${rates.map(formatRate).join(" then ")})`,
+      amountMinor: prsiMinor,
+      rule: ref(pack, "prsi.classA1", pack.prsi.source),
+    });
   } else {
-    notes.push("Class S PRSI for the self-employed is not modelled yet (phase 4).");
+    const classS = ieClassS(pack, gross);
+    prsiMinor = classS.amountMinor;
+    lines.push(...classS.lines);
+    notes.push(...classS.notes);
   }
-  const prsiMinor = sumMinor(prsiPeriods.map((p) => p.prsiMinor));
-  const rates = [...new Set(prsiPeriods.map((p) => p.rate))];
-  lines.push({
-    label: `PRSI Class A1 by pay date (${rates.map(formatRate).join(" then ")})`,
-    amountMinor: prsiMinor,
-    rule: ref(pack, "prsi.classA1", pack.prsi.source),
-  });
 
   const mff = input.myFutureFund
     ? myFutureFundContributions(pack, gross)

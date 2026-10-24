@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cúntas</string>
+    <string name="title_activity_main">Cúntas</string>
+    <string name="package_name">ie.cuntas.app</string>
+    <string name="custom_url_scheme">ie.cuntas.app</string>
+</resources>

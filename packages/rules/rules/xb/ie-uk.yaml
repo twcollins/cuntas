@@ -14,3 +14,20 @@ transBorderRelief:
 isa:
   ref: "No Irish exemption for UK ISAs"
   source: https://www.expertsforexpats.com/advice/tax/ireland-uk-tax-guide-for-british-expats-in-ireland
+# What changes when a household member moves between Ireland and the UK. Shown by the residence what-if.
+relocation:
+  source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/
+  toUK:
+    - { topic: isa, text: "A UK ISA is tax-free again from the day you become UK resident.", source: https://www.gov.uk/individual-savings-accounts }
+    - { topic: funds, text: "Irish-domiciled ETFs fall under UK offshore fund rules: gains on funds without UK reporting status are taxed as income, not capital gains.", source: https://www.gov.uk/government/publications/offshore-funds-list-of-reporting-funds }
+    - { topic: pensions, text: "Irish occupational pensions, PRSAs and the Irish State Pension paid to a UK resident are taxed in the UK (DTA Art. 17).", source: https://www.irishtaxhub.ie/blog/taxation-of-foreign-pensions-in-ireland }
+    - { topic: investmentAccount, text: "The Irish Investment Account is for Irish residents; check what happens to it when you leave before moving.", source: https://www.rsm.global/ireland/node/768 }
+    - { topic: myFutureFund, text: "MyFutureFund contributions stop when you leave Irish employment; the pot stays invested.", source: https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/ }
+    - { topic: statePension, text: "Irish PRSI and UK NI records both count towards each country's State Pension under the Common Travel Area agreement.", source: https://www.gov.ie/en/publication/0cbbc-social-security-agreement-between-ireland-and-the-uk/ }
+  toIE:
+    - { topic: isa, text: "A UK ISA loses its tax exemption: income and gains are taxable in Ireland, and ISA funds may be exit-tax funds with deemed disposal.", source: https://www.expertsforexpats.com/advice/tax/ireland-uk-tax-guide-for-british-expats-in-ireland }
+    - { topic: pensions, text: "UK private and workplace pensions paid to an Irish resident are taxed only in Ireland (DTA Art. 17): claim relief at source from HMRC.", source: https://www.irishtaxhub.ie/blog/taxation-of-foreign-pensions-in-ireland }
+    - { topic: governmentPension, text: "UK government service pensions stay taxable in the UK unless you are an Irish national resident in Ireland (DTA Art. 18).", source: https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/ }
+    - { topic: gains, text: "UK temporary non-residence rules can tax gains made while abroad if you return to the UK within five years.", source: https://www.gov.uk/hmrc-internal-manuals/capital-gains-manual/cg26500 }
+    - { topic: lisa, text: "Lifetime ISA bonuses and withdrawal charges still apply; the Irish tax exemption does not.", source: https://www.gov.uk/lifetime-isa }
+    - { topic: statePension, text: "UK NI years already earned are kept; Class 3 voluntary contributions from abroad need ten years of UK residence or contributions.", source: https://www.crowe.com/uk/insights/changes-voluntary-national-insurance-abroad }

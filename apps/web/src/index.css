@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light dark; }
+:root { color-scheme: light; }
+:root.dark { color-scheme: dark; }
 body { font-feature-settings: "tnum" 0; -webkit-font-smoothing: antialiased; }
 .tabular-nums { font-variant-numeric: tabular-nums; }

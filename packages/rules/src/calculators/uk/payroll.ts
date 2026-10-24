@@ -1,7 +1,8 @@
 import { applyRate, divideMinor, sumMinor, toMinor } from "../../money";
 import { MONTHS_PER_YEAR } from "../../dates";
-import type { ExplainedLine, UkPack } from "../../packs";
+import { regionPackFor, type ExplainedLine, type StudentLoanPlan, type UkPack, type UkRegion } from "../../packs";
 import { bandedTax } from "../shared";
+import { ukStudentLoanRepayment } from "./studentLoan";
 
 export type UkRateBand = "basic" | "higher" | "additional";
 
@@ -20,12 +21,33 @@ export function ukRateBand(pack: UkPack, incomeMinor: number): UkRateBand {
   return "additional";
 }
 
-/** UK PAYE income tax and Class 1 employee NI for one tax year (England, Wales, NI). */
-export function ukPayroll(pack: UkPack, input: { grossAnnualMinor: number; pensionSalarySacrificeMinor?: number }) {
+/** Income tax bands for a region: Scottish taxpayers use the Scottish sub-pack for the same tax year. */
+export function ukIncomeTaxBands(pack: UkPack, region: UkRegion = "rUK") {
+  if (region === "rUK") {
+    return { version: pack.version, source: pack.incomeTax.source, exact: true, bands: pack.incomeTax.bands.map((b, i) => ({ ...b, name: `band ${i + 1}` })) };
+  }
+  const { pack: sub, exact } = regionPackFor(region, pack.taxYear);
+  return { version: sub.version, source: sub.incomeTax.source, exact, bands: sub.incomeTax.bands };
+}
+
+export interface UkPayrollInput {
+  grossAnnualMinor: number;
+  pensionSalarySacrificeMinor?: number;
+  /** Scottish taxpayers pay Scottish income tax; Wales and Northern Ireland follow the rUK bands. */
+  region?: UkRegion;
+  studentLoans?: readonly StudentLoanPlan[];
+}
+
+/** UK PAYE income tax, Class 1 employee NI and student loan repayments for one tax year. */
+export function ukPayroll(pack: UkPack, input: UkPayrollInput) {
+  const notes: string[] = [];
   const gross = input.grossAnnualMinor - (input.pensionSalarySacrificeMinor ?? 0);
   const pa = ukPersonalAllowance(pack, gross);
   const taxable = Math.max(0, gross - pa);
-  const bands = pack.incomeTax.bands.map((b) => ({ upToMinor: b.upTo === null ? null : toMinor(b.upTo), rate: b.rate }));
+  const region = input.region ?? "rUK";
+  const regional = ukIncomeTaxBands(pack, region);
+  if (!regional.exact) notes.push(`Scottish rates for ${pack.taxYear} are not published yet; using ${regional.version}.`);
+  const bands = regional.bands.map((b) => ({ upToMinor: b.upTo === null ? null : toMinor(b.upTo), rate: b.rate }));
   const banded = bandedTax(taxable, bands);
   const incomeTaxMinor = sumMinor(banded.map((b) => b.taxMinor));
 
@@ -37,13 +59,16 @@ export function ukPayroll(pack: UkPack, input: { grossAnnualMinor: number; pensi
   const lines: ExplainedLine[] = [
     { label: "Personal allowance", amountMinor: pa, rule: { pack: pack.version, key: "incomeTax.personalAllowance", source: pack.incomeTax.source } },
     ...banded.map((b, i) => ({
-      label: `Income tax band ${i + 1}`,
+      label: region === "rUK" ? `Income tax band ${i + 1}` : `Scottish ${regional.bands[i]?.name ?? ""} rate`,
       amountMinor: b.taxMinor,
-      rule: { pack: pack.version, key: `incomeTax.bands[${i}]`, source: pack.incomeTax.source, value: b.rate },
+      rule: { pack: regional.version, key: `incomeTax.bands[${i}]`, source: regional.source, value: b.rate },
     })),
     { label: "Employee National Insurance", amountMinor: niMinor, rule: { pack: pack.version, key: "nationalInsurance", source: ni.source } },
   ];
-  const netAnnualMinor = gross - incomeTaxMinor - niMinor;
+  const loans = ukStudentLoanRepayment(pack, { incomeMinor: gross, plans: input.studentLoans ?? [] });
+  for (const l of loans.lines) lines.push({ label: `Student loan (${l.plan})`, amountMinor: l.amountMinor, rule: l.rule });
+  notes.push(...loans.notes);
+  const netAnnualMinor = gross - incomeTaxMinor - niMinor - loans.totalMinor;
   const band = ukRateBand(pack, gross);
   const marginalRate = taxable === 0 ? 0 : (banded.filter((b) => b.portionMinor > 0).at(-1)?.rate ?? 0);
   return {
@@ -54,12 +79,14 @@ export function ukPayroll(pack: UkPack, input: { grossAnnualMinor: number; pensi
     personalAllowanceMinor: pa,
     incomeTaxMinor,
     niMinor,
+    studentLoanMinor: loans.totalMinor,
+    region,
     netAnnualMinor,
     netPerPeriodMinor: divideMinor(netAnnualMinor, MONTHS_PER_YEAR),
     marginalRate,
     rateBand: band,
     lines,
-    notes: ["Student loan repayments are not modelled yet."],
+    notes,
   };
 }
 

@@ -1,10 +1,18 @@
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 import { Layout } from "./components/Layout";
+import { AccountPage } from "./pages/Account";
 import { AccountsPage } from "./pages/Accounts";
+import { AdminPage } from "./pages/Admin";
+import { BillsPage } from "./pages/Bills";
+import { InvestingPage } from "./pages/Investing";
+import { RetirementPage } from "./pages/Retirement";
+import { WhatIfPage } from "./pages/WhatIf";
 import { BudgetsPage } from "./pages/Budgets";
 import { DebtsPage } from "./pages/Debts";
 import { GoalsPage } from "./pages/Goals";
+import { GuidePage } from "./pages/Guide";
 import { HouseholdPage } from "./pages/Household";
+import { HouseholdsPage } from "./pages/Households";
 import { ImportPage } from "./pages/Import";
 import { JoinPage } from "./pages/Join";
 import { OverviewPage } from "./pages/Overview";
@@ -21,14 +29,22 @@ const pages = [
   ["/plan", PlanPage],
   ["/transactions", TransactionsPage],
   ["/budgets", BudgetsPage],
+  ["/bills", BillsPage],
   ["/accounts", AccountsPage],
   ["/import", ImportPage],
   ["/debts", DebtsPage],
   ["/goals", GoalsPage],
   ["/pensions", PensionsPage],
+  ["/retirement", RetirementPage],
+  ["/investing", InvestingPage],
   ["/tax", TaxPage],
+  ["/what-if", WhatIfPage],
   ["/household", HouseholdPage],
+  ["/households", HouseholdsPage],
+  ["/account", AccountPage],
   ["/settings", SettingsPage],
+  ["/guide", GuidePage],
+  ["/admin", AdminPage],
   ["/join", JoinPage],
 ] as const;
 

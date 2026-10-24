@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { detectFileKind, importFile, PRESETS, readCsvHeaders, type ColumnMapping, type DateFormat, type ParsedStatement } from "@cuntas/importers";
+import { detectFileKind, guessMapping, importFile, PRESETS, readCsvHeaders, type ColumnMapping, type DateFormat, type ParsedStatement } from "@cuntas/importers";
 import { importStatement, newId } from "@cuntas/ledger";
 import { Badge, Button, Card, Field, Input, PageHeader, Select, Table } from "../components/ui";
 import { useAsOf } from "../lib/derived";
@@ -28,7 +28,9 @@ export function ImportPage() {
     if (detectFileKind(f.name, text) === "csv" && !p.preset) {
       const h = readCsvHeaders(text).headers;
       setHeaders(h);
-      setMapping({ date: h[0] ?? "", dateFormat: "DD/MM/YYYY", amount: h[1] ?? "", description: [h[2] ?? h[0] ?? ""], defaultCurrency: ds.household.baseCurrency });
+      const m = guessMapping(h, ds.household.baseCurrency);
+      setMapping(m);
+      setParsed(importFile(f.name, text, m));
     } else {
       setMapping(null);
     }

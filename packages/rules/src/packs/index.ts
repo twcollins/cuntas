@@ -1,5 +1,5 @@
 import { MANIFEST, RAW_PACKS } from "./generated";
-import type { ChartDefaults, Dated, IePack, Jurisdiction, RulePack, TreatyPack, UkPack } from "./types";
+import type { ChartDefaults, Dated, IePack, Jurisdiction, RulePack, TreatyPack, UkPack, UkRegion, UkRegionPack } from "./types";
 import type { IsoDate } from "../dates";
 
 export * from "./types";
@@ -46,6 +46,39 @@ export function taxYearOf(jurisdiction: Jurisdiction, date: IsoDate): string {
   if (jurisdiction === "IE") return String(year);
   const start = date.slice(5) >= "04-06" ? year : year - 1;
   return `${start}-${String(start + 1).slice(2)}`;
+}
+
+function isRegionPack(value: unknown): value is UkRegionPack {
+  return typeof value === "object" && value !== null && (value as { kind?: unknown }).kind === "ukRegion";
+}
+
+const regionPacks: UkRegionPack[] = Object.values(RAW_PACKS)
+  .filter(isRegionPack)
+  .sort((a, b) => a.effective.from.localeCompare(b.effective.from));
+
+export function listRegionPacks(region?: UkRegion): UkRegionPack[] {
+  return regionPacks.filter((p) => !region || p.region === region);
+}
+
+/**
+ * The regional sub-pack for a UK tax year. When the year has none yet it falls back to the latest
+ * earlier one and says so, because Scottish rates are set later than the UK Budget.
+ */
+export function regionPackFor(region: Exclude<UkRegion, "rUK">, taxYear: string): { pack: UkRegionPack; exact: boolean } {
+  const packs = listRegionPacks(region);
+  const exact = packs.find((p) => p.taxYear === taxYear);
+  if (exact) return { pack: exact, exact: true };
+  const earlier = [...packs].reverse().find((p) => p.taxYear < taxYear) ?? packs[0];
+  if (!earlier) throw new Error(`No ${region} rule pack loaded`);
+  return { pack: earlier, exact: false };
+}
+
+/** The latest pack on or before a date that defines an optional section. */
+export function latestWith<K extends keyof IePack>(jurisdiction: "IE", key: K, date: IsoDate): IePack | undefined;
+export function latestWith<K extends keyof UkPack>(jurisdiction: "UK", key: K, date: IsoDate): UkPack | undefined;
+export function latestWith(jurisdiction: Jurisdiction, key: string, date: IsoDate): RulePack | undefined {
+  return [...listPacks(jurisdiction)].reverse().find((p) => p.effective.from <= date && (p as unknown as Record<string, unknown>)[key] !== undefined)
+    ?? listPacks(jurisdiction).find((p) => (p as unknown as Record<string, unknown>)[key] !== undefined);
 }
 
 export function chartDefaults(): ChartDefaults {

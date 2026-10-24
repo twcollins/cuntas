@@ -7,6 +7,7 @@ import { ZodError } from "zod";
 import { MANIFEST } from "@cuntas/rules";
 import { sessionMiddleware } from "./auth";
 import type { AppDeps, Env } from "./deps";
+import { adminRoutes } from "./routes/admin";
 import { authRoutes } from "./routes/auth";
 import { householdRoutes } from "./routes/households";
 import { completeConnection } from "./services/bankSync";
@@ -17,7 +18,7 @@ export function createApp(deps: AppDeps) {
   const app = new OpenAPIHono<Env>();
 
   app.use("*", secureHeaders());
-  app.use("*", cors({ origin: deps.webOrigin, credentials: true }));
+  app.use("*", cors({ origin: [deps.webOrigin, ...(deps.extraOrigins ?? [])], credentials: true }));
   app.use("*", async (c, next) => {
     c.set("deps", deps);
     await next();
@@ -35,6 +36,7 @@ export function createApp(deps: AppDeps) {
   app.get("/health", (c) => c.json({ ok: true }));
   app.route("/auth", authRoutes);
   app.route("/", householdRoutes);
+  app.route("/", adminRoutes);
 
   app.get("/fx", async (c) => {
     const from = c.req.query("from") ?? "2000-01-01";

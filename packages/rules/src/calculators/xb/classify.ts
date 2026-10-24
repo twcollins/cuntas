@@ -91,7 +91,7 @@ export function classify(item: CrossBorderItem, member: CrossBorderMember, taxYe
       if (item.accountCountry === res) {
         return { taxedBy: [res], primary: res, method: "domestic", reference: t.articles.interest, notes, flags: [] };
       }
-      notes.push(`Interest on a ${item.accountCountry} account is taxable in ${res}; declare it on your return.`);
+      notes.push(`Interest on ${item.accountCountry === "IE" ? "an Irish" : "a UK"} account is taxable in ${res}; declare it on your return.`);
       return { taxedBy: [res], primary: res, method: "residence-only", reference: t.articles.interest, notes, flags: [other(res) === item.accountCountry ? "foreign-deposit-declare" : ""].filter(Boolean) };
     }
   }

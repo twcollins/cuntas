@@ -18,6 +18,7 @@ import {
   putDocument,
 } from "../services/households";
 import { listProviderTransactions, revokeConnection, startConnection, syncConnection } from "../services/bankSync";
+import { householdStatus, listMembers, MembershipError, removeMember, setMemberRole } from "../services/admin";
 
 const json = <T extends z.ZodTypeAny>(schema: T, description = "OK") => ({ description, content: { "application/json": { schema } } });
 const Household = z.object({ id: z.string().uuid(), name: z.string(), baseCurrency: z.enum(["EUR", "GBP"]) }).openapi("Household");
@@ -27,23 +28,37 @@ const Ok = z.object({ ok: z.boolean() });
 // The dataset is validated by @cuntas/ledger's zod schema inside the service.
 const DatasetBody = z.record(z.unknown()).openapi("Dataset");
 
-async function member(c: { var: Env["Variables"] }, householdId: string, owner = false) {
+/**
+ * Checks membership (and ownership when asked). A suspended household is read-only: members can
+ * still load and export their data, but not change it.
+ */
+async function member(c: { var: Env["Variables"] }, householdId: string, opts: { owner?: boolean; write?: boolean } = {}) {
   const user = c.var.user;
   if (!user) throw new HTTPException(401, { message: "Sign in required" });
   const m = await isMember(c.var.deps.db, user.id, householdId);
-  if (!m || (owner && m.role !== "owner")) throw new HTTPException(404, { message: "Household not found" });
-  return { householdId, userId: user.id };
+  if (!m || (opts.owner && m.role !== "owner")) throw new HTTPException(404, { message: "Household not found" });
+  const ctx = { householdId, userId: user.id };
+  if (opts.write !== false && (await householdStatus(c.var.deps.db, ctx))?.suspended) {
+    throw new HTTPException(423, { message: "This household is suspended by the administrator and is read-only" });
+  }
+  return ctx;
 }
 
 export const householdRoutes = new OpenAPIHono<Env>();
 
 householdRoutes.openapi(
-  createRoute({ method: "get", path: "/me", responses: { 200: json(z.object({ user: z.object({ id: z.string(), displayName: z.string() }), households: z.array(Household.extend({ role: z.string() })) })) } }),
+  createRoute({ method: "get", path: "/me", responses: { 200: json(z.object({ user: z.object({ id: z.string(), displayName: z.string(), isAdmin: z.boolean() }), households: z.array(Household.extend({ role: z.string(), suspended: z.boolean() })) })) } }),
   async (c) => {
     const user = c.var.user;
     if (!user) throw new HTTPException(401, { message: "Sign in required" });
     const households = await listHouseholds(c.var.deps.db, user.id);
-    return c.json({ user: { id: user.id, displayName: user.displayName }, households: households.map((h) => ({ ...h, baseCurrency: h.baseCurrency as "EUR" | "GBP" })) }, 200);
+    return c.json(
+      {
+        user: { id: user.id, displayName: user.displayName, isAdmin: user.isAdmin },
+        households: households.map(({ suspendedAt, ...h }) => ({ ...h, baseCurrency: h.baseCurrency as "EUR" | "GBP", suspended: suspendedAt !== null })),
+      },
+      200,
+    );
   },
 );
 
@@ -70,7 +85,7 @@ householdRoutes.openapi(
     responses: { 200: json(z.object({ version: z.number().int(), dataset: DatasetBody.nullable() })) },
   }),
   async (c) => {
-    const ctx = await member(c, c.req.valid("param").householdId);
+    const ctx = await member(c, c.req.valid("param").householdId, { write: false });
     const doc = await getDocument(c.var.deps.db, c.var.deps.kek, ctx);
     return c.json(doc as never, 200);
   },
@@ -96,11 +111,66 @@ householdRoutes.openapi(
 );
 
 householdRoutes.openapi(
-  createRoute({ method: "post", path: "/households/{householdId}/invites", request: { params: HouseholdParam }, responses: { 201: json(z.object({ url: z.string() }), "Invite link") } }),
+  createRoute({
+    method: "post",
+    path: "/households/{householdId}/invites",
+    request: { params: HouseholdParam, query: z.object({ role: z.enum(["owner", "member"]).optional() }) },
+    responses: { 201: json(z.object({ url: z.string() }), "Invite link") },
+  }),
   async (c) => {
-    const ctx = await member(c, c.req.valid("param").householdId, true);
-    const token = await createInvite(c.var.deps.db, ctx);
+    const ctx = await member(c, c.req.valid("param").householdId, { owner: true });
+    const token = await createInvite(c.var.deps.db, ctx, { role: c.req.valid("query").role ?? "member" });
     return c.json({ url: `${c.var.deps.webOrigin}/join#${token}` }, 201);
+  },
+);
+
+// Members: everyone can see who shares the household; owners change roles and remove people;
+// anyone can leave.
+
+const MemberParam = HouseholdParam.extend({ userId: z.string().uuid() });
+const MemberRow = z.object({ userId: z.string(), displayName: z.string(), role: z.string(), joinedAt: z.string() }).openapi("HouseholdMember");
+
+householdRoutes.openapi(
+  createRoute({ method: "get", path: "/households/{householdId}/members", request: { params: HouseholdParam }, responses: { 200: json(z.array(MemberRow)) } }),
+  async (c) => {
+    const ctx = await member(c, c.req.valid("param").householdId, { write: false });
+    return c.json(await listMembers(c.var.deps.db, ctx), 200);
+  },
+);
+
+householdRoutes.openapi(
+  createRoute({
+    method: "patch",
+    path: "/households/{householdId}/members/{userId}",
+    request: { params: MemberParam, body: { content: { "application/json": { schema: z.object({ role: z.enum(["owner", "member"]) }) } } } },
+    responses: { 200: json(Ok), 409: json(z.object({ error: z.string() }), "Would leave no owner") },
+  }),
+  async (c) => {
+    const p = c.req.valid("param");
+    const ctx = await member(c, p.householdId, { owner: true });
+    try {
+      await setMemberRole(c.var.deps.db, ctx, p.userId, c.req.valid("json").role);
+      return c.json({ ok: true }, 200);
+    } catch (e) {
+      if (e instanceof MembershipError) return c.json({ error: e.message }, 409);
+      throw e;
+    }
+  },
+);
+
+householdRoutes.openapi(
+  createRoute({ method: "delete", path: "/households/{householdId}/members/{userId}", request: { params: MemberParam }, responses: { 200: json(Ok), 409: json(z.object({ error: z.string() }), "Would leave no owner") } }),
+  async (c) => {
+    const p = c.req.valid("param");
+    const self = c.var.user?.id === p.userId;
+    const ctx = await member(c, p.householdId, { owner: !self, write: false });
+    try {
+      await removeMember(c.var.deps.db, ctx, p.userId);
+      return c.json({ ok: true }, 200);
+    } catch (e) {
+      if (e instanceof MembershipError) return c.json({ error: e.message }, 409);
+      throw e;
+    }
   },
 );
 
@@ -125,7 +195,7 @@ householdRoutes.openapi(
 householdRoutes.openapi(
   createRoute({ method: "get", path: "/households/{householdId}/export", request: { params: HouseholdParam }, responses: { 200: json(DatasetBody, "Full JSON export") } }),
   async (c) => {
-    const ctx = await member(c, c.req.valid("param").householdId);
+    const ctx = await member(c, c.req.valid("param").householdId, { write: false });
     requireRecentAuth(c.var.user!);
     const doc = await getDocument(c.var.deps.db, c.var.deps.kek, ctx);
     await withTenant(c.var.deps.db, ctx, (tx) => audit(tx, { householdId: ctx.householdId, actor: ctx.userId, action: "export", entity: "household" }));
@@ -137,7 +207,8 @@ householdRoutes.openapi(
 householdRoutes.openapi(
   createRoute({ method: "delete", path: "/households/{householdId}", request: { params: HouseholdParam }, responses: { 200: json(Ok, "Deleted everything") } }),
   async (c) => {
-    const ctx = await member(c, c.req.valid("param").householdId, true);
+    // Deleting everything stays possible while suspended: people can always take their data away.
+    const ctx = await member(c, c.req.valid("param").householdId, { owner: true, write: false });
     requireRecentAuth(c.var.user!);
     const { db } = c.var.deps;
     const list = await withTenant(db, ctx, (tx) => tx.select({ id: connections.id }).from(connections));
@@ -158,7 +229,7 @@ householdRoutes.openapi(
     responses: { 200: json(z.array(z.object({ id: z.string(), name: z.string(), country: z.string() }))) },
   }),
   async (c) => {
-    await member(c, c.req.valid("param").householdId);
+    await member(c, c.req.valid("param").householdId, { write: false });
     return c.json(await c.var.deps.provider.listInstitutions(c.req.valid("query").country), 200);
   },
 );
@@ -190,7 +261,7 @@ householdRoutes.openapi(
     },
   }),
   async (c) => {
-    const ctx = await member(c, c.req.valid("param").householdId);
+    const ctx = await member(c, c.req.valid("param").householdId, { write: false });
     const rows = await withTenant(c.var.deps.db, ctx, (tx) => tx.select().from(connections).where(eq(connections.householdId, ctx.householdId)));
     return c.json(rows.map((r) => ({ id: r.id, institutionName: r.institutionName, status: r.status, consentExpiresAt: r.consentExpiresAt, lastSyncedAt: r.lastSyncedAt, accounts: r.accounts })), 200);
   },
@@ -214,7 +285,7 @@ householdRoutes.openapi(
   }),
   async (c) => {
     const p = c.req.valid("param");
-    const ctx = await member(c, p.householdId);
+    const ctx = await member(c, p.householdId, { write: false });
     return c.json((await listProviderTransactions(c.var.deps, ctx, p.connectionId, c.req.valid("query").since)) as never, 200);
   },
 );

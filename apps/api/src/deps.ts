@@ -11,6 +11,10 @@ export interface AppDeps {
   webOrigin: string;
   apiOrigin: string;
   secureCookies: boolean;
+  /** Further origins allowed by CORS, e.g. the native apps' capacitor://localhost and https://localhost. */
+  extraOrigins?: string[];
+  /** SameSite=None; Secure cookies, needed when the app runs on a different site, as the native apps do. */
+  crossSiteCookies?: boolean;
   rulesSigningKey?: string;
   fetch?: typeof fetch;
   now?: () => Date;
@@ -19,6 +23,6 @@ export interface AppDeps {
 export type Env = {
   Variables: {
     deps: AppDeps;
-    user: { id: string; displayName: string; sessionId: string; reauthAt: string } | null;
+    user: { id: string; displayName: string; sessionId: string; reauthAt: string; isAdmin: boolean } | null;
   };
 };

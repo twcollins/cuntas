@@ -14,6 +14,8 @@ import {
   ukIsaCheck,
   ukPayroll,
   type CrossBorderItem,
+  type StudentLoanPlan,
+  type UkRegion,
   type ExplainedLine,
   type IeAssessment,
   type PayFrequency,
@@ -22,6 +24,9 @@ import { Badge, Button, Card, Disclaimer, Field, Input, MoneyInput, PageHeader, 
 import { useAsOf } from "../lib/derived";
 import { formatDate, money, moneyExact, pct } from "../lib/format";
 import { useDataset } from "../lib/store";
+import { PayslipCheckCard } from "./tax/PayslipCheck";
+import { SelfAssessmentCard } from "./tax/SelfAssessment";
+import { StudentLoanPicker } from "./tax/StudentLoanPicker";
 
 export function TaxPage() {
   return (
@@ -29,6 +34,8 @@ export function TaxPage() {
       <PageHeader title="Tax centre" subtitle="Calculators driven by versioned Irish and UK rule packs. Each figure links to the rule and source it came from." />
       <div className="space-y-4">
         <TakeHome />
+        <SelfAssessmentCard />
+        <PayslipCheckCard />
         <div className="grid gap-4 lg:grid-cols-2">
           <Deadlines />
           <IsaChecker />
@@ -56,18 +63,21 @@ function TakeHome() {
   const [pensionPct, setPensionPct] = useState(0);
   const [mff, setMff] = useState(false);
   const [rent, setRent] = useState(0);
+  const [employment, setEmployment] = useState<"employee" | "selfEmployed">(first?.employmentType === "selfEmployed" ? "selfEmployed" : "employee");
+  const [region, setRegion] = useState<UkRegion>(first?.ukRegion ?? "rUK");
+  const [loans, setLoans] = useState<StudentLoanPlan[]>(first?.studentLoans ?? []);
   const yearValid = packs.some((p) => p.taxYear === year) ? year : packs.at(-1)!.taxYear;
 
   const result = useMemo(() => {
     if (j === "IE") {
       const pack = getPack("IE", yearValid);
-      const r = iePayroll(pack, { grossAnnualMinor: gross, frequency: freq, assessment, spouseGrossAnnualMinor: spouse, employment: "employee", age, pensionEmployeeMinor: applyRate(gross, pensionPct / 100), myFutureFund: mff, rentPaidMinor: rent });
+      const r = iePayroll(pack, { grossAnnualMinor: gross, frequency: freq, assessment, spouseGrossAnnualMinor: spouse, employment, age, pensionEmployeeMinor: applyRate(gross, pensionPct / 100), myFutureFund: mff, rentPaidMinor: rent });
       return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: r.periods, marginal: r.marginalRate, lines: r.lines, notes: r.notes, rows: [["Income tax", r.incomeTaxMinor], ["USC", r.uscMinor], ["PRSI", r.prsiMinor], ["Pension", r.pensionEmployeeMinor], ["MyFutureFund", r.myFutureFund.employeeMinor]] as [string, number][] };
     }
     const pack = getPack("UK", yearValid);
-    const r = ukPayroll(pack, { grossAnnualMinor: gross });
-    return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: 12, marginal: r.marginalRate, lines: r.lines, notes: r.notes, rows: [["Income tax", r.incomeTaxMinor], ["National Insurance", r.niMinor]] as [string, number][] };
-  }, [j, yearValid, gross, freq, assessment, spouse, age, pensionPct, mff, rent]);
+    const r = ukPayroll(pack, { grossAnnualMinor: gross, region, studentLoans: loans });
+    return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: 12, marginal: r.marginalRate, lines: r.lines, notes: r.notes, rows: [[region === "scotland" ? "Scottish income tax" : "Income tax", r.incomeTaxMinor], ["National Insurance", r.niMinor], ["Student loan", r.studentLoanMinor]] as [string, number][] };
+  }, [j, yearValid, gross, freq, assessment, spouse, age, pensionPct, mff, rent, employment, region, loans]);
   const cur = j === "IE" ? "EUR" : "GBP";
 
   return (
@@ -75,13 +85,13 @@ function TakeHome() {
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Rules">{(id) => <Select id={id} value={j} onChange={(e) => { setJ(e.target.value as "IE" | "UK"); setYear(e.target.value === "IE" ? packOn("IE", asOf).taxYear : packOn("UK", asOf).taxYear); }} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK (rUK)" }]} />}</Field>
+            <Field label="Rules">{(id) => <Select id={id} value={j} onChange={(e) => { setJ(e.target.value as "IE" | "UK"); setYear(e.target.value === "IE" ? packOn("IE", asOf).taxYear : packOn("UK", asOf).taxYear); }} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />}</Field>
             <Field label="Tax year">{(id) => <Select id={id} value={yearValid} onChange={(e) => setYear(e.target.value)} options={packs.map((p) => ({ value: p.taxYear, label: p.taxYear }))} />}</Field>
           </div>
           {ds.members.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {ds.members.map((m) => (
-                <Button key={m.id} variant="ghost" className="text-xs" onClick={() => { setGross(m.grossAnnualMinor); setAge(ageOn(m.dateOfBirth, asOf)); setAssessment(m.assessment); const plan = ds.pensionPlans.find((p) => p.memberId === m.id && p.isEmployerScheme); setPensionPct((plan?.employeeRate ?? 0) * 100); }}>Use {m.name}</Button>
+                <Button key={m.id} variant="ghost" className="text-xs" onClick={() => { setGross(m.grossAnnualMinor); setAge(ageOn(m.dateOfBirth, asOf)); setAssessment(m.assessment); setEmployment(m.employmentType === "selfEmployed" ? "selfEmployed" : "employee"); setRegion(m.ukRegion); setLoans(m.studentLoans); const plan = ds.pensionPlans.find((p) => p.memberId === m.id && p.isEmployerScheme); setPensionPct((plan?.employeeRate ?? 0) * 100); }}>Use {m.name}</Button>
               ))}
             </div>
           )}
@@ -98,7 +108,14 @@ function TakeHome() {
                 <Field label="Pension (% of pay)">{(id) => <Input id={id} type="number" step={0.5} min={0} value={pensionPct} onChange={(e) => setPensionPct(Number(e.target.value))} />}</Field>
                 <Field label="Rent paid a year">{(id) => <MoneyInput id={id} value={rent} onChange={setRent} />}</Field>
               </div>
+              <Field label="Work">{(id) => <Select id={id} value={employment} onChange={(e) => setEmployment(e.target.value as "employee" | "selfEmployed")} options={[{ value: "employee", label: "Employee (PAYE, Class A1 PRSI)" }, { value: "selfEmployed", label: "Self-employed (Class S PRSI)" }]} />}</Field>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={mff} onChange={(e) => setMff(e.target.checked)} />Enrolled in MyFutureFund</label>
+            </>
+          )}
+          {j === "UK" && (
+            <>
+              <Field label="Income tax">{(id) => <Select id={id} value={region} onChange={(e) => setRegion(e.target.value as UkRegion)} options={[{ value: "rUK", label: "England, Wales, Northern Ireland" }, { value: "scotland", label: "Scotland (Scottish taxpayer)" }]} />}</Field>
+              <StudentLoanPicker value={loans} onChange={setLoans} />
             </>
           )}
         </div>
@@ -142,6 +159,7 @@ function Deadlines() {
     { label: `Form 11 / ROS for ${year - 1} (and pension relief for ${year - 1})`, date: deadlineFor(year - 1, ie.deadlines.form11), j: "IE" },
     ...ie.cgt.payment.map((p) => ({ label: `CGT on ${p.disposalsThroughMonth === 12 ? "December" : "January to November"} ${ie.taxYear} disposals`, date: deadlineFor(Number(ie.taxYear), { monthDay: p.dueMonthDay, yearOffset: p.yearOffset }), j: "IE" })),
     { label: `Form 11 for ${year}`, date: deadlineFor(year, ie.deadlines.form11), j: "IE" },
+    ...(ie.selfAssessment ? [{ label: `Preliminary tax for ${year} (self-employed)`, date: deadlineFor(year, ie.selfAssessment.preliminaryDue), j: "IE" }] : []),
     { label: `UK self assessment ${uk.taxYear}`, date: deadlineFor(Number(uk.taxYear.slice(0, 4)), uk.deadlines.selfAssessmentOnline), j: "UK" },
   ].sort((a, b) => a.date.localeCompare(b.date));
   return (

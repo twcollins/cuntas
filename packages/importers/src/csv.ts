@@ -7,7 +7,21 @@ import type { ColumnMapping, CsvPreset, ParsedStatement, ParsedTransaction } fro
 /** Finds the most specific preset whose signature headers are all present. */
 export function detectPreset(headers: string[]): CsvPreset | undefined {
   const have = new Set(headers.map(normaliseHeader));
-  return PRESETS.filter((p) => p.signature.every((s) => have.has(s))).sort((a, b) => b.signature.length - a.signature.length)[0];
+  return PRESETS.filter((p) => !p.headerless && p.signature.every((s) => have.has(s))).sort((a, b) => b.signature.length - a.signature.length)[0];
+}
+
+/** Finds a preset for a file with no header row by checking the shape of every row. */
+export function detectHeaderlessPreset(rows: string[][]): CsvPreset | undefined {
+  const data = rows.filter((r) => r.some((c) => c.trim()));
+  if (data.length === 0) return undefined;
+  return PRESETS.find((p) => {
+    const cols = p.headerless;
+    if (!cols) return false;
+    const at = (name?: string) => (name ? cols.findIndex((c) => normaliseHeader(c) === normaliseHeader(name)) : -1);
+    const d = at(p.date);
+    const a = at(p.amount);
+    return data.every((r) => r.length === cols.length && parseDate(r[d]?.trim() ?? "", p.dateFormat) !== null && parseAmount(r[a]?.trim() ?? "", p.decimalComma) !== null);
+  });
 }
 
 export function readCsvHeaders(text: string): { headers: string[]; sample: string[][] } {
@@ -15,12 +29,42 @@ export function readCsvHeaders(text: string): { headers: string[]; sample: strin
   return { headers: (rows[0] ?? []).map((h) => h.trim()), sample: rows.slice(1, 6) };
 }
 
+const HEADER_GUESSES: Record<"date" | "description" | "amount" | "debit" | "credit", RegExp> = {
+  date: /date|when/,
+  description: /desc|narrative|details|memo|reference|payee|merchant|what/,
+  amount: /amount|value|sum/,
+  debit: /debit|moneyout|paidout|withdraw|out$/,
+  credit: /credit|moneyin|paidin|lodge|deposit|in$/,
+};
+
+/** A starting column mapping for an unrecognised CSV, guessed from header names. */
+export function guessMapping(headers: string[], defaultCurrency: Currency): ColumnMapping {
+  const find = (key: keyof typeof HEADER_GUESSES, skip: string[] = []) =>
+    headers.find((h) => !skip.includes(h) && HEADER_GUESSES[key].test(normaliseHeader(h)));
+  const date = find("date") ?? headers[0] ?? "";
+  const debit = find("debit", [date]);
+  const credit = find("credit", [date, ...(debit ? [debit] : [])]);
+  const used = [date, debit, credit].filter((h): h is string => !!h);
+  const description = find("description", used) ?? headers.find((h) => !used.includes(h)) ?? date;
+  const split = debit && credit;
+  const amount = split ? undefined : (find("amount", [...used, description]) ?? headers.find((h) => ![...used, description].includes(h)));
+  return { date, dateFormat: "DD/MM/YYYY", description: [description], defaultCurrency, ...(split ? { debit, credit } : { amount }) };
+}
+
 const asCurrency = (v: string | undefined, fallback: Currency): Currency => (v === "EUR" || v === "GBP" ? v : fallback);
 
 export function importCsv(text: string, mapping?: ColumnMapping & { id?: string }): ParsedStatement {
-  const rows = parseCsv(text);
-  const headers = (rows[0] ?? []).map((h) => h.trim());
-  const preset = mapping ?? detectPreset(headers);
+  let rows = parseCsv(text);
+  let headers = (rows[0] ?? []).map((h) => h.trim());
+  let preset: (ColumnMapping & { id?: string }) | undefined = mapping ?? detectPreset(headers);
+  if (!preset) {
+    const headerless = detectHeaderlessPreset(rows);
+    if (headerless?.headerless) {
+      preset = headerless;
+      headers = headerless.headerless;
+      rows = [headers, ...rows];
+    }
+  }
   if (!preset) {
     return { format: "csv", transactions: [], warnings: ["Unrecognised layout: map the columns to import this file."] };
   }
@@ -54,6 +98,12 @@ export function importCsv(text: string, mapping?: ColumnMapping & { id?: string 
     }
     const rawDescription = preset.description.map((d) => col(row, d)).filter(Boolean).join(" ").trim();
     const balance = preset.balance ? parseAmount(col(row, preset.balance) ?? "", preset.decimalComma) : null;
+    const prev = parsed.at(-1);
+    if (preset.detailRows && amount === 0 && prev?.bookedAt === date) {
+      prev.rawDescription = [prev.rawDescription, rawDescription].filter(Boolean).join(" ");
+      if (balance !== null) prev.balanceMinor = balance;
+      return;
+    }
     const externalId = preset.externalId ? col(row, preset.externalId) : undefined;
     parsed.push({
       bookedAt: date,

@@ -12,6 +12,7 @@ const TYPES: { value: Goal["type"]; label: string }[] = [
   { value: "sinkingFund", label: "Required purchase (sinking fund)" },
   { value: "houseDeposit", label: "House deposit" },
   { value: "college", label: "Children's college fund" },
+  { value: "taxSetAside", label: "Tax set-aside (self-employed)" },
   { value: "other", label: "Other goal" },
 ];
 

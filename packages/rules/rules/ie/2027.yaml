@@ -39,6 +39,16 @@ prsi:
     - { from: "2027-10-01", rate: 0.045 }
   weeklyExemptionThreshold: 352
   credit: { upperWeeklyThreshold: 424, maxWeekly: 12, taperDivisor: 6 }
+  # Class S (self-employed): charged on all reckonable income once it exceeds the threshold.
+  # A mid-year rate change applies month by month, as Revenue did for 2024 (4.025%).
+  classS:
+    source: https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/prsi-for-self-employed-people/
+    status: provisional
+    rates:
+      - { from: "2027-01-01", rate: 0.0435 }
+      - { from: "2027-10-01", rate: 0.045 }
+    incomeThreshold: 5000
+    minimumContribution: 650
 
 pension:
   source: https://revenue.ie/en/jobs-and-pensions/pension/relief/tax-relief-limits.aspx
@@ -52,6 +62,13 @@ pension:
     - { minAge: 60, rate: 0.40 }
   reliefClaimDeadline: { monthDay: "10-31", yearOffset: 1 }
   statePensionAge: 66
+  # Retirement lump sum: 25% of the fund, first EUR 200,000 tax-free, the next EUR 300,000 at the standard rate.
+  lumpSum:
+    source: https://www.revenue.ie/en/jobs-and-pensions/pensions/lump-sum-payments.aspx
+    status: provisional
+    share: 0.25
+    taxFreeMax: 200000
+    standardRateTop: 500000
 
 myFutureFund:
   source: https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/
@@ -108,3 +125,21 @@ minimumWage:
 deadlines:
   source: https://revenue.ie/en/jobs-and-pensions/pension/relief/tax-relief-limits.aspx
   form11: { monthDay: "10-31", yearOffset: 1 }
+
+statePension:
+  source: https://www.citizensinformation.ie/en/social-welfare/older-and-retired-people/state-pension-contributory/
+  status: provisional
+  maxWeeklyContributory: 309.30
+  contributionYearsForMax: 40
+  minimumContributionYears: 10
+
+# Self-assessment (Form 11): preliminary tax for a year is due by 31 October of that year, with the
+# return and balance for the year before. Pay the lowest of the three bases.
+selfAssessment:
+  source: https://www.revenue.ie/en/self-assessment-and-self-employment/preliminary-tax/index.aspx
+  status: provisional
+  preliminaryTax:
+    currentYearShare: 0.90
+    priorYearShare: 1.00
+    prePrecedingYearShare: 1.05
+  preliminaryDue: { monthDay: "10-31", yearOffset: 0 }

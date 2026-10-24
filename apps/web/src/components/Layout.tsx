@@ -1,53 +1,163 @@
 import { Link, Outlet } from "@tanstack/react-router";
-import { useState } from "react";
-import { useStore } from "../lib/store";
+import { useEffect, useRef, useState } from "react";
+import { switchHousehold, useStore } from "../lib/store";
+import { setTheme, useTheme, type ThemePreference } from "../lib/theme";
 import { cx } from "./ui";
 
-const NAV = [
-  { to: "/", label: "Overview", icon: "◎" },
-  { to: "/plan", label: "Next steps", icon: "↗" },
-  { to: "/transactions", label: "Transactions", icon: "≡" },
-  { to: "/budgets", label: "Budgets", icon: "▤" },
-  { to: "/accounts", label: "Accounts", icon: "▣" },
-  { to: "/import", label: "Import", icon: "⇪" },
-  { to: "/debts", label: "Debts", icon: "↘" },
-  { to: "/goals", label: "Goals", icon: "◆" },
-  { to: "/pensions", label: "Pensions", icon: "☂" },
-  { to: "/tax", label: "Tax centre", icon: "§" },
-  { to: "/household", label: "Household", icon: "⌂" },
-  { to: "/settings", label: "Data & sync", icon: "⚙" },
-] as const;
+type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean };
+
+const NAV: { group: string; items: NavItem[] }[] = [
+  {
+    group: "Money",
+    items: [
+      { to: "/", label: "Overview", icon: "◎" },
+      { to: "/plan", label: "Next steps", icon: "↗" },
+      { to: "/transactions", label: "Transactions", icon: "≡" },
+      { to: "/budgets", label: "Budgets", icon: "▤" },
+      { to: "/bills", label: "Bills", icon: "↻" },
+      { to: "/accounts", label: "Accounts", icon: "▣" },
+      { to: "/import", label: "Import", icon: "⇪" },
+    ],
+  },
+  {
+    group: "Plan",
+    items: [
+      { to: "/debts", label: "Debts", icon: "↘" },
+      { to: "/goals", label: "Goals", icon: "◆" },
+      { to: "/pensions", label: "Pensions", icon: "☂" },
+      { to: "/retirement", label: "Retirement", icon: "◔" },
+      { to: "/investing", label: "Compare wrappers", icon: "⚖" },
+    ],
+  },
+  {
+    group: "Tax",
+    items: [
+      { to: "/tax", label: "Tax centre", icon: "§" },
+      { to: "/what-if", label: "What if we moved", icon: "⇄" },
+    ],
+  },
+  {
+    group: "Household",
+    items: [
+      { to: "/household", label: "Household", icon: "⌂" },
+      { to: "/households", label: "Households", icon: "⌘" },
+      { to: "/account", label: "Account & sync", icon: "⇅" },
+      { to: "/settings", label: "Settings", icon: "⚙" },
+      { to: "/guide", label: "Guide", icon: "?" },
+      { to: "/admin", label: "Server admin", icon: "⛭", adminOnly: true },
+    ],
+  },
+];
+
+const THEMES: { value: ThemePreference; label: string; icon: string }[] = [
+  { value: "light", label: "Light", icon: "☀" },
+  { value: "system", label: "System", icon: "◐" },
+  { value: "dark", label: "Dark", icon: "☾" },
+];
+
+export function ThemeSwitch({ className }: { className?: string }) {
+  const { preference } = useTheme();
+  return (
+    <div role="radiogroup" aria-label="Colour theme" className={cx("inline-flex rounded-lg border border-stone-200 p-0.5 dark:border-stone-700", className)}>
+      {THEMES.map((t) => (
+        <button
+          key={t.value}
+          type="button"
+          role="radio"
+          aria-checked={preference === t.value}
+          title={`${t.label} theme`}
+          aria-label={`${t.label} theme`}
+          onClick={() => setTheme(t.value)}
+          className={cx(
+            "rounded-md px-2 py-1 text-xs",
+            preference === t.value ? "bg-stone-100 font-medium text-stone-900 dark:bg-stone-700 dark:text-stone-50" : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100",
+          )}
+        >
+          <span aria-hidden>{t.icon}</span> {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** The sidebar header: the open household, and a menu to switch, add or manage households. */
+function HouseholdSwitcher({ onNavigate }: { onNavigate: () => void }) {
+  const { dataset, households, activeId } = useStore();
+  const [menu, setMenu] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !ref.current?.contains(e.target as Node)) setMenu(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [menu]);
+  const item = "block w-full rounded-md px-3 py-1.5 text-left text-sm hover:bg-stone-100 dark:hover:bg-stone-800";
+  return (
+    <div ref={ref} className="relative mb-6">
+      <button type="button" aria-haspopup="menu" aria-expanded={menu} aria-label={`Household: ${dataset?.household.name ?? ""}. Switch household`} onClick={() => setMenu(!menu)} className="flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left hover:bg-stone-100 dark:hover:bg-stone-800">
+        <img src="/icon.svg" alt="" className="h-8 w-8" />
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold leading-tight">Cúntas</div>
+          <div className="truncate text-xs text-stone-500">{dataset?.household.name}</div>
+        </div>
+        <span aria-hidden className="text-xs text-stone-400">▾</span>
+      </button>
+      {menu && (
+        <div role="menu" className="absolute inset-x-0 top-full z-50 mt-1 rounded-lg border border-stone-200 bg-white p-1 shadow-lg dark:border-stone-700 dark:bg-stone-900">
+          {households.map((h) => (
+            <button key={h.id} type="button" role="menuitemradio" aria-checked={h.id === activeId} className={cx(item, "flex items-center justify-between gap-2")} onClick={() => { setMenu(false); onNavigate(); void switchHousehold(h.id); }}>
+              <span className="truncate">{h.name}</span>
+              {h.id === activeId && <span aria-hidden className="text-brand-700 dark:text-brand-500">✓</span>}
+            </button>
+          ))}
+          <div className="my-1 border-t border-stone-100 dark:border-stone-800" />
+          <Link to="/households" role="menuitem" className={item} onClick={() => { setMenu(false); onNavigate(); }}>Add or manage households</Link>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Layout() {
-  const { dataset, sync } = useStore();
+  const { sync, account } = useStore();
   const [open, setOpen] = useState(false);
   return (
     <div className="min-h-screen md:flex">
-      <aside className={cx("fixed inset-y-0 left-0 z-40 w-60 transform border-r border-stone-200 bg-white p-4 transition md:static md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")}>
-        <div className="mb-6 flex items-center gap-2 px-2">
-          <img src="/icon.svg" alt="" className="h-8 w-8" />
-          <div>
-            <div className="font-semibold leading-tight">Cúntas</div>
-            <div className="max-w-[10rem] truncate text-xs text-stone-500">{dataset?.household.name}</div>
-          </div>
-        </div>
-        <nav className="space-y-0.5" aria-label="Main">
-          {NAV.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-              activeProps={{ className: "bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-100" }}
-              activeOptions={{ exact: n.to === "/" }}
-            >
-              <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>
-              {n.label}
-            </Link>
-          ))}
+      <aside className={cx("fixed inset-y-0 left-0 z-40 flex w-60 transform flex-col border-r border-stone-200 bg-white p-4 transition md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")}>
+        <HouseholdSwitcher onNavigate={() => setOpen(false)} />
+        <nav className="-mx-1 flex-1 space-y-3 overflow-y-auto px-1" aria-label="Main">
+          {NAV.map((g) => {
+            const items = g.items.filter((n) => !n.adminOnly || account?.isAdmin);
+            return (
+              <div key={g.group}>
+                <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">{g.group}</div>
+                <div className="space-y-0.5">
+                  {items.map((n) => (
+                    <Link
+                      key={n.to}
+                      to={n.to}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 rounded-lg px-3 py-1 text-sm text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
+                      activeProps={{ className: "bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-100" }}
+                      activeOptions={{ exact: n.to === "/" }}
+                    >
+                      <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>
+                      {n.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
-        <div className="absolute bottom-4 left-4 right-4 text-xs text-stone-500">
-          {sync ? (sync.dirty ? "● Changes not yet synced" : "✓ Synced") : "Stored on this device only"}
+        <div className="mt-4 space-y-2 border-t border-stone-100 pt-3 text-xs text-stone-500 dark:border-stone-800">
+          <div>{sync ? (sync.dirty ? "● Changes not yet synced" : "✓ Synced") : "Stored on this device only"}</div>
         </div>
       </aside>
       {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} />}

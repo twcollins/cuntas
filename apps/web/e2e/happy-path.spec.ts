@@ -40,7 +40,7 @@ test("demo household: next step, import without duplicates, recategorise, export
   await expect(page.getByLabel("Category for Insomnia Coffee").last()).toHaveValue("cat_entertainment");
 
   // Export downloads a JSON file.
-  await go(page, "Data & sync");
+  await go(page, "Settings");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export JSON" }).click();
   expect((await download).suggestedFilename()).toMatch(/^cuntas-.*\.json$/);
@@ -62,7 +62,7 @@ test("new household: take-home pay matches the golden EUR 50,000 case", async ({
 test("delete everything returns to onboarding", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Open demo" }).click();
-  await go(page, "Data & sync");
+  await go(page, "Settings");
   await page.getByLabel("Type DELETE to confirm").fill("DELETE");
   await page.getByRole("button", { name: "Delete all data" }).click();
   await expect(page.getByRole("button", { name: "Open demo" })).toBeVisible();

@@ -52,7 +52,7 @@ export async function listHouseholds(db: Db, userId: string) {
   const out = [];
   for (const m of mine) {
     const [h] = await withTenant(db, { householdId: m.householdId, userId }, (tx) =>
-      tx.select({ id: households.id, name: households.name, baseCurrency: households.baseCurrency }).from(households),
+      tx.select({ id: households.id, name: households.name, baseCurrency: households.baseCurrency, suspendedAt: households.suspendedAt }).from(households),
     );
     if (h) out.push({ ...h, role: m.role });
   }
@@ -84,16 +84,18 @@ export async function putDocument(db: Db, kek: Buffer, ctx: { householdId: strin
   });
 }
 
-export async function createInvite(db: Db, ctx: { householdId: string; userId: string }, ttlHours = 72) {
+export async function createInvite(db: Db, ctx: { householdId: string; userId: string }, opts: { role?: "owner" | "member"; ttlHours?: number } = {}) {
   const token = randomToken();
+  const role = opts.role ?? "member";
   await withTenant(db, ctx, async (tx) => {
     await tx.insert(invites).values({
       tokenHash: sha256(token),
       householdId: ctx.householdId,
       createdBy: ctx.userId,
-      expiresAt: new Date(Date.now() + ttlHours * 3_600_000).toISOString(),
+      role,
+      expiresAt: new Date(Date.now() + (opts.ttlHours ?? 72) * 3_600_000).toISOString(),
     });
-    await audit(tx, { householdId: ctx.householdId, actor: ctx.userId, action: "invite.create", entity: "invite" });
+    await audit(tx, { householdId: ctx.householdId, actor: ctx.userId, action: `invite.create.${role}`, entity: "invite" });
   });
   return token;
 }

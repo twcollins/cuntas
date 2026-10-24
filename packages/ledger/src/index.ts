@@ -13,4 +13,7 @@ export * from "./goals";
 export * from "./snapshot";
 export * from "./dataset";
 export * from "./io";
+export * from "./recurring";
+export * from "./retirement";
+export * from "./whatIf";
 export { createDemoDataset } from "./demo";

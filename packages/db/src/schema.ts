@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   displayName: text("display_name").notNull(),
   email: text("email").unique(),
+  /** Set only by the admin CLI as the table owner; the API role cannot write it. */
+  isAdmin: boolean("is_admin").notNull().default(false),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
@@ -41,6 +43,7 @@ export const households = pgTable("households", {
   baseCurrency: char("base_currency", { length: 3 }).notNull(),
   dekEncrypted: text("dek_encrypted").notNull(),
   createdAt: ts("created_at").notNull().defaultNow(),
+  suspendedAt: ts("suspended_at"),
 });
 
 export const memberships = pgTable(
@@ -61,6 +64,7 @@ export const invites = pgTable("invites", {
   expiresAt: ts("expires_at").notNull(),
   usedAt: ts("used_at"),
   usedBy: uuid("used_by").references(() => users.id),
+  role: text("role").notNull().default("member"),
 });
 
 export const householdDocuments = pgTable("household_documents", {

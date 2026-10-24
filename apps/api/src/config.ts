@@ -17,6 +17,8 @@ export async function depsFromEnv(env = process.env): Promise<AppDeps & { close:
     webOrigin,
     apiOrigin: env.API_ORIGIN ?? "http://localhost:8787",
     secureCookies: env.NODE_ENV === "production",
+    extraOrigins: (env.EXTRA_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+    crossSiteCookies: env.CROSS_SITE_COOKIES === "1",
     ...(env.RULES_SIGNING_KEY ? { rulesSigningKey: env.RULES_SIGNING_KEY.replace(/\\n/g, "\n") } : {}),
   };
 }

@@ -38,6 +38,24 @@ export const memberSchema = z.object({
   assessment: z.enum(["single", "oneParent", "marriedOneIncome", "marriedTwoIncomes"]).default("single"),
   myFutureFundOptedOut: z.boolean().default(false),
   stockMatch: z.object({ contributedRate: z.number(), fullMatchRate: z.number() }).nullable().default(null),
+  /** Scottish taxpayers pay Scottish income tax when UK resident. */
+  ukRegion: z.enum(["rUK", "scotland"]).default("rUK"),
+  studentLoans: z.array(z.enum(["plan1", "plan2", "plan4", "plan5", "postgraduate"])).default([]),
+  /** Planned retirement age; defaults to the Irish State Pension age. */
+  retirementAge: z.number().int().min(40).max(80).nullable().default(null),
+  /** Social insurance years so far, for State Pension estimates. */
+  ieContributionYears: z.number().int().min(0).max(60).nullable().default(null),
+  ukQualifyingYears: z.number().int().min(0).max(60).nullable().default(null),
+  /** Self-assessment history, for preliminary tax. */
+  selfAssessment: z
+    .object({
+      payeIncomeMinor: minor.default(0),
+      payeDeductedMinor: minor.default(0),
+      priorYearLiabilityMinor: minor.nullable().default(null),
+      prePrecedingYearLiabilityMinor: minor.nullable().default(null),
+      preliminaryPaidMinor: minor.default(0),
+    })
+    .default({}),
 });
 
 export const residencePeriodSchema = z.object({
@@ -134,7 +152,7 @@ export const budgetSchema = z.object({
 export const goalSchema = z.object({
   id,
   name: z.string(),
-  type: z.enum(["emergencyFund", "houseDeposit", "sinkingFund", "college", "other"]),
+  type: z.enum(["emergencyFund", "houseDeposit", "sinkingFund", "college", "taxSetAside", "other"]),
   targetMinor: minor,
   currency,
   targetDate: isoDate.nullable().default(null),
@@ -206,6 +224,41 @@ export const stepStateSchema = z.object({
   evaluatedAt: z.string(),
 });
 
+export const payslipSchema = z.object({
+  id,
+  memberId: id,
+  jurisdiction,
+  payDate: isoDate,
+  frequency: z.enum(["weekly", "fortnightly", "monthly"]),
+  currency,
+  grossMinor: minor,
+  incomeTaxMinor: minor,
+  /** IE only. */
+  uscMinor: minor.default(0),
+  prsiMinor: minor.default(0),
+  /** UK only. */
+  niMinor: minor.default(0),
+  studentLoanMinor: minor.default(0),
+  taxCode: z.string().default(""),
+  pensionMinor: minor.default(0),
+});
+
+export const billCadences = ["weekly", "fortnightly", "monthly", "quarterly", "annual", "biennial"] as const;
+
+export const billSchema = z.object({
+  id,
+  name: z.string(),
+  /** Template id from BILL_TEMPLATES, or null for a bill added from detection or by hand. */
+  template: z.string().nullable().default(null),
+  cadence: z.enum(billCadences),
+  amountMinor: minor,
+  currency,
+  nextDue: isoDate,
+  categoryId: id.nullable().default(null),
+  /** Links a confirmed bill to a detected recurring payee. */
+  payeeKey: z.string().nullable().default(null),
+});
+
 export const auditEventSchema = z.object({ id, actor: z.string(), action: z.string(), entity: z.string(), at: z.string() });
 
 export const SCHEMA_VERSION = 1;
@@ -230,6 +283,10 @@ export const datasetSchema = z.object({
   fxRates: z.array(fxRateSchema),
   stepStates: z.array(stepStateSchema),
   auditEvents: z.array(auditEventSchema),
+  payslips: z.array(payslipSchema).default([]),
+  bills: z.array(billSchema).default([]),
+  /** Detected recurring payees the user said are not bills. */
+  recurringDismissed: z.array(z.string()).default([]),
 });
 
 export type Household = z.infer<typeof householdSchema>;
@@ -251,8 +308,16 @@ export type Holding = z.infer<typeof holdingSchema>;
 export type FxRate = z.infer<typeof fxRateSchema>;
 export type StepState = z.infer<typeof stepStateSchema>;
 export type AuditEvent = z.infer<typeof auditEventSchema>;
+export type Payslip = z.infer<typeof payslipSchema>;
+export type Bill = z.infer<typeof billSchema>;
+export type BillCadence = Bill["cadence"];
 export type Dataset = z.infer<typeof datasetSchema>;
 export type WaterfallBucket = (typeof waterfallBuckets)[number];
 
 export const LIABILITY_TYPES: readonly AccountType[] = ["creditCard", "loan", "mortgage"];
 export const LIQUID_TYPES: readonly AccountType[] = ["current", "savings", "cash"];
+
+/** A member with every optional field at its default. */
+export function newMember(fields: Pick<Member, "id" | "name" | "dateOfBirth"> & Partial<Member>): Member {
+  return memberSchema.parse({ nationality: ["IE"], employmentType: "employee", ...fields });
+}

@@ -43,6 +43,9 @@ export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR",
     fxRates: [],
     stepStates: [],
     auditEvents: [],
+    payslips: [],
+    bills: [],
+    recurringDismissed: [],
   };
 }
 

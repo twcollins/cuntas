@@ -3,6 +3,7 @@ import { newId, pensionKinds, type PensionPlan } from "@cuntas/ledger";
 import { applyRate, myFutureFundStatus, pensionReliefHeadroom, ageOn, toMinor } from "@cuntas/rules";
 import { Badge, Button, Card, Disclaimer, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Why } from "../components/ui";
 import { usePlan } from "../lib/derived";
+import { AnnualAllowanceCard } from "./tax/AnnualAllowance";
 import { formatDate, money, pct } from "../lib/format";
 import { update, useDataset } from "../lib/store";
 
@@ -73,6 +74,7 @@ export function PensionsPage() {
           );
         })}
       </div>
+      <div className="mt-4"><AnnualAllowanceCard /></div>
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Pension">
         {editing && <PensionForm plan={editing} onDone={() => setEditing(null)} />}
       </Modal>

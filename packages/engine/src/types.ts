@@ -87,6 +87,8 @@ export interface HouseholdSnapshot {
   children: { count: number; collegeGoals: number; collegeFundsOnTrack: boolean };
   dismissed: Dismissal[];
   thresholds: Thresholds;
+  /** Present when a member is self-employed: income tax, USC and PRSI to save each month. */
+  selfEmployedTax?: { monthlySetAsideMinor: number; plannedMonthlyMinor: number; nextDeadline: IsoDate };
 }
 
 export interface Progress {

@@ -6,6 +6,7 @@ import { Badge, Button, Card, Disclaimer, Empty, Field, Input, Modal, MoneyInput
 import { usePlan } from "../lib/derived";
 import { formatDate, money, pct } from "../lib/format";
 import { update, useDataset } from "../lib/store";
+import { useChartColors } from "../lib/theme";
 
 const KINDS: { value: Debt["kind"]; label: string }[] = [
   { value: "creditCard", label: "Credit card" }, { value: "loan", label: "Personal loan" }, { value: "creditUnion", label: "Credit union loan" },
@@ -14,6 +15,7 @@ const KINDS: { value: Debt["kind"]; label: string }[] = [
 ];
 
 export function DebtsPage() {
+  const colors = useChartColors();
   const ds = useDataset();
   const { snapshot, asOf } = usePlan(ds);
   const base = ds.household.baseCurrency;
@@ -68,13 +70,13 @@ export function DebtsPage() {
             <div className="h-64">
               <ResponsiveContainer>
                 <LineChart data={chart}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} width={60} />
-                  <Tooltip formatter={(v: number) => money(Math.round(v * 100), base)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} label={{ value: "Months", position: "insideBottom", offset: -2, fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} width={60} />
+                  <Tooltip contentStyle={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 8 }} formatter={(v: number) => money(Math.round(v * 100), base)} />
                   <Legend />
-                  <Line type="monotone" dataKey="avalanche" stroke="#0f766e" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="snowball" stroke="#d97706" strokeWidth={2} dot={false} strokeDasharray="4 3" />
+                  <Line type="monotone" dataKey="avalanche" stroke={colors.primary} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="snowball" stroke={colors.secondary} strokeWidth={2} dot={false} strokeDasharray="4 3" />
                 </LineChart>
               </ResponsiveContainer>
             </div>

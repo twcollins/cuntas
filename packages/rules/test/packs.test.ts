@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { MANIFEST, RAW_PACKS } from "../src/packs/generated";
 import { listPacks } from "../src";
 
-const META = new Set(["jurisdiction", "taxYear", "version", "status", "currency", "effective", "sources", "id", "source"]);
+const META = new Set(["jurisdiction", "taxYear", "version", "status", "currency", "effective", "sources", "id", "source", "kind", "region", "parent"]);
 
 describe("rule packs", () => {
   it("generated packs match the YAML sources", () => {
@@ -33,5 +33,14 @@ describe("rule packs", () => {
       for (const p of packs) expect(["provisional", "verified"]).toContain(p.status);
     }
     expect(MANIFEST.every((m) => m.sha256.length === 64)).toBe(true);
+  });
+
+  it("sub-packs and sections marked provisional say so explicitly", () => {
+    const sct = RAW_PACKS["uk/scotland/2026-27"] as { kind: string; status: string };
+    expect(sct.kind).toBe("ukRegion");
+    expect(sct.status).toBe("provisional");
+    // Sections added without official confirmation carry their own status inside verified packs.
+    const uk = RAW_PACKS["uk/2026-27"] as Record<string, { status?: string }>;
+    expect(uk.studentLoans?.status).toBe("provisional");
   });
 });

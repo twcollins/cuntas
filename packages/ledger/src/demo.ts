@@ -1,7 +1,7 @@
-import { addDays, addMonths, toMinor, type IsoDate } from "@cuntas/rules";
+import { addDays, addMonths, ageOn, applyRate, iePayslipCheck, packOn, toMinor, type IsoDate } from "@cuntas/rules";
 import { periodOf } from "./budgets";
 import { createEmptyDataset, reconcile } from "./dataset";
-import type { Account, Dataset, Transaction } from "./schema";
+import { newMember, type Account, type Dataset, type Transaction } from "./schema";
 
 /** Small deterministic PRNG so the demo household is identical on every run. */
 function prng(seed: number) {
@@ -36,8 +36,8 @@ export function createDemoDataset(asOf: IsoDate): Dataset {
   };
 
   ds.members = [
-    { id: "m_aoife", name: "Aoife", dateOfBirth: "1992-03-14", nationality: ["IE"], employmentType: "employee", grossAnnualMinor: eur(58000), payFrequency: "monthly", assessment: "single", myFutureFundOptedOut: false, stockMatch: null },
-    { id: "m_sean", name: "Seán", dateOfBirth: "1989-07-02", nationality: ["UK", "IE"], employmentType: "employee", grossAnnualMinor: eur(44000), payFrequency: "monthly", assessment: "single", myFutureFundOptedOut: false, stockMatch: null },
+    newMember({ id: "m_aoife", name: "Aoife", dateOfBirth: "1992-03-14", nationality: ["IE"], grossAnnualMinor: eur(58000), ieContributionYears: 12 }),
+    newMember({ id: "m_sean", name: "Seán", dateOfBirth: "1989-07-02", nationality: ["UK", "IE"], grossAnnualMinor: eur(44000), ieContributionYears: 4, ukQualifyingYears: 10, studentLoans: ["plan1"] }),
   ];
   ds.residencePeriods = [
     { id: "rp_aoife", memberId: "m_aoife", jurisdiction: "IE", from: "1992-03-14", to: null, declaredBy: "user" },
@@ -160,7 +160,8 @@ export function createDemoDataset(asOf: IsoDate): Dataset {
 
     push(tx("acc_rev", day(8), -eur(25), "Three Ireland"));
     push(tx("acc_rev", day(12), -eur(1499) / 100, "Netflix"));
-    push(tx("acc_rev", day(12), -eur(1799) / 100, "Spotify"));
+    // A price rise in the last two months, for recurring-bill detection to spot.
+    push(tx("acc_rev", day(12), -eur(m >= 5 ? 1999 : 1799) / 100, "Spotify"));
     for (const d of [2, 9, 16, 23]) push(tx("acc_rev", day(d), -eur(420) / 100, "Insomnia Coffee"));
     push(tx("acc_rev", day(14), -amt(22, 45), "Deliveroo"));
     push(tx("acc_rev", day(19), -amt(15, 40), "PayPal *Marketplace"));
@@ -189,6 +190,23 @@ export function createDemoDataset(asOf: IsoDate): Dataset {
     ds.budgets.push({ id: `b_${p}`, period: p, mode: "envelope", lines: lines.map(([categoryId, a]) => ({ categoryId, amountMinor: eur(a), rollover: true })) });
   }
   ds.categoryRules = [{ id: "rule_rent", match: { payeeContains: "rent m kelly" }, categoryId: "cat_rent", priority: 10 }];
+
+  ds.bills = [
+    { id: "bill_motor_tax", name: "Motor tax", template: "ie-motor-tax", cadence: "annual", amountMinor: eur(280), currency: "EUR", nextDue: addMonths(asOf, 2), categoryId: "cat_car", payeeKey: null },
+    { id: "bill_nct", name: "NCT", template: "ie-nct", cadence: "biennial", amountMinor: eur(55), currency: "EUR", nextDue: addDays(asOf, 20), categoryId: "cat_car", payeeKey: null },
+    { id: "bill_tv", name: "TV licence", template: "ie-tv-licence", cadence: "annual", amountMinor: eur(160), currency: "EUR", nextDue: addMonths(asOf, 5), categoryId: "cat_tv_subs", payeeKey: null },
+  ];
+  // Aoife's latest payslip, with her tax credits not fully allocated to the job, for the payslip check to flag.
+  const payDate = `${period}-25` <= asOf ? `${period}-25` : `${addMonths(`${period}-01`, -1).slice(0, 7)}-25`;
+  const grossMonthly = Math.round(eur(58000) / 12);
+  const pensionMonthly = applyRate(grossMonthly, 0.03);
+  const expected = iePayslipCheck(packOn("IE", payDate), {
+    frequency: "monthly", payDate, grossPeriodMinor: grossMonthly, incomeTaxMinor: 0, uscMinor: 0, prsiMinor: 0,
+    assessment: "single", age: ageOn("1992-03-14", payDate), pensionPeriodMinor: pensionMonthly, toleranceMinor: 0,
+  }).expected;
+  ds.payslips = [
+    { id: "ps_aoife", memberId: "m_aoife", jurisdiction: "IE", payDate, frequency: "monthly", currency: "EUR", grossMinor: grossMonthly, incomeTaxMinor: expected.incomeTaxMinor + eur(177), uscMinor: expected.uscMinor, prsiMinor: expected.prsiMinor, niMinor: 0, studentLoanMinor: 0, taxCode: "", pensionMinor: pensionMonthly },
+  ];
 
   return reconcile(ds);
 }

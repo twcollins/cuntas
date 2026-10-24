@@ -79,6 +79,22 @@ export const RAW_PACKS: Record<string, unknown> = {
         "upperWeeklyThreshold": 424,
         "maxWeekly": 12,
         "taperDivisor": 6
+      },
+      "classS": {
+        "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/prsi-for-self-employed-people/",
+        "status": "provisional",
+        "rates": [
+          {
+            "from": "2026-01-01",
+            "rate": 0.042
+          },
+          {
+            "from": "2026-10-01",
+            "rate": 0.0435
+          }
+        ],
+        "incomeThreshold": 5000,
+        "minimumContribution": 650
       }
     },
     "pension": {
@@ -114,7 +130,14 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "10-31",
         "yearOffset": 1
       },
-      "statePensionAge": 66
+      "statePensionAge": 66,
+      "lumpSum": {
+        "source": "https://www.revenue.ie/en/jobs-and-pensions/pensions/lump-sum-payments.aspx",
+        "status": "provisional",
+        "share": 0.25,
+        "taxFreeMax": 200000,
+        "standardRateTop": 500000
+      }
     },
     "myFutureFund": {
       "source": "https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/",
@@ -200,6 +223,26 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "10-31",
         "yearOffset": 1
       }
+    },
+    "statePension": {
+      "source": "https://www.citizensinformation.ie/en/social-welfare/older-and-retired-people/state-pension-contributory/",
+      "status": "provisional",
+      "maxWeeklyContributory": 299.3,
+      "contributionYearsForMax": 40,
+      "minimumContributionYears": 10
+    },
+    "selfAssessment": {
+      "source": "https://www.revenue.ie/en/self-assessment-and-self-employment/preliminary-tax/index.aspx",
+      "status": "provisional",
+      "preliminaryTax": {
+        "currentYearShare": 0.9,
+        "priorYearShare": 1,
+        "prePrecedingYearShare": 1.05
+      },
+      "preliminaryDue": {
+        "monthDay": "10-31",
+        "yearOffset": 0
+      }
     }
   },
   "ie/2027": {
@@ -281,6 +324,22 @@ export const RAW_PACKS: Record<string, unknown> = {
         "upperWeeklyThreshold": 424,
         "maxWeekly": 12,
         "taperDivisor": 6
+      },
+      "classS": {
+        "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/prsi-for-self-employed-people/",
+        "status": "provisional",
+        "rates": [
+          {
+            "from": "2027-01-01",
+            "rate": 0.0435
+          },
+          {
+            "from": "2027-10-01",
+            "rate": 0.045
+          }
+        ],
+        "incomeThreshold": 5000,
+        "minimumContribution": 650
       }
     },
     "pension": {
@@ -316,7 +375,14 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "10-31",
         "yearOffset": 1
       },
-      "statePensionAge": 66
+      "statePensionAge": 66,
+      "lumpSum": {
+        "source": "https://www.revenue.ie/en/jobs-and-pensions/pensions/lump-sum-payments.aspx",
+        "status": "provisional",
+        "share": 0.25,
+        "taxFreeMax": 200000,
+        "standardRateTop": 500000
+      }
     },
     "myFutureFund": {
       "source": "https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/",
@@ -410,6 +476,26 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "10-31",
         "yearOffset": 1
       }
+    },
+    "statePension": {
+      "source": "https://www.citizensinformation.ie/en/social-welfare/older-and-retired-people/state-pension-contributory/",
+      "status": "provisional",
+      "maxWeeklyContributory": 309.3,
+      "contributionYearsForMax": 40,
+      "minimumContributionYears": 10
+    },
+    "selfAssessment": {
+      "source": "https://www.revenue.ie/en/self-assessment-and-self-employment/preliminary-tax/index.aspx",
+      "status": "provisional",
+      "preliminaryTax": {
+        "currentYearShare": 0.9,
+        "priorYearShare": 1,
+        "prePrecedingYearShare": 1.05
+      },
+      "preliminaryDue": {
+        "monthDay": "10-31",
+        "yearOffset": 0
+      }
     }
   },
   "ie/flowchart": {
@@ -445,6 +531,15 @@ export const RAW_PACKS: Record<string, unknown> = {
     },
     "debtPlanner": {
       "extraPaymentProbe": 50
+    },
+    "projections": {
+      "nominalReturn": 0.05,
+      "inflation": 0.02,
+      "scenarioSpread": 0.02,
+      "withdrawalRate": 0.04,
+      "depositRate": 0.025,
+      "dividendYield": 0.02,
+      "years": 20
     }
   },
   "uk/2026-27": {
@@ -521,7 +616,8 @@ export const RAW_PACKS: Record<string, unknown> = {
       "source": "https://www.aviva.co.uk/investments/investing-for-beginners/autumn-budget-update/",
       "fullWeekly": 241.3,
       "qualifyingYearsForFull": 35,
-      "minimumQualifyingYears": 10
+      "minimumQualifyingYears": 10,
+      "pensionAge": 67
     },
     "niVoluntary": {
       "source": "https://www.crowe.com/uk/insights/changes-voluntary-national-insurance-abroad",
@@ -535,6 +631,61 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "01-31",
         "yearOffset": 1
       }
+    },
+    "studentLoans": {
+      "source": "https://www.gov.uk/repaying-your-student-loan/what-you-pay",
+      "status": "provisional",
+      "plans": {
+        "plan1": {
+          "threshold": 26900,
+          "rate": 0.09
+        },
+        "plan2": {
+          "threshold": 29385,
+          "rate": 0.09
+        },
+        "plan4": {
+          "threshold": 33795,
+          "rate": 0.09
+        },
+        "plan5": {
+          "threshold": 25000,
+          "rate": 0.09
+        },
+        "postgraduate": {
+          "threshold": 21000,
+          "rate": 0.06
+        }
+      }
+    },
+    "cgt": {
+      "source": "https://www.gov.uk/capital-gains-tax/rates",
+      "status": "provisional",
+      "annualExemptAmount": 3000,
+      "rates": {
+        "basic": 0.18,
+        "higher": 0.24
+      }
+    },
+    "pensionAnnualAllowance": {
+      "source": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "status": "provisional",
+      "annualAllowance": 60000,
+      "taper": {
+        "thresholdIncome": 200000,
+        "adjustedIncome": 260000,
+        "divisor": 2,
+        "minimum": 10000
+      },
+      "moneyPurchaseAnnualAllowance": 10000,
+      "carryForwardYears": 3,
+      "noEarningsReliefLimit": 3600
+    },
+    "pensionLumpSum": {
+      "source": "https://www.gov.uk/tax-on-your-private-pension/lump-sum-allowance",
+      "status": "provisional",
+      "share": 0.25,
+      "lumpSumAllowance": 268275
     }
   },
   "uk/2027-28": {
@@ -615,6 +766,111 @@ export const RAW_PACKS: Record<string, unknown> = {
         "monthDay": "01-31",
         "yearOffset": 1
       }
+    },
+    "studentLoans": {
+      "source": "https://www.gov.uk/repaying-your-student-loan/what-you-pay",
+      "status": "provisional",
+      "plans": {
+        "plan1": {
+          "threshold": 26900,
+          "rate": 0.09
+        },
+        "plan2": {
+          "threshold": 29385,
+          "rate": 0.09
+        },
+        "plan4": {
+          "threshold": 33795,
+          "rate": 0.09
+        },
+        "plan5": {
+          "threshold": 25000,
+          "rate": 0.09
+        },
+        "postgraduate": {
+          "threshold": 21000,
+          "rate": 0.06
+        }
+      }
+    },
+    "cgt": {
+      "source": "https://www.gov.uk/capital-gains-tax/rates",
+      "status": "provisional",
+      "annualExemptAmount": 3000,
+      "rates": {
+        "basic": 0.18,
+        "higher": 0.24
+      }
+    },
+    "pensionAnnualAllowance": {
+      "source": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "status": "provisional",
+      "annualAllowance": 60000,
+      "taper": {
+        "thresholdIncome": 200000,
+        "adjustedIncome": 260000,
+        "divisor": 2,
+        "minimum": 10000
+      },
+      "moneyPurchaseAnnualAllowance": 10000,
+      "carryForwardYears": 3,
+      "noEarningsReliefLimit": 3600
+    },
+    "pensionLumpSum": {
+      "source": "https://www.gov.uk/tax-on-your-private-pension/lump-sum-allowance",
+      "status": "provisional",
+      "share": 0.25,
+      "lumpSumAllowance": 268275
+    }
+  },
+  "uk/scotland/2026-27": {
+    "kind": "ukRegion",
+    "region": "scotland",
+    "parent": "UK",
+    "taxYear": "2026-27",
+    "version": "UK-SCT-2026-27.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-04-06",
+      "to": "2027-04-05"
+    },
+    "sources": [
+      "https://www.gov.scot/publications/scottish-income-tax-2026-2027/"
+    ],
+    "incomeTax": {
+      "source": "https://www.gov.scot/publications/scottish-income-tax-2026-2027/",
+      "bands": [
+        {
+          "upTo": 3967,
+          "rate": 0.19,
+          "name": "starter"
+        },
+        {
+          "upTo": 16956,
+          "rate": 0.2,
+          "name": "basic"
+        },
+        {
+          "upTo": 31092,
+          "rate": 0.21,
+          "name": "intermediate"
+        },
+        {
+          "upTo": 62430,
+          "rate": 0.42,
+          "name": "higher"
+        },
+        {
+          "upTo": 125140,
+          "rate": 0.45,
+          "name": "advanced"
+        },
+        {
+          "upTo": null,
+          "rate": 0.48,
+          "name": "top"
+        }
+      ]
     }
   },
   "xb/ie-uk": {
@@ -650,6 +906,73 @@ export const RAW_PACKS: Record<string, unknown> = {
     "isa": {
       "ref": "No Irish exemption for UK ISAs",
       "source": "https://www.expertsforexpats.com/advice/tax/ireland-uk-tax-guide-for-british-expats-in-ireland"
+    },
+    "relocation": {
+      "source": "https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/",
+      "toUK": [
+        {
+          "topic": "isa",
+          "text": "A UK ISA is tax-free again from the day you become UK resident.",
+          "source": "https://www.gov.uk/individual-savings-accounts"
+        },
+        {
+          "topic": "funds",
+          "text": "Irish-domiciled ETFs fall under UK offshore fund rules: gains on funds without UK reporting status are taxed as income, not capital gains.",
+          "source": "https://www.gov.uk/government/publications/offshore-funds-list-of-reporting-funds"
+        },
+        {
+          "topic": "pensions",
+          "text": "Irish occupational pensions, PRSAs and the Irish State Pension paid to a UK resident are taxed in the UK (DTA Art. 17).",
+          "source": "https://www.irishtaxhub.ie/blog/taxation-of-foreign-pensions-in-ireland"
+        },
+        {
+          "topic": "investmentAccount",
+          "text": "The Irish Investment Account is for Irish residents; check what happens to it when you leave before moving.",
+          "source": "https://www.rsm.global/ireland/node/768"
+        },
+        {
+          "topic": "myFutureFund",
+          "text": "MyFutureFund contributions stop when you leave Irish employment; the pot stays invested.",
+          "source": "https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/"
+        },
+        {
+          "topic": "statePension",
+          "text": "Irish PRSI and UK NI records both count towards each country's State Pension under the Common Travel Area agreement.",
+          "source": "https://www.gov.ie/en/publication/0cbbc-social-security-agreement-between-ireland-and-the-uk/"
+        }
+      ],
+      "toIE": [
+        {
+          "topic": "isa",
+          "text": "A UK ISA loses its tax exemption: income and gains are taxable in Ireland, and ISA funds may be exit-tax funds with deemed disposal.",
+          "source": "https://www.expertsforexpats.com/advice/tax/ireland-uk-tax-guide-for-british-expats-in-ireland"
+        },
+        {
+          "topic": "pensions",
+          "text": "UK private and workplace pensions paid to an Irish resident are taxed only in Ireland (DTA Art. 17): claim relief at source from HMRC.",
+          "source": "https://www.irishtaxhub.ie/blog/taxation-of-foreign-pensions-in-ireland"
+        },
+        {
+          "topic": "governmentPension",
+          "text": "UK government service pensions stay taxable in the UK unless you are an Irish national resident in Ireland (DTA Art. 18).",
+          "source": "https://www.countrytaxcalc.com/tax-guides/uk-ireland-tax-treaty-guide-2026/"
+        },
+        {
+          "topic": "gains",
+          "text": "UK temporary non-residence rules can tax gains made while abroad if you return to the UK within five years.",
+          "source": "https://www.gov.uk/hmrc-internal-manuals/capital-gains-manual/cg26500"
+        },
+        {
+          "topic": "lisa",
+          "text": "Lifetime ISA bonuses and withdrawal charges still apply; the Irish tax exemption does not.",
+          "source": "https://www.gov.uk/lifetime-isa"
+        },
+        {
+          "topic": "statePension",
+          "text": "UK NI years already earned are kept; Class 3 voluntary contributions from abroad need ten years of UK residence or contributions.",
+          "source": "https://www.crowe.com/uk/insights/changes-voluntary-national-insurance-abroad"
+        }
+      ]
     }
   }
 };
@@ -658,31 +981,36 @@ export const MANIFEST = [
   {
     "key": "ie/2026",
     "version": "IE-2026.3",
-    "sha256": "9cd1bf30edce57cb33c4f02bacdb3f6536c087358ebc1ca848e18066457ff742"
+    "sha256": "0a66a15b56f4f02fb1289173ca05db4a20f4a0473925e3d7462a2a756e69be34"
   },
   {
     "key": "ie/2027",
     "version": "IE-2027.1",
-    "sha256": "1b04362db20f147766996e8301766d99cc5c446b79e3bf47a53fc747fcb87d4e"
+    "sha256": "bbcc76e34db4d16154b8f4131d5d6089527fef44331a2bbe4321deb8ad3b47c7"
   },
   {
     "key": "ie/flowchart",
     "version": "CHART-2.1",
-    "sha256": "91ab83ef6f9eb00faa4e4b7813e5ed320ebed71765a095e4cf9e97b6478bd4a5"
+    "sha256": "1eb5c1d5e75d402b4b01b02baa2ad5a04d6a783f898e170161c6fda7c836ceff"
   },
   {
     "key": "uk/2026-27",
     "version": "UK-2026-27.1",
-    "sha256": "557fa5a4d6d71fbcfa9b16deb8110952158738fbbdc26ecb480e35deddc4261e"
+    "sha256": "c591b1777607dc35d2924918f35bd847db0b0f553cb1cfb6b94626d46394f25a"
   },
   {
     "key": "uk/2027-28",
     "version": "UK-2027-28.1",
-    "sha256": "df83083c58742d693d5835182f77d135c7c2b12bd570dc0423ee712aab01d29a"
+    "sha256": "bf31ff501505534e14d151696af2e757693f4974b0ccf29fca7b188c7d8b7390"
+  },
+  {
+    "key": "uk/scotland/2026-27",
+    "version": "UK-SCT-2026-27.1",
+    "sha256": "d21b91ab94a5adc54bf6a6844f63ec5db31a39325689efd436e6d92985ffa5a5"
   },
   {
     "key": "xb/ie-uk",
     "version": "XB-2026.1",
-    "sha256": "8459072c5d160bbff53527bd5e8b5a23e0257dc2d6c3c8508ad8dd329790db33"
+    "sha256": "997d5c9612be51e0d2828b0561a53e9906f68dc506bcda21d9ab286862568583"
   }
 ] as const;

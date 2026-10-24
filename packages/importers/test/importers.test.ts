@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { importFile, parseAmount, parseDate, PRESETS } from "../src";
+import { guessMapping, importFile, parseAmount, parseDate, PRESETS } from "../src";
 
 const fixture = (name: string) => readFileSync(join(__dirname, "../fixtures", name), "utf8");
 
@@ -27,6 +27,7 @@ describe("parsing", () => {
 const cases: [string, string, number][] = [
   ["revolut.csv", "revolut", 4],
   ["aib.csv", "aib", 3],
+  ["aib-current.csv", "aib", 3],
   ["boi.csv", "boi", 3],
   ["ptsb.csv", "ptsb", 2],
   ["anpost.csv", "anpost", 2],
@@ -35,11 +36,13 @@ const cases: [string, string, number][] = [
   ["starling.csv", "starling", 2],
   ["barclays.csv", "barclays", 2],
   ["danske.csv", "danske", 1],
+  ["hsbc-uk.csv", "hsbc-uk", 3],
+  ["hsbc-uk-basic.csv", "hsbc-uk-basic", 3],
 ];
 
 describe("bank presets", () => {
   it("has a fixture for every preset", () => {
-    expect(cases.map((c) => c[1]).sort()).toEqual(PRESETS.map((p) => p.id).sort());
+    expect([...new Set(cases.map((c) => c[1]))].sort()).toEqual(PRESETS.map((p) => p.id).sort());
   });
   for (const [file, preset, count] of cases) {
     it(`${preset}: detects and parses`, () => {
@@ -68,6 +71,42 @@ describe("bank presets", () => {
     const r = importFile("aib.csv", fixture("aib.csv"));
     expect(r.transactions.map((t) => t.amountMinor)).toEqual([-4510, 320000, -112000]);
     expect(r.transactions[0]!.payee).toBe("DUNNES STORES");
+  });
+  it("AIB current account: single Description column, two-digit years, detail rows folded in", () => {
+    const r = importFile("aib-current.csv", fixture("aib-current.csv"));
+    expect(r.transactions.map((t) => [t.bookedAt, t.amountMinor])).toEqual([
+      ["2026-10-27", 330134],
+      ["2026-10-23", -6000],
+      ["2026-10-23", -33694],
+    ]);
+    expect(r.transactions[0]).toMatchObject({ rawDescription: "DAFM20135600000000 IE26102600000000", balanceMinor: 883567 });
+    expect(r.transactions[1]).toMatchObject({ payee: "Brinks ATM", rawDescription: "VDA-Brinks ATM D08 X00X 21OCT26 20:31" });
+    expect(r.transactions[1]!.balanceMinor).toBeUndefined();
+    expect(r.transactions[2]).toMatchObject({ payee: "Electric Irela", balanceMinor: 553433 });
+  });
+  it("guesses a column mapping from header names when no preset matches", () => {
+    expect(guessMapping(["Account", "Txn Date", "Narrative", "Money Out", "Money In", "Balance"], "EUR")).toMatchObject({
+      date: "Txn Date",
+      dateFormat: "DD/MM/YYYY",
+      description: ["Narrative"],
+      debit: "Money Out",
+      credit: "Money In",
+    });
+    expect(guessMapping(["When", "What", "Value"], "GBP")).toMatchObject({ date: "When", description: ["What"], amount: "Value" });
+  });
+  it("HSBC UK: paid out/in columns with quoted thousands", () => {
+    const r = importFile("hsbc-uk.csv", fixture("hsbc-uk.csv"));
+    expect(r.transactions.map((t) => t.amountMinor)).toEqual([-104210, 285000, -2345]);
+    expect(r.transactions.every((t) => t.currency === "GBP")).toBe(true);
+    expect(r.transactions[0]!.balanceMinor).toBe(231055);
+  });
+  it("HSBC UK: detects the export with no header row and keeps the first line", () => {
+    const r = importFile("hsbc-uk-basic.csv", fixture("hsbc-uk-basic.csv"));
+    expect(r.transactions[0]).toMatchObject({ bookedAt: "2026-09-05", amountMinor: -780, rawDescription: "TFL TRAVEL CH" });
+    expect(r.transactions[2]!.amountMinor).toBe(285000);
+  });
+  it("a headerless file that is not HSBC's shape still asks for a mapping", () => {
+    expect(importFile("x.csv", "foo,bar\nbaz,qux\n").warnings[0]).toMatch(/map the columns/);
   });
   it("Monzo: uses the bank's transaction id", () => {
     expect(importFile("monzo.csv", fixture("monzo.csv")).transactions[0]!.externalId).toBe("tx_0000A1");

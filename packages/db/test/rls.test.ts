@@ -86,3 +86,36 @@ describe("row-level security: cross-household isolation", () => {
     ).rejects.toThrow();
   });
 });
+
+describe("instance administration", () => {
+  it("the app role can create users and change names but cannot make anyone an admin", async () => {
+    const carol = await withTenant(db, { householdId: null, userId: null }, async (tx) => (await tx.insert(users).values({ displayName: "Carol" }).returning())[0]!.id);
+    await withTenant(db, { householdId: null, userId: carol }, (tx) => tx.update(users).set({ displayName: "Carol B" }).where(eq(users.id, carol)));
+    await expect(withTenant(db, { householdId: null, userId: carol }, (tx) => tx.update(users).set({ isAdmin: true }).where(eq(users.id, carol)))).rejects.toThrow();
+    await expect(withTenant(db, { householdId: null, userId: null }, (tx) => tx.insert(users).values({ displayName: "Mallory", isAdmin: true }))).rejects.toThrow();
+  });
+
+  it("admin_households lists every household for an admin and nothing for anyone else", async () => {
+    const list = (who: string) =>
+      withTenant(db, { householdId: null, userId: who }, async (tx) => {
+        const r = await tx.execute(sql`SELECT id, member_count, owner_names FROM admin_households()`);
+        return (r as unknown as { rows: { id: string; member_count: number; owner_names: string[] }[] }).rows;
+      });
+    expect(await list(alice)).toEqual([]);
+    await db.update(users).set({ isAdmin: true }).where(eq(users.id, alice)); // as the table owner, like the admin CLI
+    const rows = await list(alice);
+    expect(rows.map((r) => r.id).sort()).toEqual([A, B]);
+    expect(rows.find((r) => r.id === B)!.owner_names).toEqual(["Bob"]);
+    expect(await list(bob)).toEqual([]);
+  });
+
+  it("an owner invite grants the owner role", async () => {
+    const token = "owner-invite";
+    await withTenant(db, { householdId: B, userId: bob }, (tx) =>
+      tx.insert(invites).values({ tokenHash: sha256(token), householdId: B, createdBy: bob, role: "owner", expiresAt: new Date(Date.now() + 86_400_000).toISOString() }),
+    );
+    await withTenant(db, { householdId: null, userId: alice }, (tx) => tx.execute(sql`SELECT accept_invite(${sha256(token)}, ${alice}::uuid)`));
+    const [m] = await withTenant(db, { householdId: B, userId: alice }, (tx) => tx.select().from(memberships).where(eq(memberships.userId, alice)));
+    expect(m!.role).toBe("owner");
+  });
+});

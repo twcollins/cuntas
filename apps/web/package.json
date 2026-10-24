@@ -8,9 +8,14 @@
     "build": "tsc -p . && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p .",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:native": "tsc -p . && CAPACITOR=1 vite build && cap sync",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
     "@cuntas/engine": "workspace:*",
     "@cuntas/importers": "workspace:*",
     "@cuntas/ledger": "workspace:*",
@@ -24,6 +29,9 @@
     "recharts": "^2.13.3"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
     "@playwright/test": "^1.48.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

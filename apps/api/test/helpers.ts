@@ -5,7 +5,7 @@ import { migrate, schema, users, type Db } from "@cuntas/db";
 import { MockProvider } from "@cuntas/providers";
 import { createApp, createSession } from "../src";
 
-export async function testApp() {
+export async function testApp(overrides: Partial<Parameters<typeof createApp>[0]> = {}) {
   const pg = new PGlite();
   await migrate({ exec: (s) => pg.exec(s), query: async (s) => (await pg.query<{ name: string }>(s)).rows });
   const db = drizzle(pg, { schema }) as unknown as Db;
@@ -17,6 +17,7 @@ export async function testApp() {
     webOrigin: "http://localhost:5173",
     apiOrigin: "http://localhost:8787",
     secureCookies: false,
+    ...overrides,
   };
   const app = createApp(deps);
 

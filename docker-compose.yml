@@ -28,6 +28,8 @@ services:
       ENABLE_BANKING_APP_ID: ${ENABLE_BANKING_APP_ID:-}
       ENABLE_BANKING_PRIVATE_KEY: ${ENABLE_BANKING_PRIVATE_KEY:-}
       RULES_SIGNING_KEY: ${RULES_SIGNING_KEY:-}
+      EXTRA_ORIGINS: ${EXTRA_ORIGINS:-}
+      CROSS_SITE_COOKIES: ${CROSS_SITE_COOKIES:-0}
     depends_on:
       postgres: { condition: service_healthy }
 

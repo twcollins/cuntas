@@ -3,7 +3,9 @@ import {
   ageOn,
   applyRate,
   chartDefaults,
+  deadlineFor,
   iePayroll,
+  ieSelfAssessment,
   MONTHS_PER_YEAR,
   myFutureFundStatus,
   packOn,
@@ -43,7 +45,7 @@ export function memberPay(ds: Dataset, m: Member, asOf: IsoDate): MemberPay {
   }
   if (residence === "UK") {
     const pack = packOn("UK", asOf);
-    const r = ukPayroll(pack, { grossAnnualMinor: m.grossAnnualMinor });
+    const r = ukPayroll(pack, { grossAnnualMinor: m.grossAnnualMinor, region: m.ukRegion, studentLoans: m.studentLoans });
     return { netAnnualMinor: r.netAnnualMinor, marginalRate: r.marginalRate, currency: "GBP", pack: pack.version };
   }
   const pack = packOn("IE", asOf);
@@ -208,5 +210,28 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart: ChartDefaults =
       .filter((x) => x.status === "dismissed")
       .map((x) => ({ stepId: x.stepId, reason: x.dismissedReason ?? "", ...(x.memberId ? { memberId: x.memberId } : {}) })),
     thresholds: thresholdsFor(ds, chart),
+    ...selfEmployedTax(ds, asOf, pack, fx),
   };
+}
+
+/** Monthly set-aside for Irish self-employed members, against what tax set-aside goals put by. */
+function selfEmployedTax(ds: Dataset, asOf: IsoDate, pack: IePack, fx: FxTable): Pick<HouseholdSnapshot, "selfEmployedTax"> {
+  const selfEmployed = ds.members.filter((m) => m.employmentType === "selfEmployed" && m.grossAnnualMinor > 0 && residenceOn(ds, m.id, asOf) === "IE");
+  if (selfEmployed.length === 0 || !pack.selfAssessment) return {};
+  const base = ds.household.baseCurrency;
+  const monthly = selfEmployed.reduce((sum, m) => {
+    const r = ieSelfAssessment(pack, {
+      tradingProfitMinor: m.grossAnnualMinor,
+      payeIncomeMinor: m.selfAssessment.payeIncomeMinor,
+      payeDeductedMinor: m.selfAssessment.payeDeductedMinor,
+      assessment: m.assessment,
+      age: ageOn(m.dateOfBirth, asOf),
+    });
+    return sum + r.setAsideMonthlyMinor;
+  }, 0);
+  const planned = ds.goals.filter((g) => g.type === "taxSetAside").reduce((a, g) => a + (fx.tryConvert(g.monthlyContributionMinor, g.currency, base, asOf) ?? 0), 0);
+  const year = Number(asOf.slice(0, 4));
+  const thisYear = deadlineFor(year, pack.selfAssessment.preliminaryDue);
+  const nextDeadline = thisYear >= asOf ? thisYear : deadlineFor(year + 1, pack.selfAssessment.preliminaryDue);
+  return { selfEmployedTax: { monthlySetAsideMinor: fx.tryConvert(monthly, "EUR", base, asOf) ?? monthly, plannedMonthlyMinor: planned, nextDeadline } };
 }

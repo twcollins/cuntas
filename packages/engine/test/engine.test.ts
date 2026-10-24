@@ -22,6 +22,15 @@ describe("next-step engine", () => {
     expect(r.current?.sources.length).toBeGreaterThan(0);
   });
 
+  it("step 0: a self-employed household is asked to set aside tax until the goal covers it", () => {
+    const tax = { monthlySetAsideMinor: toMinor(1200), plannedMonthlyMinor: toMinor(400), nextDeadline: "2026-10-31" };
+    const r = evaluate(snapshot({ selfEmployedTax: tax }), pack);
+    expect(r.current?.check).toBe("ie.track-budget.tax-set-aside");
+    expect(r.current?.headline).toBe("Set aside €1,200 a month for tax on self-employed income");
+    expect(r.current?.deadline).toBe("2026-10-31");
+    expect(evaluate(snapshot({ selfEmployedTax: { ...tax, plannedMonthlyMinor: toMinor(1200) } }), pack).current).toBeNull();
+  });
+
   it("step 1: starter fund is the greater of EUR 1,500 or one month's net pay", () => {
     const r = evaluate(snapshot({ liquidSavingsMinor: toMinor(2000) }), pack);
     expect(r.current?.step).toBe("ie.starter-fund");

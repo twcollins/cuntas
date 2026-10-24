@@ -10,3 +10,5 @@ mortgageOverpay: { rate: 0.10 }
 goals: { savingsHorizonYears: 5 }
 reminders: { renewalDaysAhead: 30, consentDaysAhead: 7 }
 debtPlanner: { extraPaymentProbe: 50 }
+# Projection assumptions for retirement and wrapper comparisons (real-terms maths uses both).
+projections: { nominalReturn: 0.05, inflation: 0.02, scenarioSpread: 0.02, withdrawalRate: 0.04, depositRate: 0.025, dividendYield: 0.02, years: 20 }

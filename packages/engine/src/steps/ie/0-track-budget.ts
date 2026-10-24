@@ -1,5 +1,5 @@
 import type { StepDefinition } from "../../types";
-import { chartRef, money } from "../../helpers";
+import { chartRef, money, packRef } from "../../helpers";
 
 export const trackBudget: StepDefinition = {
   id: "ie.track-budget",
@@ -43,6 +43,24 @@ export const trackBudget: StepDefinition = {
       vars: (ctx) => ({ bucket: ctx.snapshot.waterfall.firstShortBucket ?? "", shortfall: money(ctx, ctx.snapshot.waterfall.shortfallMinor) }),
       sources: (ctx) => [chartRef(ctx, "step0")],
       actions: [{ id: "waterfall", label: "Open payday waterfall", to: "/budgets" }],
+    },
+    {
+      id: "ie.track-budget.tax-set-aside",
+      title: "Set aside tax on self-employed income",
+      appliesWhen: ({ snapshot }) => (snapshot.selfEmployedTax?.monthlySetAsideMinor ?? 0) > 0,
+      isMet: ({ snapshot }) => snapshot.selfEmployedTax!.plannedMonthlyMinor >= snapshot.selfEmployedTax!.monthlySetAsideMinor,
+      progress: ({ snapshot }) => ({ current: snapshot.selfEmployedTax!.plannedMonthlyMinor, target: snapshot.selfEmployedTax!.monthlySetAsideMinor, unit: snapshot.currency }),
+      headline: "Set aside {amount} a month for tax on self-employed income",
+      explain:
+        "No PAYE is taken from self-employed income, so income tax, USC and Class S PRSI fall due in one go: preliminary tax and the Form 11 balance by {deadline}. " +
+        "A tax set-aside goal you pay into each month spreads the bill.",
+      vars: (ctx) => ({ amount: money(ctx, ctx.snapshot.selfEmployedTax!.monthlySetAsideMinor), deadline: ctx.snapshot.selfEmployedTax!.nextDeadline }),
+      sources: (ctx) => [chartRef(ctx, "step0"), ...(ctx.pack.selfAssessment ? [packRef(ctx, "selfAssessment.preliminaryTax", ctx.pack.selfAssessment.source)] : [])],
+      actions: [
+        { id: "form11", label: "Open Form 11 estimate", to: "/tax" },
+        { id: "goal", label: "Add a tax set-aside goal", to: "/goals" },
+      ],
+      deadline: (ctx) => ctx.snapshot.selfEmployedTax?.nextDeadline,
     },
   ],
 };

@@ -151,7 +151,7 @@ function BankConnections() {
   if (!sync || !api) {
     return (
       <Card title="Bank sync">
-        <p className="text-sm text-stone-600 dark:text-stone-400">Bank sync uses read-only open banking (PSD2) consent through a licensed aggregator, which needs the self-hosted server. Connect one under <strong>Data &amp; sync</strong>, or import CSV, OFX or CAMT.053 files.</p>
+        <p className="text-sm text-stone-600 dark:text-stone-400">Bank sync uses read-only open banking (PSD2) consent through a licensed aggregator, which needs the self-hosted server. Sign in to one under <strong>Account &amp; sync</strong> and sync this household, or import CSV, OFX or CAMT.053 files.</p>
       </Card>
     );
   }

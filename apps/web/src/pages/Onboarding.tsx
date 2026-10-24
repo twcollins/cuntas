@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { ServerHouseholdList, ServerSignIn } from "../components/ServerAccess";
 import { Button, Card, Field, Input, Select } from "../components/ui";
-import { startDemo, startEmpty } from "../lib/store";
+import type { ServerHousehold } from "../lib/server";
+import { startDemo, startEmpty, useStore } from "../lib/store";
 
 export function Onboarding() {
   const [name, setName] = useState("My household");
   const [currency, setCurrency] = useState<"EUR" | "GBP">("EUR");
+  const { account } = useStore();
+  const [serverHouseholds, setServerHouseholds] = useState<ServerHousehold[] | null>(null);
   return (
-    <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-4 py-12">
+    <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-4 py-12">
       <div className="mb-8 flex items-center gap-3">
         <img src="/icon.svg" alt="" className="h-12 w-12" />
         <div>
@@ -14,7 +18,7 @@ export function Onboarding() {
           <p className="text-stone-600 dark:text-stone-400">What should your next euro do? Budgeting and planning built on Irish (and UK) tax rules.</p>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card title="Try the demo household">
           <p className="mb-4 text-sm text-stone-600 dark:text-stone-400">
             A couple in Dublin with six months of transactions, a credit card, a credit union loan, an Irish pension and a UK ISA. Everything stays in this browser.
@@ -32,9 +36,22 @@ export function Onboarding() {
             <Button variant="primary" onClick={() => startEmpty(name.trim() || "My household", currency)}>Create household</Button>
           </div>
         </Card>
+        <Card title="I already use Cúntas">
+          {account && serverHouseholds ? (
+            <>
+              <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">Signed in as {account.displayName}. Open a household on this device:</p>
+              <ServerHouseholdList apiUrl={account.apiUrl} households={serverHouseholds} />
+            </>
+          ) : (
+            <>
+              <p className="mb-4 text-sm text-stone-600 dark:text-stone-400">Sign in to your own Cúntas server to open a household you share or synced from another device.</p>
+              <ServerSignIn onSignedIn={setServerHouseholds} />
+            </>
+          )}
+        </Card>
       </div>
       <p className="mt-8 text-xs text-stone-500">
-        Your data is stored locally on this device. Nothing is sent anywhere unless you connect a self-hosted server under Data &amp; sync. This is information, not financial advice.
+        Your data is stored locally on this device. Nothing is sent anywhere unless you sign in to your own self-hosted server. This is information, not financial advice.
       </p>
     </div>
   );

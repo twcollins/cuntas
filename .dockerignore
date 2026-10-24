@@ -4,3 +4,5 @@
 **/playwright-report
 **/test-results
 .env
+apps/web/android
+apps/web/ios

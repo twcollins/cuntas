@@ -19,7 +19,7 @@ export function apiClient(baseUrl: string) {
     return body as T;
   }
   return {
-    me: () => call<{ user: { id: string; displayName: string }; households: { id: string; name: string; baseCurrency: string; role: string }[] }>("/me"),
+    me: () => call<{ user: { id: string; displayName: string; isAdmin: boolean }; households: { id: string; name: string; baseCurrency: string; role: string; suspended: boolean }[] }>("/me"),
     async register(displayName: string) {
       const options = await call<Parameters<typeof startRegistration>[0]["optionsJSON"]>("/auth/passkey/register/options", { method: "POST", body: JSON.stringify({ displayName }) });
       const response = await startRegistration({ optionsJSON: options });
@@ -34,7 +34,22 @@ export function apiClient(baseUrl: string) {
     createHousehold: (name: string, baseCurrency: string) => call<{ id: string }>("/households", { method: "POST", body: JSON.stringify({ name, baseCurrency }) }),
     getDocument: (hh: string) => call<{ version: number; dataset: Dataset | null }>(`/households/${hh}/document`),
     putDocument: (hh: string, baseVersion: number, dataset: Dataset) => call<{ version: number }>(`/households/${hh}/document`, { method: "PUT", body: JSON.stringify({ baseVersion, dataset }) }),
-    invite: (hh: string) => call<{ url: string }>(`/households/${hh}/invites`, { method: "POST" }),
+    deleteHousehold: (hh: string) => call<{ ok: boolean }>(`/households/${hh}`, { method: "DELETE" }),
+    invite: (hh: string, role: "owner" | "member" = "member") => call<{ url: string }>(`/households/${hh}/invites?role=${role}`, { method: "POST" }),
+    members: (hh: string) => call<HouseholdMember[]>(`/households/${hh}/members`),
+    setMemberRole: (hh: string, userId: string, role: "owner" | "member") => call<{ ok: boolean }>(`/households/${hh}/members/${userId}`, { method: "PATCH", body: JSON.stringify({ role }) }),
+    removeMember: (hh: string, userId: string) => call<{ ok: boolean }>(`/households/${hh}/members/${userId}`, { method: "DELETE" }),
+    admin: {
+      households: () => call<AdminHousehold[]>("/admin/households"),
+      create: (body: { name: string; baseCurrency: "EUR" | "GBP"; joinAsOwner: boolean }) => call<{ id: string; name: string; ownerInviteUrl: string | null }>("/admin/households", { method: "POST", body: JSON.stringify(body) }),
+      update: (hh: string, body: { name?: string; suspended?: boolean }) => call<{ ok: boolean }>(`/admin/households/${hh}`, { method: "PATCH", body: JSON.stringify(body) }),
+      remove: (hh: string) => call<{ ok: boolean }>(`/admin/households/${hh}`, { method: "DELETE" }),
+      members: (hh: string) => call<HouseholdMember[]>(`/admin/households/${hh}/members`),
+      setRole: (hh: string, userId: string, role: "owner" | "member") => call<{ ok: boolean }>(`/admin/households/${hh}/members/${userId}`, { method: "PATCH", body: JSON.stringify({ role }) }),
+      removeMember: (hh: string, userId: string) => call<{ ok: boolean }>(`/admin/households/${hh}/members/${userId}`, { method: "DELETE" }),
+      invite: (hh: string, role: "owner" | "member") => call<{ url: string }>(`/admin/households/${hh}/invites`, { method: "POST", body: JSON.stringify({ role }) }),
+      users: () => call<{ id: string; displayName: string; isAdmin: boolean; createdAt: string }[]>("/admin/users"),
+    },
     acceptInvite: (token: string) => call<{ householdId: string }>("/invites/accept", { method: "POST", body: JSON.stringify({ token }) }),
     institutions: (hh: string, country: "IE" | "UK") => call<{ id: string; name: string; country: string }[]>(`/households/${hh}/institutions?country=${country}`),
     connect: (hh: string, body: { institutionId: string; institutionName: string; country: "IE" | "UK" }) => call<{ url: string }>(`/households/${hh}/connections`, { method: "POST", body: JSON.stringify(body) }),
@@ -47,3 +62,36 @@ export function apiClient(baseUrl: string) {
 }
 
 export type Api = ReturnType<typeof apiClient>;
+
+export interface HouseholdMember {
+  userId: string;
+  displayName: string;
+  role: string;
+  joinedAt: string;
+}
+
+export interface AdminHousehold {
+  id: string;
+  name: string;
+  baseCurrency: string;
+  createdAt: string;
+  suspendedAt: string | null;
+  memberCount: number;
+  ownerNames: string[];
+  documentVersion: number | null;
+  documentUpdatedAt: string | null;
+  connectionCount: number;
+}
+
+/** Runs an API call; if the server asks for fresh authentication, signs in with a passkey and retries once. */
+export async function withReauth<T>(api: Api, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 403 && /re-authenticate/i.test(e.message)) {
+      await api.signIn();
+      return fn();
+    }
+    throw e;
+  }
+}
