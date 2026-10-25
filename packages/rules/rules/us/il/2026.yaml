@@ -1,0 +1,23 @@
+# Illinois individual income tax, 2026: a flat rate on federal AGI less exemptions.
+# Rate and exemption from the 2026 withholding booklet IL-700-T; the age-65 amount and the income
+# limits from the 2025 IL-1040 instructions (2026 instructions not yet published). Dependents are
+# taken to get the same exemption as filers (Schedule IL-E): check.
+kind: usState
+state: IL
+parent: US
+taxYear: "2026"
+version: "US-IL-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/withholding/documents/currentyear/il-700-t.pdf
+  - https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/incometax/documents/currentyear/individual/il-1040-instr.pdf
+incomeTax:
+  source: https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/withholding/documents/currentyear/il-700-t.pdf
+  base: federalAgi
+  rate: 0.0495
+  exemption:
+    perFiler: 2925
+    perDependent: 2925
+    perAged: 1000
+    incomeLimit: { single: 250000, marriedJoint: 500000, marriedSeparate: 250000, headOfHousehold: 250000 }

@@ -2,13 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import type { NextStepCard } from "@cuntas/engine";
 import { newId } from "@cuntas/ledger";
+import { isCurrency } from "@cuntas/rules";
 import { money, formatDate } from "../lib/format";
 import { update } from "../lib/store";
 import { Badge, Button, Card, Field, Input, Modal, ProgressBar, Why } from "./ui";
 
 function progressText(card: NextStepCard) {
   const { current, target, unit } = card.progress;
-  if (unit === "EUR" || unit === "GBP") return target === 0 ? `${money(current, unit)} to clear` : `${money(current, unit)} of ${money(target, unit)}`;
+  if (isCurrency(unit)) return target === 0 ? `${money(current, unit)} to clear` : `${money(current, unit)} of ${money(target, unit)}`;
   if (unit === "%") return `${current}% of ${target}%`;
   if (unit === "months") return `${current} of ${target} months`;
   return `${current} of ${target}`;

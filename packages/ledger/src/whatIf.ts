@@ -1,8 +1,19 @@
-import { addDays, classify, treaty, type Classification, type CrossBorderItem, type IsoDate, type Jurisdiction, type RelocationNote } from "@cuntas/rules";
+import {
+  addDays,
+  classify,
+  COUNTRY_INFO,
+  treatyFor,
+  type Classification,
+  type Country,
+  type CrossBorderItem,
+  type IsoDate,
+  type Jurisdiction,
+  type RelocationNote,
+} from "@cuntas/rules";
 import { FxTable } from "./fx";
 import { newId } from "./ids";
 import type { Dataset, Member } from "./schema";
-import { memberPay, residenceOn } from "./snapshot";
+import { memberPay, residenceOn, type MemberPay } from "./snapshot";
 
 export interface WhatIfItem {
   memberId: string;
@@ -10,6 +21,18 @@ export interface WhatIfItem {
   before: Classification;
   after: Classification;
   changed: boolean;
+  /** The item as classified before the move. */
+  item: CrossBorderItem;
+}
+
+export interface WhatIfMember {
+  id: string;
+  name: string;
+  from: Jurisdiction;
+  to: Country;
+  payBefore: MemberPay;
+  /** Take-home under the new country's rules. */
+  payAfter: MemberPay;
 }
 
 /** A copy of the dataset with a member resident in `to` from `from` onwards; pay converted to the new currency. */
@@ -20,8 +43,8 @@ export function withResidence(ds: Dataset, memberId: string, to: Jurisdiction, f
     .filter((r) => r.memberId !== memberId || r.from < from)
     .map((r) => (r.memberId === memberId && (r.to === null || r.to >= from) ? { ...r, to: addDays(from, -1) } : r));
   periods.push({ id: newId("rp"), memberId, jurisdiction: to, from, to: null, declaredBy: "what-if" });
-  const curFrom = current === "UK" ? "GBP" : "EUR";
-  const curTo = to === "UK" ? "GBP" : "EUR";
+  const curFrom = COUNTRY_INFO[current].currency;
+  const curTo = COUNTRY_INFO[to].currency;
   const members = ds.members.map((m) => (m.id === memberId && curFrom !== curTo ? { ...m, grossAnnualMinor: fx.tryConvert(m.grossAnnualMinor, curFrom, curTo, from) ?? m.grossAnnualMinor } : m));
   return { ...ds, residencePeriods: periods, members };
 }
@@ -42,37 +65,55 @@ function itemsFor(ds: Dataset, m: Member, residence: Jurisdiction): { label: str
   return items;
 }
 
+/** The country an item comes from: where the pay, pension or account is. */
+function itemCountry(i: WhatIfItem): Country {
+  const item = i.item;
+  if (item.kind === "isa") return "UK";
+  if (item.kind === "deposit") return item.accountCountry;
+  if (item.kind === "employment") return item.workCountry;
+  return item.sourceCountry;
+}
+
 /**
  * Shows what changes if members move: which accounts, pensions and pay change tax treatment, plus
  * the relocation notes from the cross-border rule pack. Residence stays the user's declaration.
  */
 export function residenceWhatIf(ds: Dataset, asOf: IsoDate, input: { memberIds: string[]; to: Jurisdiction; keepJob: boolean }) {
   const taxYear = asOf.slice(0, 4);
+  const to = input.to;
   let after = ds;
-  for (const id of input.memberIds) if (residenceOn(ds, id, asOf) !== input.to) after = withResidence(after, id, input.to, asOf);
+  for (const id of input.memberIds) if (residenceOn(ds, id, asOf) !== to) after = withResidence(after, id, to, asOf);
 
-  const members = [];
+  const members: WhatIfMember[] = [];
   const items: WhatIfItem[] = [];
   for (const id of input.memberIds) {
     const m = ds.members.find((x) => x.id === id);
     if (!m) continue;
     const from = residenceOn(ds, id, asOf);
     const mAfter = after.members.find((x) => x.id === id)!;
-    members.push({ id, name: m.name, from, to: input.to, payBefore: memberPay(ds, m, asOf), payAfter: memberPay(after, mAfter, asOf) });
-    if (from === input.to) continue;
     const working = m.employmentType === "employee" || m.employmentType === "selfEmployed";
+    members.push({ id, name: m.name, from, to, payBefore: memberPay(ds, m, asOf), payAfter: memberPay(after, mAfter, asOf) });
+    if (from === to) continue;
     const list = itemsFor(ds, m, from);
     if (working) list.unshift({ label: "Employment income", item: { kind: "employment", workCountry: from } });
     for (const { label, item } of list) {
-      const afterItem: CrossBorderItem = item.kind === "employment" ? { kind: "employment", workCountry: input.keepJob ? from : input.to } : item;
-      const before = classify(item, { residence: from, nationality: m.nationality }, taxYear);
-      const next = classify(afterItem, { residence: input.to, nationality: m.nationality }, taxYear);
+      const afterItem: CrossBorderItem = item.kind === "employment" ? { kind: "employment", workCountry: input.keepJob ? from : to } : item;
+      const before = classify(item, { residence: from, nationality: m.nationality, counterpart: to }, taxYear);
+      const next = classify(afterItem, { residence: to, nationality: m.nationality, counterpart: from }, taxYear);
       const changed = before.method !== next.method || before.taxedBy.join() !== next.taxedBy.join();
-      items.push({ memberId: id, label, before, after: next, changed });
+      items.push({ memberId: id, label, before, after: next, changed, item });
     }
   }
-  const relocation = treaty().relocation;
-  const moving = members.some((m) => m.from !== m.to);
-  const notes: RelocationNote[] = moving && relocation ? (input.to === "UK" ? relocation.toUK : relocation.toIE) : [];
+  // Relocation notes from the treaties between the new country and each country a mover lives in or
+  // holds pay, pensions or accounts in, each topic once.
+  const ties = new Set<Country>();
+  for (const m of members.filter((x) => x.from !== x.to)) ties.add(m.from);
+  for (const i of items) ties.add(itemCountry(i));
+  ties.delete(to);
+  const notes: RelocationNote[] = [];
+  const key = `to${to}` as const;
+  for (const from of ties) {
+    for (const n of treatyFor(from, to).relocation?.[key] ?? []) if (!notes.some((x) => x.topic === n.topic)) notes.push(n);
+  }
   return { members, items, notes };
 }

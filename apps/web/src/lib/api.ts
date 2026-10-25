@@ -1,5 +1,6 @@
 import { startAuthentication, startRegistration } from "@simplewebauthn/browser";
 import type { Dataset } from "@cuntas/ledger";
+import type { Currency, Jurisdiction } from "@cuntas/rules";
 
 export class ApiError extends Error {
   constructor(message: string, readonly status: number, readonly body?: unknown) {
@@ -41,7 +42,7 @@ export function apiClient(baseUrl: string) {
     removeMember: (hh: string, userId: string) => call<{ ok: boolean }>(`/households/${hh}/members/${userId}`, { method: "DELETE" }),
     admin: {
       households: () => call<AdminHousehold[]>("/admin/households"),
-      create: (body: { name: string; baseCurrency: "EUR" | "GBP"; joinAsOwner: boolean }) => call<{ id: string; name: string; ownerInviteUrl: string | null }>("/admin/households", { method: "POST", body: JSON.stringify(body) }),
+      create: (body: { name: string; baseCurrency: Currency; joinAsOwner: boolean }) => call<{ id: string; name: string; ownerInviteUrl: string | null }>("/admin/households", { method: "POST", body: JSON.stringify(body) }),
       update: (hh: string, body: { name?: string; suspended?: boolean }) => call<{ ok: boolean }>(`/admin/households/${hh}`, { method: "PATCH", body: JSON.stringify(body) }),
       remove: (hh: string) => call<{ ok: boolean }>(`/admin/households/${hh}`, { method: "DELETE" }),
       members: (hh: string) => call<HouseholdMember[]>(`/admin/households/${hh}/members`),
@@ -51,8 +52,8 @@ export function apiClient(baseUrl: string) {
       users: () => call<{ id: string; displayName: string; isAdmin: boolean; createdAt: string }[]>("/admin/users"),
     },
     acceptInvite: (token: string) => call<{ householdId: string }>("/invites/accept", { method: "POST", body: JSON.stringify({ token }) }),
-    institutions: (hh: string, country: "IE" | "UK") => call<{ id: string; name: string; country: string }[]>(`/households/${hh}/institutions?country=${country}`),
-    connect: (hh: string, body: { institutionId: string; institutionName: string; country: "IE" | "UK" }) => call<{ url: string }>(`/households/${hh}/connections`, { method: "POST", body: JSON.stringify(body) }),
+    institutions: (hh: string, country: Jurisdiction) => call<{ id: string; name: string; country: string }[]>(`/households/${hh}/institutions?country=${country}`),
+    connect: (hh: string, body: { institutionId: string; institutionName: string; country: Jurisdiction }) => call<{ url: string }>(`/households/${hh}/connections`, { method: "POST", body: JSON.stringify(body) }),
     connections: (hh: string) => call<{ id: string; institutionName: string; status: string; consentExpiresAt: string | null; lastSyncedAt: string | null; accounts: { ref: string; name: string; currency: string }[] }[]>(`/households/${hh}/connections`),
     syncConnection: (hh: string, id: string) => call<{ fetched: number; status: string }>(`/households/${hh}/connections/${id}/sync`, { method: "POST" }),
     connectionTransactions: (hh: string, id: string, since: string) => call<{ accountRef: string; transaction: import("@cuntas/importers").ParsedTransaction }[]>(`/households/${hh}/connections/${id}/transactions?since=${since}`),

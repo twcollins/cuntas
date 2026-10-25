@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { newId, pensionKinds, type PensionPlan } from "@cuntas/ledger";
-import { applyRate, myFutureFundStatus, pensionReliefHeadroom, ageOn, toMinor } from "@cuntas/rules";
+import { ageOn, applyRate, type Currency, myFutureFundStatus, pensionReliefHeadroom, toMinor } from "@cuntas/rules";
 import { Badge, Button, Card, Disclaimer, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Why } from "../components/ui";
 import { usePlan } from "../lib/derived";
 import { AnnualAllowanceCard } from "./tax/AnnualAllowance";
-import { formatDate, money, pct } from "../lib/format";
+import { currencyOptions, formatDate, money, pct } from "../lib/format";
 import { update, useDataset } from "../lib/store";
 
 const KIND_LABELS: Record<PensionPlan["kind"], string> = {
   occupationalDC: "Occupational DC", occupationalDB: "Occupational DB", PRSA: "PRSA", AVC: "AVC", MyFutureFund: "MyFutureFund", ARF: "ARF",
   ukWorkplaceDC: "UK workplace DC", ukWorkplaceDB: "UK workplace DB", SIPP: "SIPP", statePensionIE: "State Pension (IE)", statePensionUK: "State Pension (UK)",
+  us401k: "401(k) (US)", usIRA: "Traditional IRA (US)", usRothIRA: "Roth IRA (US)", usHSA: "HSA (US)",
 };
 
 const MFF_LABEL = { "auto-enrolled": "Auto-enrolled", "opted-out": "Opted out", "in-qualifying-scheme": "In a qualifying scheme", "not-eligible-age": "Not eligible (age)", "not-eligible-earnings": "Not eligible (earnings)" } as const;
@@ -94,7 +95,7 @@ function PensionForm({ plan, onDone }: { plan: PensionPlan; onDone: () => void }
         <Field label="Member">{(id) => <Select id={id} value={p.memberId} onChange={(e) => setP({ ...p, memberId: e.target.value })} options={ds.members.map((m) => ({ value: m.id, label: m.name }))} />}</Field>
         <Field label="Kind">{(id) => <Select id={id} value={p.kind} onChange={(e) => setP({ ...p, kind: e.target.value as PensionPlan["kind"], jurisdiction: e.target.value.startsWith("uk") || e.target.value === "SIPP" || e.target.value === "statePensionUK" ? "UK" : "IE", currency: e.target.value.startsWith("uk") || e.target.value === "SIPP" || e.target.value === "statePensionUK" ? "GBP" : "EUR" })} options={pensionKinds.map((k) => ({ value: k, label: KIND_LABELS[k] }))} />}</Field>
         <Field label="Current value">{(id) => <MoneyInput id={id} value={p.valueMinor} onChange={(v) => setP({ ...p, valueMinor: v })} />}</Field>
-        <Field label="Currency">{(id) => <Select id={id} value={p.currency} onChange={(e) => setP({ ...p, currency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+        <Field label="Currency">{(id) => <Select id={id} value={p.currency} onChange={(e) => setP({ ...p, currency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
         <Field label="You contribute (% of pay)">{(id) => <Input id={id} type="number" step={0.5} min={0} value={+(p.employeeRate * 100).toFixed(2)} onChange={(e) => setP({ ...p, employeeRate: Number(e.target.value) / 100 })} />}</Field>
         <Field label="Employer contributes (% of pay)">{(id) => <Input id={id} type="number" step={0.5} min={0} value={+(p.employerRate * 100).toFixed(2)} onChange={(e) => setP({ ...p, employerRate: Number(e.target.value) / 100 })} />}</Field>
         <Field label="Employer matches up to (% of pay)" hint="Leave 0 if there's no match.">{(id) => <Input id={id} type="number" step={0.5} min={0} value={+((p.employerMatchRule?.upToRate ?? 0) * 100).toFixed(2)} onChange={(e) => setP({ ...p, employerMatchRule: Number(e.target.value) > 0 ? { upToRate: Number(e.target.value) / 100, ratio: p.employerMatchRule?.ratio ?? 1 } : null })} />}</Field>

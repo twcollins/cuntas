@@ -4,6 +4,8 @@ import { PeopleWithAccess } from "./household/PeopleWithAccess";
 import { Badge, Button, Card, Field, Input, PageHeader, Select } from "../components/ui";
 import { createOnServer, deleteOnServer } from "../lib/server";
 import { removeHousehold, setHouseholdSync, startDemo, startEmpty, switchHousehold, useStore, type HouseholdEntry } from "../lib/store";
+import type { Currency } from "@cuntas/rules";
+import { currencyOptions } from "../lib/format";
 
 /** Every household on this device: add, switch, remove, and (for synced ones) who can open it. */
 export function HouseholdsPage() {
@@ -83,7 +85,7 @@ function HouseholdRow({ h, active, run }: { h: HouseholdEntry; active: boolean; 
 function AddHousehold({ run }: { run: (fn: () => Promise<unknown>, done?: string) => Promise<void> }) {
   const { account } = useStore();
   const [name, setName] = useState("");
-  const [currency, setCurrency] = useState<"EUR" | "GBP">("EUR");
+  const [currency, setCurrency] = useState<Currency>("EUR");
   const [onServer, setOnServer] = useState(false);
   const [invite, setInvite] = useState("");
   const token = invite.includes("#") ? invite.slice(invite.indexOf("#") + 1).trim() : invite.trim();
@@ -98,7 +100,7 @@ function AddHousehold({ run }: { run: (fn: () => Promise<unknown>, done?: string
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Name">{(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} placeholder="My household" />}</Field>
-            <Field label="Base currency">{(id) => <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as "EUR" | "GBP")} options={[{ value: "EUR", label: "Euro (EUR)" }, { value: "GBP", label: "Sterling (GBP)" }]} />}</Field>
+            <Field label="Base currency">{(id) => <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as Currency)} options={currencyOptions(true)} />}</Field>
           </div>
           {account && (
             <label className="flex items-center gap-2 text-sm">

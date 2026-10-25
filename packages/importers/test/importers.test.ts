@@ -38,6 +38,16 @@ const cases: [string, string, number][] = [
   ["danske.csv", "danske", 1],
   ["hsbc-uk.csv", "hsbc-uk", 3],
   ["hsbc-uk-basic.csv", "hsbc-uk-basic", 3],
+  ["chase-checking.csv", "chase-checking", 2],
+  ["chase-card.csv", "chase-card", 2],
+  ["bofa-checking.csv", "bofa-checking", 3],
+  ["bofa-card.csv", "bofa-card", 2],
+  ["wellsfargo.csv", "wells-fargo", 2],
+  ["capitalone-card.csv", "capital-one-card", 2],
+  ["capitalone-360.csv", "capital-one-360", 2],
+  ["citi.csv", "citi", 2],
+  ["amex.csv", "amex", 2],
+  ["discover.csv", "discover", 2],
 ];
 
 describe("bank presets", () => {
@@ -138,3 +148,31 @@ describe("OFX and CAMT.053", () => {
     ]);
   });
 });
+
+describe("US bank presets", () => {
+  const first = (file: string) => importFile(file, fixture(file)).transactions;
+  it("reads dollars, with money out negative", () => {
+    expect(first("chase-checking.csv").map((t) => [t.bookedAt, t.amountMinor, t.currency])).toEqual([["2026-09-02", -6418, "USD"], ["2026-09-01", 350000, "USD"]]);
+    expect(first("chase-card.csv")[0]!.amountMinor).toBe(-1549);
+  });
+  it("flips Amex and Discover, which export charges as positive", () => {
+    expect(first("amex.csv").map((t) => t.amountMinor)).toEqual([-41260, 41260]);
+    expect(first("discover.csv").map((t) => t.amountMinor)).toEqual([-2399, 2399]);
+  });
+  it("finds Bank of America's header below its summary block and skips the opening balance line", () => {
+    const t = first("bofa-checking.csv");
+    expect(t.map((x) => x.amountMinor)).toEqual([-12000, 280000, -113000]);
+    expect(t.at(-1)!.balanceMinor).toBe(255000);
+  });
+  it("Capital One 360 takes the sign from the transaction type", () => {
+    expect(first("capitalone-360.csv").map((t) => [t.bookedAt, t.amountMinor])).toEqual([["2026-09-02", 150000], ["2026-09-03", -20000]]);
+  });
+  it("Capital One and Citi card debits are money out, credits money in; Citi pending rows wait", () => {
+    expect(first("capitalone-card.csv").map((t) => t.amountMinor)).toEqual([-1199, 25000]);
+    expect(first("citi.csv").map((t) => t.amountMinor)).toEqual([-5421, 30000]);
+  });
+  it("Wells Fargo has no header row", () => {
+    expect(first("wellsfargo.csv").map((t) => [t.bookedAt, t.amountMinor])).toEqual([["2026-09-03", -4210], ["2026-09-01", 240000]]);
+  });
+});
+

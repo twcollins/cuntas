@@ -1,4 +1,4 @@
-import { addDays, type IsoDate } from "@cuntas/rules";
+import { addDays, type Country, type IsoDate } from "@cuntas/rules";
 import { assignContentIds } from "@cuntas/importers";
 import type { BankDataProvider, ConsentSession, ProviderAccount, ProviderInstitution } from "./types";
 
@@ -9,7 +9,7 @@ export class MockProvider implements BankDataProvider {
   readonly id = "mock";
   private sessions = new Map<string, ConsentSession>();
 
-  async listInstitutions(country: "IE" | "UK"): Promise<ProviderInstitution[]> {
+  async listInstitutions(country: Country): Promise<ProviderInstitution[]> {
     return country === "IE"
       ? [{ id: "mock:aib", name: "Mock AIB", country: "IE" }, { id: "mock:revolut", name: "Mock Revolut", country: "IE" }]
       : [{ id: "mock:monzo", name: "Mock Monzo", country: "UK" }, { id: "mock:hsbc-uk", name: "Mock HSBC UK", country: "UK" }];

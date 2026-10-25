@@ -1,4 +1,4 @@
-import type { Currency } from "@cuntas/rules";
+import { isCurrency, type Currency } from "@cuntas/rules";
 import { assignContentIds } from "./hash";
 import { cleanPayee, normaliseHeader, parseAmount, parseCsv, parseDate } from "./parse";
 import { PRESETS } from "./presets";
@@ -51,12 +51,26 @@ export function guessMapping(headers: string[], defaultCurrency: Currency): Colu
   return { date, dateFormat: "DD/MM/YYYY", description: [description], defaultCurrency, ...(split ? { debit, credit } : { amount }) };
 }
 
-const asCurrency = (v: string | undefined, fallback: Currency): Currency => (v === "EUR" || v === "GBP" ? v : fallback);
+const asCurrency = (v: string | undefined, fallback: Currency): Currency => (v && isCurrency(v) ? v : fallback);
+
+/** How far down a file to look for the header row, past summary lines some banks put first. */
+const HEADER_SEARCH_ROWS = 12;
 
 export function importCsv(text: string, mapping?: ColumnMapping & { id?: string }): ParsedStatement {
   let rows = parseCsv(text);
   let headers = (rows[0] ?? []).map((h) => h.trim());
   let preset: (ColumnMapping & { id?: string }) | undefined = mapping ?? detectPreset(headers);
+  if (!preset) {
+    // Some exports (Bank of America checking) open with a summary block before the header row.
+    for (let i = 1; i < Math.min(rows.length, HEADER_SEARCH_ROWS) && !preset; i++) {
+      const found = detectPreset(rows[i]!.map((h) => h.trim()));
+      if (found) {
+        preset = found;
+        rows = rows.slice(i);
+        headers = rows[0]!.map((h) => h.trim());
+      }
+    }
+  }
   if (!preset) {
     const headerless = detectHeaderlessPreset(rows);
     if (headerless?.headerless) {
@@ -80,12 +94,15 @@ export function importCsv(text: string, mapping?: ColumnMapping & { id?: string 
   rows.slice(1).forEach((row, n) => {
     const line = n + 2;
     if (preset.where && col(row, preset.where.column) !== preset.where.equals) return;
+    if (preset.skip && (col(row, preset.skip.column) ?? "").startsWith(preset.skip.startsWith)) return;
     const date = parseDate(col(row, preset.date) ?? "", preset.dateFormat);
     let amount: number | null;
     if (preset.amount) {
       amount = parseAmount(col(row, preset.amount) ?? "", preset.decimalComma);
       const fee = preset.fee ? parseAmount(col(row, preset.fee) ?? "", preset.decimalComma) : 0;
       if (amount !== null && fee) amount -= Math.abs(fee);
+      if (amount !== null && preset.signFrom) amount = (col(row, preset.signFrom.column) ?? "").toLowerCase() === preset.signFrom.negativeWhen.toLowerCase() ? -Math.abs(amount) : Math.abs(amount);
+      if (amount !== null && preset.invertAmount) amount = -amount;
     } else {
       const debit = parseAmount(col(row, preset.debit) ?? "", preset.decimalComma) ?? 0;
       const credit = parseAmount(col(row, preset.credit) ?? "", preset.decimalComma) ?? 0;

@@ -1,0 +1,27 @@
+# New Jersey gross income tax, 2026 (rates unchanged; 2026 NJ-1040-ES). No standard deduction:
+# $1,000 per filer and per filer 65+, $1,500 per dependent. Tenants deduct 18% of rent as property
+# tax (up to $15,000). No tax at or below $10,000 single / $20,000 joint of gross income. New
+# Jersey builds income from its own categories; for 401(k) wages it matches federal AGI.
+kind: usState
+state: NJ
+parent: US
+taxYear: "2026"
+version: "US-NJ-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.nj.gov/treasury/taxation/pdf/current/1040esi.pdf
+  - https://www.nj.gov/treasury/taxation/pdf/current/1040i.pdf
+incomeTax:
+  source: https://www.nj.gov/treasury/taxation/pdf/current/1040esi.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 20000, rate: 0.014 }, { upTo: 35000, rate: 0.0175 }, { upTo: 40000, rate: 0.035 }, { upTo: 75000, rate: 0.05525 }, { upTo: 500000, rate: 0.0637 }, { upTo: 1000000, rate: 0.0897 }, { upTo: null, rate: 0.1075 }]
+    marriedJoint: [{ upTo: 20000, rate: 0.014 }, { upTo: 50000, rate: 0.0175 }, { upTo: 70000, rate: 0.0245 }, { upTo: 80000, rate: 0.035 }, { upTo: 150000, rate: 0.05525 }, { upTo: 500000, rate: 0.0637 }, { upTo: 1000000, rate: 0.0897 }, { upTo: null, rate: 0.1075 }]
+    marriedSeparate: [{ upTo: 20000, rate: 0.014 }, { upTo: 35000, rate: 0.0175 }, { upTo: 40000, rate: 0.035 }, { upTo: 75000, rate: 0.05525 }, { upTo: 500000, rate: 0.0637 }, { upTo: 1000000, rate: 0.0897 }, { upTo: null, rate: 0.1075 }]
+    headOfHousehold: [{ upTo: 20000, rate: 0.014 }, { upTo: 50000, rate: 0.0175 }, { upTo: 70000, rate: 0.0245 }, { upTo: 80000, rate: 0.035 }, { upTo: 150000, rate: 0.05525 }, { upTo: 500000, rate: 0.0637 }, { upTo: 1000000, rate: 0.0897 }, { upTo: null, rate: 0.1075 }]
+  exemption: { perFiler: 1000, perDependent: 1500, perAged: 1000 }
+  rentDeduction: { share: 0.18, max: { single: 15000, marriedJoint: 15000, marriedSeparate: 7500, headOfHousehold: 15000 } }
+  noTaxBelow: { single: 10000, marriedJoint: 20000, marriedSeparate: 10000, headOfHousehold: 20000 }
+  notes:
+    - "New Jersey's child tax credit, earned income credit and pension exclusion aren't included."

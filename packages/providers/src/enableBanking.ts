@@ -1,6 +1,6 @@
 import { createSign } from "node:crypto";
 import { assignContentIds, cleanPayee, parseAmount } from "@cuntas/importers";
-import type { Currency } from "@cuntas/rules";
+import type { Country, Currency } from "@cuntas/rules";
 import { ProviderError, type BankDataProvider, type ConsentSession, type ProviderAccount, type ProviderInstitution } from "./types";
 
 export interface EnableBankingConfig {
@@ -77,7 +77,7 @@ export class EnableBankingProvider implements BankDataProvider {
     return (method === "DELETE" ? undefined : await res.json()) as T;
   }
 
-  async listInstitutions(country: "IE" | "UK"): Promise<ProviderInstitution[]> {
+  async listInstitutions(country: Country): Promise<ProviderInstitution[]> {
     const ebCountry = country === "UK" ? "GB" : country;
     const r = await this.call<{ aspsps: { name: string; country: string; bic?: string }[] }>("GET", `/aspsps?country=${ebCountry}&psu_type=personal`);
     return r.aspsps.map((a) => ({ id: `${a.country}:${a.name}`, name: a.name, country, ...(a.bic ? { bic: a.bic } : {}) }));

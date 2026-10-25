@@ -1,0 +1,27 @@
+# Mississippi individual income tax, 2026: 0% on the first $10,000 of taxable income and 4% above,
+# after a standard deduction and a personal exemption set by filing status. Mississippi starts from
+# its own gross income; for wages that matches federal AGI (401(k) deferrals are excluded).
+kind: usState
+state: MS
+parent: US
+taxYear: "2026"
+version: "US-MS-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.dor.ms.gov/general-information
+  - https://www.dor.ms.gov/sites/default/files/tax-forms/business/89700251revised1.13.2026.pdf
+incomeTax:
+  source: https://www.dor.ms.gov/general-information
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 10000, rate: 0 }, { upTo: null, rate: 0.04 }]
+    marriedJoint: [{ upTo: 10000, rate: 0 }, { upTo: null, rate: 0.04 }]
+    marriedSeparate: [{ upTo: 10000, rate: 0 }, { upTo: null, rate: 0.04 }]
+    headOfHousehold: [{ upTo: 10000, rate: 0 }, { upTo: null, rate: 0.04 }]
+  standardDeduction: { single: 2300, marriedJoint: 4600, marriedSeparate: 2300, headOfHousehold: 3400 }
+  exemption:
+    perFiler: 0
+    byStatus: { single: 6000, marriedJoint: 12000, marriedSeparate: 6000, headOfHousehold: 8000 }
+    perDependent: 1500
+    perAged: 1500

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Badge, Button, Card, Empty, Field, Input, Modal, PageHeader, Select, Table } from "../components/ui";
 import { apiClient, withReauth, type AdminHousehold, type Api, type HouseholdMember } from "../lib/api";
-import { formatDate } from "../lib/format";
+import { currencyOptions, formatDate } from "../lib/format";
 import { DEFAULT_API_URL, cleanUrl, refreshAccount, signInToServer } from "../lib/server";
 import { useStore } from "../lib/store";
+import type { Currency } from "@cuntas/rules";
 
 // Instance administration for a self-hosted server: create households for other people, suspend,
 // rename or delete them, and manage who belongs to each. Admins never see a household's ledger.
@@ -167,14 +168,14 @@ function AdminConsole({ api }: { api: Api }) {
 
 function CreateHousehold({ api, onCreated }: { api: Api; onCreated: (name: string, ownerLink: string | null) => void }) {
   const [name, setName] = useState("");
-  const [currency, setCurrency] = useState<"EUR" | "GBP">("EUR");
+  const [currency, setCurrency] = useState<Currency>("EUR");
   const [join, setJoin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
     <Card title="New household">
       <div className="space-y-3">
         <Field label="Name">{(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Murphy household" />}</Field>
-        <Field label="Base currency">{(id) => <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as "EUR" | "GBP")} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+        <Field label="Base currency">{(id) => <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as Currency)} options={currencyOptions()} />}</Field>
         <label className="flex items-start gap-2 text-sm"><input type="checkbox" className="mt-1" checked={join} onChange={(e) => setJoin(e.target.checked)} />Join it myself as owner (otherwise you get an owner invite link to send)</label>
         <Button
           variant="primary"

@@ -1,0 +1,133 @@
+# Indiana individual income tax, 2026: a flat 2.95% on federal AGI less exemptions and deductions,
+# plus the county income tax of the county you lived in on January 1, on the same income. The state
+# rate is 2026's; county rates are those in effect January 1, 2026 (Departmental Notice #1, R46).
+# Exemptions and deductions follow the 2025 IT-40 (the 2026 booklet isn't published yet).
+kind: usState
+state: IN
+parent: US
+taxYear: "2026"
+version: "US-IN-2026.2"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.in.gov/dor/resources/tax-rates-and-reports/rates-fees-and-penalties/
+  - https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf
+  - https://forms.in.gov/Download.aspx?id=16915
+# $1,000 for each filer and dependent; a dependent child adds $1,500 (2,500 in all); $1,000 for each
+# filer 65 or over, and $500 more each if AGI is under $40,000 ($20,000 married filing separately).
+incomeTax:
+  source: https://forms.in.gov/Download.aspx?id=16915
+  base: federalAgi
+  rate: 0.0295
+  exemption:
+    perFiler: 1000
+    perDependent: 2500
+    perAged: 1000
+    agedLowIncome: { extra: 500, below: { single: 40000, marriedJoint: 40000, marriedSeparate: 20000, headOfHousehold: 40000 } }
+  # Rent on your Indiana main home, up to $3,000 ($1,500 married filing separately).
+  rentDeduction: { share: 1, max: { single: 3000, marriedJoint: 3000, marriedSeparate: 1500, headOfHousehold: 3000 } }
+  notes:
+    - "Indiana's refundable earned income credit (10% of the federal one) isn't included."
+    - "The homeowner's property tax deduction (up to $2,500), the 2026 tips, overtime and car loan interest deductions, and the extra exemptions for a first or adopted child aren't included."
+localTax:
+  source: https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf
+  note: "Every Indiana county levies a county income tax, set by where you lived on January 1."
+# Boone's rate rose to 0.0171 for withholding from October 1, 2026; its annual 2026 rate isn't
+# published yet (a past change was blended over the year).
+localities:
+  source: https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf
+  status: provisional
+  kind: county
+  list:
+    - { id: adams, name: "Adams", rate: 0.016 }
+    - { id: allen, name: "Allen", rate: 0.0159 }
+    - { id: bartholomew, name: "Bartholomew", rate: 0.0175 }
+    - { id: benton, name: "Benton", rate: 0.0179 }
+    - { id: blackford, name: "Blackford", rate: 0.025 }
+    - { id: boone, name: "Boone", rate: 0.017 }
+    - { id: brown, name: "Brown", rate: 0.025234 }
+    - { id: carroll, name: "Carroll", rate: 0.024733 }
+    - { id: cass, name: "Cass", rate: 0.0295 }
+    - { id: clark, name: "Clark", rate: 0.02 }
+    - { id: clay, name: "Clay", rate: 0.0235 }
+    - { id: clinton, name: "Clinton", rate: 0.0265 }
+    - { id: crawford, name: "Crawford", rate: 0.0165 }
+    - { id: daviess, name: "Daviess", rate: 0.015 }
+    - { id: dearborn, name: "Dearborn", rate: 0.014 }
+    - { id: decatur, name: "Decatur", rate: 0.0245 }
+    - { id: dekalb, name: "DeKalb", rate: 0.0213 }
+    - { id: delaware, name: "Delaware", rate: 0.015 }
+    - { id: dubois, name: "Dubois", rate: 0.012 }
+    - { id: elkhart, name: "Elkhart", rate: 0.02 }
+    - { id: fayette, name: "Fayette", rate: 0.0282 }
+    - { id: floyd, name: "Floyd", rate: 0.0189 }
+    - { id: fountain, name: "Fountain", rate: 0.021 }
+    - { id: franklin, name: "Franklin", rate: 0.017 }
+    - { id: fulton, name: "Fulton", rate: 0.0288 }
+    - { id: gibson, name: "Gibson", rate: 0.013 }
+    - { id: grant, name: "Grant", rate: 0.0275 }
+    - { id: greene, name: "Greene", rate: 0.0235 }
+    - { id: hamilton, name: "Hamilton", rate: 0.011 }
+    - { id: hancock, name: "Hancock", rate: 0.0194 }
+    - { id: harrison, name: "Harrison", rate: 0.01 }
+    - { id: hendricks, name: "Hendricks", rate: 0.017 }
+    - { id: henry, name: "Henry", rate: 0.0202 }
+    - { id: howard, name: "Howard", rate: 0.0235 }
+    - { id: huntington, name: "Huntington", rate: 0.0195 }
+    - { id: jackson, name: "Jackson", rate: 0.021 }
+    - { id: jasper, name: "Jasper", rate: 0.02864 }
+    - { id: jay, name: "Jay", rate: 0.025 }
+    - { id: jefferson, name: "Jefferson", rate: 0.0103 }
+    - { id: jennings, name: "Jennings", rate: 0.025 }
+    - { id: johnson, name: "Johnson", rate: 0.014 }
+    - { id: knox, name: "Knox", rate: 0.017 }
+    - { id: kosciusko, name: "Kosciusko", rate: 0.01 }
+    - { id: lagrange, name: "LaGrange", rate: 0.0165 }
+    - { id: lake, name: "Lake", rate: 0.015 }
+    - { id: laporte, name: "LaPorte", rate: 0.0145 }
+    - { id: lawrence, name: "Lawrence", rate: 0.0175 }
+    - { id: madison, name: "Madison", rate: 0.0225 }
+    - { id: marion, name: "Marion", rate: 0.0202 }
+    - { id: marshall, name: "Marshall", rate: 0.0125 }
+    - { id: martin, name: "Martin", rate: 0.025 }
+    - { id: miami, name: "Miami", rate: 0.0254 }
+    - { id: monroe, name: "Monroe", rate: 0.0214 }
+    - { id: montgomery, name: "Montgomery", rate: 0.0265 }
+    - { id: morgan, name: "Morgan", rate: 0.0272 }
+    - { id: newton, name: "Newton", rate: 0.01 }
+    - { id: noble, name: "Noble", rate: 0.0175 }
+    - { id: ohio, name: "Ohio", rate: 0.02 }
+    - { id: orange, name: "Orange", rate: 0.0175 }
+    - { id: owen, name: "Owen", rate: 0.025 }
+    - { id: parke, name: "Parke", rate: 0.0265 }
+    - { id: perry, name: "Perry", rate: 0.014 }
+    - { id: pike, name: "Pike", rate: 0.012 }
+    - { id: porter, name: "Porter", rate: 0.005 }
+    - { id: posey, name: "Posey", rate: 0.0145 }
+    - { id: pulaski, name: "Pulaski", rate: 0.0285 }
+    - { id: putnam, name: "Putnam", rate: 0.023 }
+    - { id: randolph, name: "Randolph", rate: 0.03 }
+    - { id: ripley, name: "Ripley", rate: 0.0238 }
+    - { id: rush, name: "Rush", rate: 0.0215 }
+    - { id: stjoseph, name: "St. Joseph", rate: 0.0175 }
+    - { id: scott, name: "Scott", rate: 0.0216 }
+    - { id: shelby, name: "Shelby", rate: 0.017 }
+    - { id: spencer, name: "Spencer", rate: 0.008 }
+    - { id: starke, name: "Starke", rate: 0.0171 }
+    - { id: steuben, name: "Steuben", rate: 0.0199 }
+    - { id: sullivan, name: "Sullivan", rate: 0.017 }
+    - { id: switzerland, name: "Switzerland", rate: 0.0145 }
+    - { id: tippecanoe, name: "Tippecanoe", rate: 0.0128 }
+    - { id: tipton, name: "Tipton", rate: 0.026 }
+    - { id: union, name: "Union", rate: 0.0275 }
+    - { id: vanderburgh, name: "Vanderburgh", rate: 0.0125 }
+    - { id: vermillion, name: "Vermillion", rate: 0.015 }
+    - { id: vigo, name: "Vigo", rate: 0.02 }
+    - { id: wabash, name: "Wabash", rate: 0.029 }
+    - { id: warren, name: "Warren", rate: 0.0212 }
+    - { id: warrick, name: "Warrick", rate: 0.01 }
+    - { id: washington, name: "Washington", rate: 0.02 }
+    - { id: wayne, name: "Wayne", rate: 0.0125 }
+    - { id: wells, name: "Wells", rate: 0.021 }
+    - { id: white, name: "White", rate: 0.0232 }
+    - { id: whitley, name: "Whitley", rate: 0.016829 }

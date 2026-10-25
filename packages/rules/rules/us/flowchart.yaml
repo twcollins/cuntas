@@ -1,0 +1,18 @@
+# US next steps, in the order of the r/personalfinance "prime directive" as set out in the design
+# doc: budget, starter emergency fund, employer match, high-interest debt, full emergency fund, HSA,
+# IRA, 401(k) to the limit, then other goals. Thresholds are defaults the household can override.
+# Not yet checked against the current wiki text.
+id: chart-us-pf
+version: "CHART-US-1"
+status: provisional
+source: https://www.reddit.com/r/personalfinance/wiki/commontopics/
+starterFund: { floor: 1000, months: 1 }
+# The wiki sizes the full fund in months of expenses only, with no dollar floor.
+fullFund: { floorLow: 0, floorHigh: 0, monthsLow: 3, monthsHigh: 6 }
+debt: { highAprAbove: 0.10, moderateAprFrom: 0.04 }
+retirement: { shareOfAge: 0.5 }
+mortgageOverpay: { rate: 0.10 }
+goals: { savingsHorizonYears: 5 }
+reminders: { renewalDaysAhead: 30, consentDaysAhead: 7 }
+debtPlanner: { extraPaymentProbe: 50 }
+projections: { nominalReturn: 0.05, inflation: 0.02, scenarioSpread: 0.02, withdrawalRate: 0.04, depositRate: 0.025, dividendYield: 0.02, years: 20 }

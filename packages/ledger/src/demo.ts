@@ -1,4 +1,4 @@
-import { addDays, addMonths, ageOn, applyRate, iePayslipCheck, packOn, toMinor, type IsoDate } from "@cuntas/rules";
+import { addDays, addMonths, ageOn, applyRate, iePayslipCheck, packOn, toMinor, type Currency, type IsoDate } from "@cuntas/rules";
 import { periodOf } from "./budgets";
 import { createEmptyDataset, reconcile } from "./dataset";
 import { newMember, type Account, type Dataset, type Transaction } from "./schema";
@@ -105,16 +105,17 @@ export function createDemoDataset(asOf: IsoDate): Dataset {
     { id: "g_house", name: "House deposit", type: "houseDeposit", targetMinor: eur(45000), currency: "EUR", targetDate: addMonths(asOf, 36), linkedAccountIds: [], savedMinor: eur(11500), monthlyContributionMinor: eur(400) },
   ];
 
-  // FX: synthetic weekday EUR/GBP rates, labelled as such.
+  // FX: synthetic weekday EUR/GBP and EUR/USD rates, labelled as such.
   for (let d = addDays(start, -7), i = 0; d <= asOf; d = addDays(d, 1), i++) {
     const dow = new Date(`${d}T00:00:00Z`).getUTCDay();
     if (dow === 0 || dow === 6) continue;
     ds.fxRates.push({ date: d, base: "EUR", quote: "GBP", rate: Number((0.855 + 0.008 * Math.sin(i / 23)).toFixed(4)), source: "demo-synthetic" });
+    ds.fxRates.push({ date: d, base: "EUR", quote: "USD", rate: Number((1.16 + 0.015 * Math.sin(i / 19)).toFixed(4)), source: "demo-synthetic" });
   }
-  const gbpPerEur = (d: IsoDate) => [...ds.fxRates].reverse().find((r) => r.date <= d)?.rate ?? 0.855;
+  const gbpPerEur = (d: IsoDate) => [...ds.fxRates].reverse().find((r) => r.quote === "GBP" && r.date <= d)?.rate ?? 0.855;
 
   let n = 0;
-  const tx = (accountId: string, bookedAt: IsoDate, amountMinor: number, payee: string, currency: "EUR" | "GBP" = "EUR"): Transaction => ({
+  const tx = (accountId: string, bookedAt: IsoDate, amountMinor: number, payee: string, currency: Currency = "EUR"): Transaction => ({
     id: `tx_demo_${++n}`,
     accountId,
     bookedAt,

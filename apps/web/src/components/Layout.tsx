@@ -1,10 +1,14 @@
 import { Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { switchHousehold, useStore } from "../lib/store";
+import { today } from "@cuntas/rules";
+import { useRulePrompts } from "../lib/rulepacks";
+import { switchHousehold, useDataset, useStore } from "../lib/store";
 import { setTheme, useTheme, type ThemePreference } from "../lib/theme";
+import { setDisplayLocale } from "../lib/format";
+import { termsFor } from "../lib/region";
 import { cx } from "./ui";
 
-type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean };
+type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules" };
 
 const NAV: { group: string; items: NavItem[] }[] = [
   {
@@ -34,6 +38,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { to: "/tax", label: "Tax centre", icon: "§" },
       { to: "/what-if", label: "What if we moved", icon: "⇄" },
+      { to: "/tax-rules", label: "Tax rules", icon: "¶", badge: "rules" },
     ],
   },
   {
@@ -124,8 +129,19 @@ function HouseholdSwitcher({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
+/** Count of tax-rule prompts, shown on the Tax rules item. */
+function RulesCount() {
+  const { dataset } = useStore();
+  const prompts = useRulePrompts(dataset!, today());
+  if (prompts.length === 0) return null;
+  return <span aria-label={`${prompts.length} to do`} className="ml-auto rounded-full bg-amber-100 px-1.5 text-[11px] font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">{prompts.length}</span>;
+}
+
 export function Layout() {
   const { sync, account } = useStore();
+  const terms = termsFor(useDataset());
+  // Dates render in the household's style; set before children render.
+  setDisplayLocale(terms.locale);
   const [open, setOpen] = useState(false);
   return (
     <div className="min-h-screen md:flex">
@@ -148,7 +164,8 @@ export function Layout() {
                       activeOptions={{ exact: n.to === "/" }}
                     >
                       <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>
-                      {n.label}
+                      {n.to === "/pensions" ? terms.pensions : n.label}
+                      {n.badge === "rules" && <RulesCount />}
                     </Link>
                   ))}
                 </div>

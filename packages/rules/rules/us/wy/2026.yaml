@@ -1,0 +1,13 @@
+# Wyoming: no personal income tax on wages in 2026.
+kind: usState
+state: WY
+parent: US
+taxYear: "2026"
+version: "US-WY-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://governor.wyo.gov/news-releases/governor-gordon-urges-property-tax-refund-program-applications
+incomeTax:
+  source: https://governor.wyo.gov/news-releases/governor-gordon-urges-property-tax-refund-program-applications
+  none: true

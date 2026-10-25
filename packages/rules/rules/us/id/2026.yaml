@@ -1,0 +1,24 @@
+# Idaho individual income tax, 2026: 5.3% (from the 2026 withholding tables) on Idaho taxable income
+# above a zero-rate band, after the federal standard deduction. The band is 2025's ($4,811 single
+# and married filing separately, $9,622 joint and head of household); 2026's isn't published yet.
+kind: usState
+state: ID
+parent: US
+taxYear: "2026"
+version: "US-ID-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.idaho.gov/document-mngr/pubs_EPB00744
+  - https://tax.idaho.gov/document-mngr/forms_ein00046/
+incomeTax:
+  source: https://tax.idaho.gov/document-mngr/forms_ein00046/
+  base: federalAgi
+  standardDeduction: federal
+  brackets:
+    single: [{ upTo: 4811, rate: 0 }, { upTo: null, rate: 0.053 }]
+    marriedJoint: [{ upTo: 9622, rate: 0 }, { upTo: null, rate: 0.053 }]
+    marriedSeparate: [{ upTo: 4811, rate: 0 }, { upTo: null, rate: 0.053 }]
+    headOfHousehold: [{ upTo: 9622, rate: 0 }, { upTo: null, rate: 0.053 }]
+  notes:
+    - "Idaho's $10 Permanent Building Fund tax and the refundable grocery credit ($155 a person) aren't included."

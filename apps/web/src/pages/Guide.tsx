@@ -8,9 +8,9 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
     title: "Get started",
     intro: "Three steps give the planner enough to work with. Everything stays on this device unless you connect a server.",
     topics: [
-      { to: "/household", label: "Household", body: "Add each person with their pay, date of birth and tax residence. Pay drives take-home, pension relief and the next-step checks." },
-      { to: "/accounts", label: "Accounts", body: "Add current and savings accounts, cards, loans, pensions and property, in EUR or GBP. Tick the ones that hold your emergency fund." },
-      { to: "/import", label: "Import", body: "Load a CSV, OFX or CAMT.053 file from your bank. Pick a preset or map the columns once; re-importing the same file never adds duplicates." },
+      { to: "/household", label: "Household", body: "Add each person with their pay, date of birth and tax residence. Pay drives take-home, pension relief and the next-step checks. For someone in the US, also set their state, filing status and HSA coverage, and their county in Indiana." },
+      { to: "/accounts", label: "Accounts", body: "Add current and savings accounts, cards, loans, pensions and property, in EUR, GBP or USD. Tick the ones that hold your emergency fund." },
+      { to: "/import", label: "Import", body: "Load a CSV, OFX, QFX or CAMT.053 file from your bank. Irish, UK and major US banks and card issuers are recognised; any other layout is mapped once; re-importing the same file never adds duplicates." },
     ],
   },
   {
@@ -25,22 +25,23 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
   },
   {
     title: "Plan",
-    intro: "What should your next euro do? The planner follows the r/irishpersonalfinance flowchart.",
+    intro: "What should your next euro, pound or dollar do? The planner follows the r/irishpersonalfinance flowchart, or r/personalfinance for US households.",
     topics: [
-      { to: "/plan", label: "Next steps", body: "Each flowchart step, checked against your data. The first unmet one is your next step; open it to see why and the rules behind it." },
+      { to: "/plan", label: "Next steps", body: "Each flowchart step, checked against your data: the r/irishpersonalfinance flowchart, or the r/personalfinance order (emergency fund, match, debt, HSA, IRA, 401(k)) when everyone lives in the US. The first unmet step is your next step; open it to see why and the rules behind it." },
       { to: "/debts", label: "Debts", body: "List your debts, then compare avalanche (highest rate first) and snowball (smallest balance first) payoff plans." },
       { to: "/goals", label: "Goals", body: "Emergency fund, required purchases and longer goals, each with the monthly amount it needs." },
-      { to: "/pensions", label: "Pensions", body: "Every pension in one register, with employer match and the tax relief headroom left for your age band." },
+      { to: "/pensions", label: "Pensions", body: "Every pension in one register, with employer match and the tax relief headroom left for your age band. US households record 401(k)s, IRAs, Roth IRAs and HSAs here." },
       { to: "/retirement", label: "Retirement", body: "Pots grown to retirement age and turned into income alongside the State Pensions, in today's money, across three scenarios." },
       { to: "/investing", label: "Compare wrappers", body: "The same yearly amount in each wrapper open to you, compared after tax." },
     ],
   },
   {
     title: "Tax",
-    intro: "Calculators built on versioned Irish and UK rule packs. Each figure shows the pack and source it came from.",
+    intro: "Calculators built on versioned Irish, UK and US rule packs, with a pack for every US state and D.C. Each figure shows the pack and source it came from.",
     topics: [
-      { to: "/tax", label: "Tax centre", body: "Take-home pay, a payslip check, self-assessment for the self-employed, UK ISA allowance and pension annual allowance, deemed-disposal dates and tax deadlines." },
-      { to: "/what-if", label: "What if we moved", body: "See what would change tax treatment if someone moved between Ireland and the UK. Your declared residence isn't changed." },
+      { to: "/tax", label: "Tax centre", body: "Take-home pay (Irish, UK, or US federal plus state, with Indiana county tax; other local income taxes are noted but not included), a payslip check, self-assessment for the self-employed, US contribution limits and quarterly estimated tax, UK ISA allowance and pension annual allowance, deemed-disposal dates and tax deadlines." },
+      { to: "/what-if", label: "What if we moved", body: "See what would change tax treatment if someone moved between Ireland, the UK and the US. Your declared residence isn't changed." },
+      { to: "/tax-rules", label: "Tax rules", body: "The tax figures behind every result, including each US state in its own group. Download a draft for next year, check each figure against its source, load the file, and tick each section once it matches." },
     ],
   },
   {
@@ -73,7 +74,7 @@ export function GuidePage() {
             </dl>
           </Card>
         ))}
-        <p className="text-xs text-stone-500">Cúntas gives guidance, not financial advice. Provisional rule packs reflect Budget announcements not yet law; check figures with Revenue or HMRC before relying on them.</p>
+        <p className="text-xs text-stone-500">Cúntas gives guidance, not financial advice. Provisional rule packs reflect Budget announcements not yet law; check figures with Revenue, HMRC, the IRS or your state tax department before relying on them.</p>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
-import { formatMoney, formatRate, toMinor, type ChartDefaults, type RuleRef } from "@cuntas/rules";
+import { formatMoney, formatRate, toMinor, type ChartDefaults, type RulePack, type RuleRef } from "@cuntas/rules";
 import type { EvalContext, HouseholdSnapshot, Thresholds } from "./types";
 
-export const money = (ctx: EvalContext, minor: number) => formatMoney(minor, ctx.snapshot.currency, { decimals: false });
+export const money = (ctx: EvalContext<RulePack>, minor: number) => formatMoney(minor, ctx.snapshot.currency, { decimals: false });
 export const pct = formatRate;
 
 export function defaultThresholds(chart: ChartDefaults): Thresholds {
@@ -42,11 +42,11 @@ export function fullFundTarget(s: HouseholdSnapshot): { targetMinor: number; mon
   return { targetMinor: Math.max(floor, months * fundBasisMinor(s)), months };
 }
 
-export function chartRef(ctx: EvalContext, key: string): RuleRef {
+export function chartRef(ctx: EvalContext<RulePack>, key: string): RuleRef {
   return { pack: ctx.chart.version, key, source: ctx.chart.source };
 }
 
-export function packRef(ctx: EvalContext, key: string, source: string): RuleRef {
+export function packRef(ctx: EvalContext<RulePack>, key: string, source: string): RuleRef {
   return { pack: ctx.pack.version, key, source };
 }
 

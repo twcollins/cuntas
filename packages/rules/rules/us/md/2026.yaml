@@ -1,0 +1,41 @@
+# Maryland individual income tax, 2026: brackets from Tax-General 10-105 (2025 Budget
+# Reconciliation and Financing Act); a flat standard deduction indexed from 2026 ($3,400 single in
+# the 2026 withholding guide; the joint figure for 2026 isn't published, so 2025's $6,700 is used:
+# check). $3,200 exemptions step down with AGI; $1,000 more for 65+. County income taxes apply on top.
+kind: usState
+state: MD
+parent: US
+taxYear: "2026"
+version: "US-MD-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-105&enactments=false
+  - https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/instructions/withholding/2026/withholding-guide.pdf
+  - https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-211&enactments=false
+incomeTax:
+  source: https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-105&enactments=false
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 1000, rate: 0.02 }, { upTo: 2000, rate: 0.03 }, { upTo: 3000, rate: 0.04 }, { upTo: 100000, rate: 0.0475 }, { upTo: 125000, rate: 0.05 }, { upTo: 150000, rate: 0.0525 }, { upTo: 250000, rate: 0.055 }, { upTo: 500000, rate: 0.0575 }, { upTo: 1000000, rate: 0.0625 }, { upTo: null, rate: 0.065 }]
+    marriedJoint: [{ upTo: 1000, rate: 0.02 }, { upTo: 2000, rate: 0.03 }, { upTo: 3000, rate: 0.04 }, { upTo: 150000, rate: 0.0475 }, { upTo: 175000, rate: 0.05 }, { upTo: 225000, rate: 0.0525 }, { upTo: 300000, rate: 0.055 }, { upTo: 600000, rate: 0.0575 }, { upTo: 1200000, rate: 0.0625 }, { upTo: null, rate: 0.065 }]
+    marriedSeparate: [{ upTo: 1000, rate: 0.02 }, { upTo: 2000, rate: 0.03 }, { upTo: 3000, rate: 0.04 }, { upTo: 100000, rate: 0.0475 }, { upTo: 125000, rate: 0.05 }, { upTo: 150000, rate: 0.0525 }, { upTo: 250000, rate: 0.055 }, { upTo: 500000, rate: 0.0575 }, { upTo: 1000000, rate: 0.0625 }, { upTo: null, rate: 0.065 }]
+    headOfHousehold: [{ upTo: 1000, rate: 0.02 }, { upTo: 2000, rate: 0.03 }, { upTo: 3000, rate: 0.04 }, { upTo: 150000, rate: 0.0475 }, { upTo: 175000, rate: 0.05 }, { upTo: 225000, rate: 0.0525 }, { upTo: 300000, rate: 0.055 }, { upTo: 600000, rate: 0.0575 }, { upTo: 1200000, rate: 0.0625 }, { upTo: null, rate: 0.065 }]
+  standardDeduction: { single: 3400, marriedJoint: 6700, marriedSeparate: 3400, headOfHousehold: 6700 }
+  exemption:
+    perFiler: 3200
+    perDependent: 3200
+    perAged: 1000
+    amountByAgi:
+      single: [{ upTo: 100000, amount: 3200 }, { upTo: 125000, amount: 1600 }, { upTo: 150000, amount: 800 }, { upTo: null, amount: 0 }]
+      marriedJoint: [{ upTo: 150000, amount: 3200 }, { upTo: 175000, amount: 1600 }, { upTo: 200000, amount: 800 }, { upTo: null, amount: 0 }]
+      marriedSeparate: [{ upTo: 100000, amount: 3200 }, { upTo: 125000, amount: 1600 }, { upTo: 150000, amount: 800 }, { upTo: null, amount: 0 }]
+      headOfHousehold: [{ upTo: 150000, amount: 3200 }, { upTo: 175000, amount: 1600 }, { upTo: 200000, amount: 800 }, { upTo: null, amount: 0 }]
+  # Two-income married couples subtract the lower earner's income, up to $1,200.
+  twoEarnerDeduction: { max: 1200 }
+  notes:
+    - "Maryland's earned income credit, poverty level credit, senior credit and child tax credit aren't included."
+    - "Social Security is fully subtracted in Maryland."
+localTax:
+  source: https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/instructions/withholding/2026/withholding-guide.pdf
+  note: "Every Maryland county and Baltimore City levies a local income tax (2.25% to 3.30%)."

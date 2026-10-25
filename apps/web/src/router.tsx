@@ -20,6 +20,7 @@ import { PensionsPage } from "./pages/Pensions";
 import { PlanPage } from "./pages/Plan";
 import { SettingsPage } from "./pages/Settings";
 import { TaxPage } from "./pages/Tax";
+import { TaxRulesPage } from "./pages/TaxRules";
 import { TransactionsPage } from "./pages/Transactions";
 
 const rootRoute = createRootRoute({ component: Layout });
@@ -38,6 +39,7 @@ const pages = [
   ["/retirement", RetirementPage],
   ["/investing", InvestingPage],
   ["/tax", TaxPage],
+  ["/tax-rules", TaxRulesPage],
   ["/what-if", WhatIfPage],
   ["/household", HouseholdPage],
   ["/households", HouseholdsPage],

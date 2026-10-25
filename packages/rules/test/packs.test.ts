@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { MANIFEST, RAW_PACKS } from "../src/packs/generated";
 import { listPacks } from "../src";
 
-const META = new Set(["jurisdiction", "taxYear", "version", "status", "currency", "effective", "sources", "id", "source", "kind", "region", "parent"]);
+const META = new Set(["jurisdiction", "taxYear", "version", "status", "currency", "effective", "sources", "id", "source", "kind", "region", "state", "parent"]);
 
 describe("rule packs", () => {
   it("generated packs match the YAML sources", () => {
@@ -14,7 +14,7 @@ describe("rule packs", () => {
     for (const [key, pack] of Object.entries(RAW_PACKS)) {
       for (const [section, value] of Object.entries(pack as Record<string, unknown>)) {
         if (META.has(section)) continue;
-        if (key.startsWith("ie/flowchart")) continue; // one source at the top for chart defaults
+        if (key.endsWith("/flowchart")) continue; // one source at the top for chart defaults
         const v = value as Record<string, unknown>;
         const sourced =
           typeof v.source === "string" ||

@@ -1,0 +1,21 @@
+# North Dakota individual income tax, 2026 (Form ND-1ES 2026): rates on federal taxable income, with
+# a zero-rate band.
+kind: usState
+state: ND
+parent: US
+taxYear: "2026"
+version: "US-ND-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.tax.nd.gov/sites/www/files/documents/forms/individual/2025-iit/28709-form-nd-1es-2026.pdf
+incomeTax:
+  source: https://www.tax.nd.gov/sites/www/files/documents/forms/individual/2025-iit/28709-form-nd-1es-2026.pdf
+  base: federalTaxableIncome
+  brackets:
+    single: [{ upTo: 49575, rate: 0 }, { upTo: 250400, rate: 0.0195 }, { upTo: null, rate: 0.025 }]
+    marriedJoint: [{ upTo: 82800, rate: 0 }, { upTo: 304850, rate: 0.0195 }, { upTo: null, rate: 0.025 }]
+    marriedSeparate: [{ upTo: 41400, rate: 0 }, { upTo: 152425, rate: 0.0195 }, { upTo: null, rate: 0.025 }]
+    headOfHousehold: [{ upTo: 66400, rate: 0 }, { upTo: 277600, rate: 0.0195 }, { upTo: null, rate: 0.025 }]
+  notes:
+    - "North Dakota's marriage penalty credit isn't included."

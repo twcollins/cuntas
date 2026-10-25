@@ -1,0 +1,27 @@
+# District of Columbia income tax, 2026: the same brackets for every filing status (DC Code
+# 47-1806.03). DC keeps its own standard deduction (not the federal one); 2026's indexed amount
+# isn't published, so 2025's is used: check. The personal exemption is repealed. DC is one
+# jurisdiction, with no further local tax.
+kind: usState
+state: DC
+parent: US
+taxYear: "2026"
+version: "US-DC-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://otr.cfo.dc.gov/page/dc-individual-and-fiduciary-income-tax-rates
+  - https://code.dccouncil.gov/us/dc/council/code/sections/47-1806.03
+  - https://otr.cfo.dc.gov/sites/default/files/dc/sites/otr/publication/attachments/2025_D40_Book_082026_v1.pdf
+incomeTax:
+  source: https://otr.cfo.dc.gov/page/dc-individual-and-fiduciary-income-tax-rates
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 10000, rate: 0.04 }, { upTo: 40000, rate: 0.06 }, { upTo: 60000, rate: 0.065 }, { upTo: 250000, rate: 0.085 }, { upTo: 500000, rate: 0.0925 }, { upTo: 1000000, rate: 0.0975 }, { upTo: null, rate: 0.1075 }]
+    marriedJoint: [{ upTo: 10000, rate: 0.04 }, { upTo: 40000, rate: 0.06 }, { upTo: 60000, rate: 0.065 }, { upTo: 250000, rate: 0.085 }, { upTo: 500000, rate: 0.0925 }, { upTo: 1000000, rate: 0.0975 }, { upTo: null, rate: 0.1075 }]
+    marriedSeparate: [{ upTo: 10000, rate: 0.04 }, { upTo: 40000, rate: 0.06 }, { upTo: 60000, rate: 0.065 }, { upTo: 250000, rate: 0.085 }, { upTo: 500000, rate: 0.0925 }, { upTo: 1000000, rate: 0.0975 }, { upTo: null, rate: 0.1075 }]
+    headOfHousehold: [{ upTo: 10000, rate: 0.04 }, { upTo: 40000, rate: 0.06 }, { upTo: 60000, rate: 0.065 }, { upTo: 250000, rate: 0.085 }, { upTo: 500000, rate: 0.0925 }, { upTo: 1000000, rate: 0.0975 }, { upTo: null, rate: 0.1075 }]
+  standardDeduction: { single: 15000, marriedJoint: 30000, marriedSeparate: 15000, headOfHousehold: 22500 }
+  agedStandardDeduction: { married: 1650, unmarried: 2050 }
+  notes:
+    - "DC's earned income credit (85% of the federal one in 2026) and the Schedule H property tax credit aren't included."

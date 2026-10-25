@@ -1,0 +1,29 @@
+# Rhode Island personal income tax, 2026 (ADV 2025-22 inflation adjustments): one schedule for all
+# statuses; standard deduction and $5,250 exemptions each lose a fifth for every $7,450 (or part)
+# of AGI over $261,000.
+kind: usState
+state: RI
+parent: US
+taxYear: "2026"
+version: "US-RI-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.ri.gov/sites/g/files/xkgbur541/files/2025-11/ADV_2025_22_Inflation_Adjustments.pdf
+  - https://tax.ri.gov/sites/g/files/xkgbur541/files/2026-01/2026%20RI-1040ES_w.pdf
+incomeTax:
+  source: https://tax.ri.gov/sites/g/files/xkgbur541/files/2025-11/ADV_2025_22_Inflation_Adjustments.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 82050, rate: 0.0375, base: 0 }, { upTo: 186450, rate: 0.0475, base: 3076.88 }, { upTo: null, rate: 0.0599, base: 8035.88 }]
+    marriedJoint: [{ upTo: 82050, rate: 0.0375, base: 0 }, { upTo: 186450, rate: 0.0475, base: 3076.88 }, { upTo: null, rate: 0.0599, base: 8035.88 }]
+    marriedSeparate: [{ upTo: 82050, rate: 0.0375, base: 0 }, { upTo: 186450, rate: 0.0475, base: 3076.88 }, { upTo: null, rate: 0.0599, base: 8035.88 }]
+    headOfHousehold: [{ upTo: 82050, rate: 0.0375, base: 0 }, { upTo: 186450, rate: 0.0475, base: 3076.88 }, { upTo: null, rate: 0.0599, base: 8035.88 }]
+  standardDeduction: { single: 11200, marriedJoint: 22400, marriedSeparate: 11200, headOfHousehold: 16800 }
+  standardDeductionPhaseOut: { from: { single: 261000, marriedJoint: 261000, marriedSeparate: 261000, headOfHousehold: 261000 }, range: { single: 37250, marriedJoint: 37250, marriedSeparate: 37250, headOfHousehold: 37250 }, steps: 5 }
+  exemption:
+    perFiler: 5250
+    perDependent: 5250
+    phaseOut: { from: { single: 261000, marriedJoint: 261000, marriedSeparate: 261000, headOfHousehold: 261000 }, range: { single: 37250, marriedJoint: 37250, marriedSeparate: 37250, headOfHousehold: 37250 }, steps: 5 }
+  notes:
+    - "Rhode Island's earned income credit (16% of the federal one) and property tax relief credit aren't included."

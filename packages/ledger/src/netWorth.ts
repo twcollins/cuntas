@@ -1,4 +1,4 @@
-import { addDays, addMonths, type IsoDate } from "@cuntas/rules";
+import { addDays, addMonths, type Currency, type IsoDate } from "@cuntas/rules";
 import { balancesByAccount, isLiability } from "./balances";
 import { FxTable } from "./fx";
 import type { Dataset } from "./schema";
@@ -47,8 +47,8 @@ export function netWorthSeries(ds: Dataset, asOf: IsoDate, months = 12): NetWort
     let fxEffect = 0;
     if (prevForeign && prevDate) {
       for (const f of prevForeign) {
-        const now = fx.tryConvert(f.balance, f.currency as "EUR" | "GBP", base, date) ?? 0;
-        const then = fx.tryConvert(f.balance, f.currency as "EUR" | "GBP", base, prevDate) ?? 0;
+        const now = fx.tryConvert(f.balance, f.currency as Currency, base, date) ?? 0;
+        const then = fx.tryConvert(f.balance, f.currency as Currency, base, prevDate) ?? 0;
         fxEffect += now - then;
       }
     }

@@ -2,6 +2,7 @@ import {
   ageOn,
   applyRate,
   chartDefaults,
+  COUNTRY_INFO,
   ieStatePensionEstimate,
   latestWith,
   myFutureFundStatus,
@@ -9,6 +10,7 @@ import {
   projectRetirement,
   realRate,
   ukStatePensionEstimate,
+  type Currency,
   type IsoDate,
   type RetirementMember,
   type RuleRef,
@@ -35,7 +37,7 @@ export function retirementPlan(ds: Dataset, asOf: IsoDate, opts: RetirementOptio
   const withdrawalRate = opts.withdrawalRate ?? pj.withdrawalRate;
   const fx = new FxTable(ds.fxRates);
   const base = ds.household.baseCurrency;
-  const toBase = (minor: number, from: "EUR" | "GBP") => fx.tryConvert(minor, from, base, asOf) ?? minor;
+  const toBase = (minor: number, from: Currency) => fx.tryConvert(minor, from, base, asOf) ?? minor;
   const iePack = latestWith("IE", "statePension", asOf);
   const ukPack = latestWith("UK", "statePension", asOf);
   const iePayPack = packOn("IE", asOf);
@@ -50,7 +52,7 @@ export function retirementPlan(ds: Dataset, asOf: IsoDate, opts: RetirementOptio
     const working = m.employmentType === "employee" || m.employmentType === "selfEmployed";
     const plans = ds.pensionPlans.filter((p) => p.memberId === m.id && !STATE_KINDS.has(p.kind));
     const potMinor = plans.reduce((a, p) => a + toBase(p.valueMinor, p.currency), 0);
-    const grossBase = toBase(m.grossAnnualMinor, residence === "UK" ? "GBP" : "EUR");
+    const grossBase = toBase(m.grossAnnualMinor, COUNTRY_INFO[residence].currency);
     let rate = plans.reduce((a, p) => a + p.employeeRate + p.employerRate, 0);
     const employer = plans.some((p) => p.isEmployerScheme);
     if (residence === "IE" && myFutureFundStatus(iePayPack, { age, grossAnnualMinor: m.grossAnnualMinor, inQualifyingScheme: employer, optedOut: m.myFutureFundOptedOut }) === "auto-enrolled") {

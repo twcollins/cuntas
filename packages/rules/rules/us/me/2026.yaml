@@ -1,0 +1,43 @@
+# Maine individual income tax, 2026. Rate schedule revised May 2026 (the top band includes the new
+# 2% surcharge on income over $1 million single, $750,000 separate, $1.5 million joint and head of
+# household). Standard deduction and personal exemption fade out over income ranges (36 MRS
+# 5124-C; 2026 worksheets). The $300 dependent credit is refundable in Maine; here it only reduces
+# tax, and the doubling for children under 6 isn't modelled.
+kind: usState
+state: ME
+parent: US
+taxYear: "2026"
+version: "US-ME-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.maine.gov/revenue/sites/maine.gov.revenue/files/2026-05/ind_tax_rate_sched_2026_rev.pdf
+  - https://legislature.maine.gov/statutes/36/title36sec5124-C.html
+  - https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/26_item_stand_%20ded_phaseout_wksht_0.pdf
+incomeTax:
+  source: https://www.maine.gov/revenue/sites/maine.gov.revenue/files/2026-05/ind_tax_rate_sched_2026_rev.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 27400, rate: 0.058 }, { upTo: 64850, rate: 0.0675 }, { upTo: 1000000, rate: 0.0715 }, { upTo: null, rate: 0.0915 }]
+    marriedJoint: [{ upTo: 54850, rate: 0.058 }, { upTo: 129750, rate: 0.0675 }, { upTo: 1500000, rate: 0.0715 }, { upTo: null, rate: 0.0915 }]
+    marriedSeparate: [{ upTo: 27400, rate: 0.058 }, { upTo: 64850, rate: 0.0675 }, { upTo: 750000, rate: 0.0715 }, { upTo: null, rate: 0.0915 }]
+    headOfHousehold: [{ upTo: 41100, rate: 0.058 }, { upTo: 97300, rate: 0.0675 }, { upTo: 1500000, rate: 0.0715 }, { upTo: null, rate: 0.0915 }]
+  standardDeduction: { single: 15700, marriedJoint: 31400, marriedSeparate: 15700, headOfHousehold: 23550 }
+  agedStandardDeduction: { married: 1650, unmarried: 2050 }
+  standardDeductionPhaseOut:
+    from: { single: 102250, marriedJoint: 204550, marriedSeparate: 102250, headOfHousehold: 153400 }
+    range: { single: 75000, marriedJoint: 150000, marriedSeparate: 75000, headOfHousehold: 112500 }
+  exemption:
+    perFiler: 5300
+    perDependent: 0
+    phaseOut:
+      from: { single: 341000, marriedJoint: 409150, marriedSeparate: 204575, headOfHousehold: 375050 }
+      range: { single: 125000, marriedJoint: 125000, marriedSeparate: 62500, headOfHousehold: 125000 }
+  # $300 per dependent, less $20 for each $500 (or part) of AGI over the threshold (2025 thresholds).
+  exemptionCredit:
+    perFiler: 0
+    perDependent: 300
+    dependentPhaseOut: { from: { single: 100000, marriedJoint: 150000, marriedSeparate: 75000, headOfHousehold: 125000 }, step: 500, reductionPerStep: 20 }
+  notes:
+    - "Maine's earned income credit (25% of the federal one) and the property and sales tax fairness credits aren't included."
+    - "Social Security is fully subtracted in Maine."

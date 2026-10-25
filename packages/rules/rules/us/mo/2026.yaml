@@ -1,0 +1,35 @@
+# Missouri individual income tax, 2026 (MO-1040ES 2026 rate chart): the federal standard deduction,
+# the extra for 65+ (2025 amounts), and a share of federal income tax deducted by AGI (2025 rules;
+# assumed to continue). Joint returns split taxable income by each spouse's AGI and run each share
+# through the schedule.
+kind: usState
+state: MO
+parent: US
+taxYear: "2026"
+version: "US-MO-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dor.mo.gov/forms/MO-1040ES_2026.pdf
+  - https://dor.mo.gov/forms/Withholding%20Formula_2026.pdf
+  - https://dor.mo.gov/forms/MO-1040%20Instructions_2025.pdf
+incomeTax:
+  source: https://dor.mo.gov/forms/MO-1040ES_2026.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 1348, rate: 0, base: 0 }, { upTo: 2696, rate: 0.02, base: 0 }, { upTo: 4044, rate: 0.025, base: 27 }, { upTo: 5392, rate: 0.03, base: 61 }, { upTo: 6740, rate: 0.035, base: 101 }, { upTo: 8088, rate: 0.04, base: 148 }, { upTo: 9436, rate: 0.045, base: 202 }, { upTo: null, rate: 0.047, base: 263 }]
+    marriedJoint: [{ upTo: 1348, rate: 0, base: 0 }, { upTo: 2696, rate: 0.02, base: 0 }, { upTo: 4044, rate: 0.025, base: 27 }, { upTo: 5392, rate: 0.03, base: 61 }, { upTo: 6740, rate: 0.035, base: 101 }, { upTo: 8088, rate: 0.04, base: 148 }, { upTo: 9436, rate: 0.045, base: 202 }, { upTo: null, rate: 0.047, base: 263 }]
+    marriedSeparate: [{ upTo: 1348, rate: 0, base: 0 }, { upTo: 2696, rate: 0.02, base: 0 }, { upTo: 4044, rate: 0.025, base: 27 }, { upTo: 5392, rate: 0.03, base: 61 }, { upTo: 6740, rate: 0.035, base: 101 }, { upTo: 8088, rate: 0.04, base: 148 }, { upTo: 9436, rate: 0.045, base: 202 }, { upTo: null, rate: 0.047, base: 263 }]
+    headOfHousehold: [{ upTo: 1348, rate: 0, base: 0 }, { upTo: 2696, rate: 0.02, base: 0 }, { upTo: 4044, rate: 0.025, base: 27 }, { upTo: 5392, rate: 0.03, base: 61 }, { upTo: 6740, rate: 0.035, base: 101 }, { upTo: 8088, rate: 0.04, base: 148 }, { upTo: 9436, rate: 0.045, base: 202 }, { upTo: null, rate: 0.047, base: 263 }]
+  standardDeduction: federal
+  agedStandardDeduction: { married: 1600, unmarried: 2000 }
+  exemption: { perFiler: 0, perDependent: 0, byStatus: { single: 0, marriedJoint: 0, marriedSeparate: 0, headOfHousehold: 1400 } }
+  federalTaxDeduction:
+    shareByAgi: [{ upTo: 25000, share: 0.35 }, { upTo: 50000, share: 0.25 }, { upTo: 100000, share: 0.15 }, { upTo: 125000, share: 0.05 }, { upTo: null, share: 0 }]
+    max: { single: 5000, marriedJoint: 10000, marriedSeparate: 5000, headOfHousehold: 5000 }
+  splitJointIncome: true
+  notes:
+    - "Missouri's working family credit and property tax credit aren't included."
+localTax:
+  source: https://dor.mo.gov/forms/MO-1040%20Instructions_2025.pdf
+  note: "Kansas City and St. Louis levy an earnings tax."

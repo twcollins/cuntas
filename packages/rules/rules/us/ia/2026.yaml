@@ -1,0 +1,21 @@
+# Iowa individual income tax, 2026: a flat rate on federal taxable income, less exemption credits.
+# Rate from the 2026 withholding formula; the credits from the 2025 IA 1040 (2026 form not yet
+# published). The 2025 form gives two personal credits on some returns besides joint ones: check.
+kind: usState
+state: IA
+parent: US
+taxYear: "2026"
+version: "US-IA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://revenue.iowa.gov/media/53/download?inline
+  - https://revenue.iowa.gov/media/4400/download?inline=
+incomeTax:
+  source: https://revenue.iowa.gov/media/53/download?inline
+  base: federalTaxableIncome
+  rate: 0.038
+  exemptionCredit: { perFiler: 40, perDependent: 40, perAged: 20 }
+localTax:
+  source: https://revenue.iowa.gov/media/4400/download?inline=
+  note: "Some Iowa school districts and EMS districts add a surtax on Iowa income tax."

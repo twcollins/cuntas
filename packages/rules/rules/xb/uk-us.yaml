@@ -1,0 +1,34 @@
+# United Kingdom-United States double taxation convention (2001, as amended by the 2002 protocol) and what changes when a member moves from the UK to the US.
+# Treaty references only: no tax figures are calculated from this pack. Shown by the residence what-if and the cross-border classifier.
+id: UK-US-DTA
+version: "XB-US-2026.1"
+status: provisional
+source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force
+articles:
+  employment: { ref: "UK–US DTC Art. 14", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+  privatePension: { ref: "UK–US DTC Art. 17(1)", source: https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made }
+  socialSecurity: { ref: "UK–US DTC Art. 17(3)", source: https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made }
+  lumpSum: { ref: "UK–US DTC Art. 17(2)", source: https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made }
+  governmentService: { ref: "UK–US DTC Art. 19", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+  interest: { ref: "UK–US DTC Art. 11", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+  eliminationOfDoubleTax: { ref: "UK–US DTC Art. 24", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+  savingClause: { ref: "UK–US DTC Art. 1(4)", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+isa:
+  ref: "No US exemption for ISAs"
+  source: https://www.irs.gov/forms-pubs/about-form-8621
+pfic:
+  ref: "PFIC rules, IRS Form 8621"
+  source: https://www.irs.gov/forms-pubs/about-form-8621
+relocation:
+  source: https://www.irs.gov/businesses/international-businesses/united-kingdom-tax-treaty-documents
+  toUS:
+    - { topic: residence, text: "US tax residence comes from a green card or the substantial presence test (183 days, counting part of the two years before). The US tax year is the calendar year, and the year you arrive you may file as dual-status.", source: https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test }
+    - { topic: states, text: "Most US states tax income as well as the federal government, and each sets its own rules. Where you settle matters as much as the move.", source: https://www.usa.gov/state-taxes }
+    - { topic: isa, text: "An ISA is not tax-free in the US: interest, dividends and gains inside it are taxable each year. You can keep it, but you can't pay in once you're no longer UK resident.", source: https://www.gov.uk/individual-savings-accounts/if-you-move-abroad }
+    - { topic: funds, text: "UK-domiciled funds, including most held in a stocks and shares ISA, are PFICs for US tax: without an election, gains are taxed at the top rate plus an interest charge, and each fund needs Form 8621 every year.", source: https://www.irs.gov/forms-pubs/about-form-8621 }
+    - { topic: pensions, text: "UK private and workplace pensions and the UK State Pension paid to a US resident are taxed only in the US (UK–US DTC Art. 17(1) and 17(3)): claim relief at source from HMRC so UK tax is not deducted. Lump sums are taxed only as the UK would tax them (Art. 17(2)).", source: https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made }
+    - { topic: governmentPension, text: "UK government service pensions stay taxable only in the UK unless you are a US citizen living in the US (UK–US DTC Art. 19).", source: https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force }
+    - { topic: lisa, text: "Lifetime ISA bonuses and withdrawal charges still apply; the US gives no exemption.", source: https://www.gov.uk/lifetime-isa }
+    - { topic: gains, text: "UK temporary non-residence rules can tax gains made while abroad if you return to the UK within five years.", source: https://www.gov.uk/hmrc-internal-manuals/capital-gains-manual/cg26500 }
+    - { topic: foreignAccounts, text: "US residents report foreign bank and investment accounts each year: FinCEN Form 114 (FBAR) once their combined balance passes $10,000 at any point in the year, and Form 8938 above higher limits.", source: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar }
+    - { topic: statePension, text: "Under the US–UK social security agreement, National Insurance and US Social Security credits can be combined to qualify for either country's pension. Voluntary NI contributions from abroad need ten years of UK residence or contributions.", source: https://www.ssa.gov/international/Agreement_Pamphlets/uk.html }

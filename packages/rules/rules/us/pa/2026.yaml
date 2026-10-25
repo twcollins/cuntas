@@ -1,0 +1,22 @@
+# Pennsylvania personal income tax, 2026: a flat 3.07% on compensation, with no standard deduction
+# or personal exemption. 401(k) deferrals are taxable compensation in Pennsylvania. Tax
+# Forgiveness for low incomes and local earned income taxes aren't included.
+kind: usState
+state: PA
+parent: US
+taxYear: "2026"
+version: "US-PA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.pa.gov/en/agencies/revenue/resources/tax-types-and-information/personal-income-tax.html
+  - https://www.pa.gov/agencies/revenue/forms-and-publications/pa-personal-income-tax-guide/gross-compensation.html
+incomeTax:
+  source: https://www.pa.gov/en/agencies/revenue/resources/tax-types-and-information/personal-income-tax.html
+  base: wages
+  rate: 0.0307
+  notes:
+    - "Tax Forgiveness (Schedule SP) can reduce or remove the tax on low incomes; it isn't included."
+localTax:
+  source: https://dced.pa.gov/local-government/local-income-tax-information/
+  note: "Pennsylvania municipalities and school districts levy a local earned income tax, and Philadelphia a wage tax."

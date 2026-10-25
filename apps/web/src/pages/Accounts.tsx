@@ -4,14 +4,19 @@ import { accountTypes, importStatement, isLiability, latestValuation, newId, wra
 import { consentStatusLabel } from "../lib/consent";
 import { Badge, Button, Card, Empty, Field, Input, Modal, MoneyInput, PageHeader, Select, Table } from "../components/ui";
 import { useAsOf, useBalances } from "../lib/derived";
-import { formatDate, money, moneyExact } from "../lib/format";
+import { currencyOptions, formatDate, money, moneyExact, taxCountryOptions } from "../lib/format";
 import { apiClient } from "../lib/api";
 import { replaceDataset, update, useDataset, useStore } from "../lib/store";
+import type { Currency, Jurisdiction } from "@cuntas/rules";
+import { termsFor, type Terms } from "../lib/region";
 
 const TYPE_LABELS: Record<Account["type"], string> = {
+  // "current" reads "Checking account" for a US household: see typeLabel.
   current: "Current account", savings: "Savings", creditCard: "Credit card", loan: "Loan", mortgage: "Mortgage", pension: "Pension",
   brokerage: "Investments", property: "Property", vehicle: "Vehicle", cash: "Cash", other: "Other asset",
 };
+
+const typeLabel = (t: Account["type"], terms: Terms) => (t === "current" ? terms.currentAccount : TYPE_LABELS[t]);
 
 function blankAccount(ds: ReturnType<typeof useDataset>, asOf: string): Account {
   return { id: newId("acc"), name: "", memberIds: ds.members.map((m) => m.id), type: "current", currency: ds.household.baseCurrency, institutionId: null, wrapper: "none", jurisdiction: "IE", openingBalanceMinor: 0, openingDate: asOf, valuations: [], isEmergencyFund: false, archived: false };
@@ -19,13 +24,14 @@ function blankAccount(ds: ReturnType<typeof useDataset>, asOf: string): Account 
 
 export function AccountsPage() {
   const ds = useDataset();
+  const terms = termsFor(ds);
   const asOf = useAsOf();
   const { native, base } = useBalances(ds);
   const [editing, setEditing] = useState<Account | null>(null);
   const [valuing, setValuing] = useState<{ account: Account; value: number } | null>(null);
   const baseCur = ds.household.baseCurrency;
   const groups = [
-    { title: "Cash and current accounts", types: ["current", "savings", "cash"] },
+    { title: terms.cashGroup, types: ["current", "savings", "cash"] },
     { title: "Debts", types: ["creditCard", "loan", "mortgage"] },
     { title: "Investments and pensions", types: ["brokerage", "pension"] },
     { title: "Property and other assets", types: ["property", "vehicle", "other"] },
@@ -55,7 +61,7 @@ export function AccountsPage() {
                           {a.isEmergencyFund && <Badge tone="good">Emergency fund</Badge>}
                         </div>
                       </td>
-                      <td className="px-2 py-2 text-stone-500">{TYPE_LABELS[a.type]}</td>
+                      <td className="px-2 py-2 text-stone-500">{typeLabel(a.type, terms)}</td>
                       <td className="px-2 py-2 text-right tabular-nums">
                         {moneyExact(native.get(a.id) ?? 0, a.currency)}
                         {valued && <div className="text-xs text-stone-500">valued {formatDate(valued.date)}</div>}
@@ -95,6 +101,7 @@ export function AccountsPage() {
 
 function AccountForm({ account, onDone }: { account: Account; onDone: () => void }) {
   const ds = useDataset();
+  const terms = termsFor(ds);
   const [a, setA] = useState(account);
   const exists = ds.accounts.some((x) => x.id === a.id);
   const liability = isLiability(a);
@@ -102,10 +109,10 @@ function AccountForm({ account, onDone }: { account: Account; onDone: () => void
     <div className="space-y-3">
       <Field label="Name">{(id) => <Input id={id} value={a.name} onChange={(e) => setA({ ...a, name: e.target.value })} placeholder="e.g. Credit union shares" />}</Field>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Type">{(id) => <Select id={id} value={a.type} onChange={(e) => setA({ ...a, type: e.target.value as Account["type"] })} options={accountTypes.map((t) => ({ value: t, label: TYPE_LABELS[t] }))} />}</Field>
+        <Field label="Type">{(id) => <Select id={id} value={a.type} onChange={(e) => setA({ ...a, type: e.target.value as Account["type"] })} options={accountTypes.map((t) => ({ value: t, label: typeLabel(t, terms) }))} />}</Field>
         <Field label="Wrapper">{(id) => <Select id={id} value={a.wrapper} onChange={(e) => setA({ ...a, wrapper: e.target.value as Account["wrapper"] })} options={wrappers.map((w) => ({ value: w, label: w === "none" ? "None" : w }))} />}</Field>
-        <Field label="Currency">{(id) => <Select id={id} value={a.currency} onChange={(e) => setA({ ...a, currency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
-        <Field label="Country">{(id) => <Select id={id} value={a.jurisdiction} onChange={(e) => setA({ ...a, jurisdiction: e.target.value as "IE" | "UK" })} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "United Kingdom" }]} />}</Field>
+        <Field label="Currency">{(id) => <Select id={id} value={a.currency} onChange={(e) => setA({ ...a, currency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
+        <Field label="Country">{(id) => <Select id={id} value={a.jurisdiction} onChange={(e) => setA({ ...a, jurisdiction: e.target.value as Jurisdiction })} options={taxCountryOptions()} />}</Field>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Field label={liability ? "Opening balance owed" : "Opening balance"} hint={liability ? "Enter what you owe as a positive amount." : undefined}>

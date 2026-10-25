@@ -1,3 +1,4 @@
+import { CURRENCIES, type Currency } from "@cuntas/rules";
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -21,7 +22,7 @@ import { listProviderTransactions, revokeConnection, startConnection, syncConnec
 import { householdStatus, listMembers, MembershipError, removeMember, setMemberRole } from "../services/admin";
 
 const json = <T extends z.ZodTypeAny>(schema: T, description = "OK") => ({ description, content: { "application/json": { schema } } });
-const Household = z.object({ id: z.string().uuid(), name: z.string(), baseCurrency: z.enum(["EUR", "GBP"]) }).openapi("Household");
+const Household = z.object({ id: z.string().uuid(), name: z.string(), baseCurrency: z.enum(CURRENCIES) }).openapi("Household");
 const HouseholdParam = z.object({ householdId: z.string().uuid() });
 const ConnParam = HouseholdParam.extend({ connectionId: z.string().uuid() });
 const Ok = z.object({ ok: z.boolean() });
@@ -55,7 +56,7 @@ householdRoutes.openapi(
     return c.json(
       {
         user: { id: user.id, displayName: user.displayName, isAdmin: user.isAdmin },
-        households: households.map(({ suspendedAt, ...h }) => ({ ...h, baseCurrency: h.baseCurrency as "EUR" | "GBP", suspended: suspendedAt !== null })),
+        households: households.map(({ suspendedAt, ...h }) => ({ ...h, baseCurrency: h.baseCurrency as Currency, suspended: suspendedAt !== null })),
       },
       200,
     );
@@ -66,7 +67,7 @@ householdRoutes.openapi(
   createRoute({
     method: "post",
     path: "/households",
-    request: { body: { content: { "application/json": { schema: z.object({ name: z.string().min(1).max(80), baseCurrency: z.enum(["EUR", "GBP"]) }) } } } },
+    request: { body: { content: { "application/json": { schema: z.object({ name: z.string().min(1).max(80), baseCurrency: z.enum(CURRENCIES) }) } } } },
     responses: { 201: json(Household, "Created") },
   }),
   async (c) => {

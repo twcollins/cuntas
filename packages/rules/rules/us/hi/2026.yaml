@@ -1,0 +1,24 @@
+# Hawaii individual income tax, 2026: brackets as 2025 and the new 2026 standard deduction (Act 46,
+# 2024). $1,144 per exemption, and one more for each filer 65+. Act 24's rate changes start in 2027.
+kind: usState
+state: HI
+parent: US
+taxYear: "2026"
+version: "US-HI-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://files.hawaii.gov/tax/news/announce/ann24-03.pdf
+  - https://files.hawaii.gov/tax/forms/2025/n11ins.pdf
+incomeTax:
+  source: https://files.hawaii.gov/tax/news/announce/ann24-03.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 9600, rate: 0.014 }, { upTo: 14400, rate: 0.032 }, { upTo: 19200, rate: 0.055 }, { upTo: 24000, rate: 0.064 }, { upTo: 36000, rate: 0.068 }, { upTo: 48000, rate: 0.072 }, { upTo: 125000, rate: 0.076 }, { upTo: 175000, rate: 0.079 }, { upTo: 225000, rate: 0.0825 }, { upTo: 275000, rate: 0.09 }, { upTo: 325000, rate: 0.1 }, { upTo: null, rate: 0.11 }]
+    marriedJoint: [{ upTo: 19200, rate: 0.014 }, { upTo: 28800, rate: 0.032 }, { upTo: 38400, rate: 0.055 }, { upTo: 48000, rate: 0.064 }, { upTo: 72000, rate: 0.068 }, { upTo: 96000, rate: 0.072 }, { upTo: 250000, rate: 0.076 }, { upTo: 350000, rate: 0.079 }, { upTo: 450000, rate: 0.0825 }, { upTo: 550000, rate: 0.09 }, { upTo: 650000, rate: 0.1 }, { upTo: null, rate: 0.11 }]
+    marriedSeparate: [{ upTo: 9600, rate: 0.014 }, { upTo: 14400, rate: 0.032 }, { upTo: 19200, rate: 0.055 }, { upTo: 24000, rate: 0.064 }, { upTo: 36000, rate: 0.068 }, { upTo: 48000, rate: 0.072 }, { upTo: 125000, rate: 0.076 }, { upTo: 175000, rate: 0.079 }, { upTo: 225000, rate: 0.0825 }, { upTo: 275000, rate: 0.09 }, { upTo: 325000, rate: 0.1 }, { upTo: null, rate: 0.11 }]
+    headOfHousehold: [{ upTo: 14400, rate: 0.014 }, { upTo: 21600, rate: 0.032 }, { upTo: 28800, rate: 0.055 }, { upTo: 36000, rate: 0.064 }, { upTo: 54000, rate: 0.068 }, { upTo: 72000, rate: 0.072 }, { upTo: 187500, rate: 0.076 }, { upTo: 262500, rate: 0.079 }, { upTo: 337500, rate: 0.0825 }, { upTo: 412500, rate: 0.09 }, { upTo: 487500, rate: 0.1 }, { upTo: null, rate: 0.11 }]
+  standardDeduction: { single: 8000, marriedJoint: 16000, marriedSeparate: 8000, headOfHousehold: 12000 }
+  exemption: { perFiler: 1144, perDependent: 1144, perAged: 1144 }
+  notes:
+    - "Hawaii's earned income credit, food/excise tax credit and renters credit aren't included."

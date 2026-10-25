@@ -1,12 +1,16 @@
 import { z } from "zod";
+import { COUNTRIES, CURRENCIES, TAX_JURISDICTIONS, US_FILING_STATUSES, US_STATE_CODES, type UsState } from "@cuntas/rules";
 
 // The household dataset. Zod schemas validate imports and API payloads; types are inferred from them.
 // Money is integer minor units with an ISO currency on every money field.
 
 const id = z.string().min(1);
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-const currency = z.enum(["EUR", "GBP"]);
-const jurisdiction = z.enum(["IE", "UK"]);
+const currency = z.enum(CURRENCIES);
+/** A tax jurisdiction (residence, pensions, accounts): one with rule packs. */
+const jurisdiction = z.enum(TAX_JURISDICTIONS);
+/** Any supported country (nationality, banks). */
+const country = z.enum(COUNTRIES);
 const minor = z.number().int();
 
 export const householdSchema = z.object({
@@ -31,13 +35,21 @@ export const memberSchema = z.object({
   id,
   name: z.string(),
   dateOfBirth: isoDate,
-  nationality: z.array(jurisdiction),
+  nationality: z.array(country),
   employmentType: z.enum(["employee", "selfEmployed", "notWorking", "retired"]),
   grossAnnualMinor: minor.default(0),
   payFrequency: z.enum(["weekly", "fortnightly", "monthly"]).default("monthly"),
   assessment: z.enum(["single", "oneParent", "marriedOneIncome", "marriedTwoIncomes"]).default("single"),
   myFutureFundOptedOut: z.boolean().default(false),
   stockMatch: z.object({ contributedRate: z.number(), fullMatchRate: z.number() }).nullable().default(null),
+  /** US federal filing status, used when US resident. */
+  usFilingStatus: z.enum(US_FILING_STATUSES).default("single"),
+  /** State of residence, used when US resident; null until chosen (take-home is then federal only). */
+  usState: z.enum(US_STATE_CODES as [UsState, ...UsState[]]).nullable().default(null),
+  /** County or city within the state, for states whose pack carries local rates (Indiana counties). */
+  usLocality: z.string().nullable().default(null),
+  /** HSA-eligible (high-deductible) health plan coverage, used when US resident. */
+  usHsaCoverage: z.enum(["none", "selfOnly", "family"]).default("none"),
   /** Scottish taxpayers pay Scottish income tax when UK resident. */
   ukRegion: z.enum(["rUK", "scotland"]).default("rUK"),
   studentLoans: z.array(z.enum(["plan1", "plan2", "plan4", "plan5", "postgraduate"])).default([]),
@@ -67,7 +79,7 @@ export const residencePeriodSchema = z.object({
   declaredBy: z.string(),
 });
 
-export const institutionSchema = z.object({ id, name: z.string(), country: jurisdiction, bic: z.string().optional(), aggregatorRef: z.string().optional() });
+export const institutionSchema = z.object({ id, name: z.string(), country, bic: z.string().optional(), aggregatorRef: z.string().optional() });
 
 export const connectionSchema = z.object({
   id,
@@ -174,7 +186,7 @@ export const debtSchema = z.object({
   termEnd: isoDate.nullable().default(null),
 });
 
-export const pensionKinds = ["occupationalDC", "occupationalDB", "PRSA", "AVC", "MyFutureFund", "ARF", "ukWorkplaceDC", "ukWorkplaceDB", "SIPP", "statePensionIE", "statePensionUK"] as const;
+export const pensionKinds = ["occupationalDC", "occupationalDB", "PRSA", "AVC", "MyFutureFund", "ARF", "ukWorkplaceDC", "ukWorkplaceDB", "SIPP", "statePensionIE", "statePensionUK", "us401k", "usIRA", "usRothIRA", "usHSA"] as const;
 
 export const pensionPlanSchema = z.object({
   id,
@@ -213,7 +225,8 @@ export const holdingSchema = z.object({
   lots: z.array(z.object({ id, date: isoDate, units: z.number(), costMinor: minor, currency })),
 });
 
-export const fxRateSchema = z.object({ date: isoDate, base: z.literal("EUR"), quote: z.literal("GBP"), rate: z.number().positive(), source: z.string() });
+/** An ECB reference rate: units of `quote` per EUR. */
+export const fxRateSchema = z.object({ date: isoDate, base: z.literal("EUR"), quote: z.enum(CURRENCIES).exclude(["EUR"]), rate: z.number().positive(), source: z.string() });
 
 export const stepStateSchema = z.object({
   id,

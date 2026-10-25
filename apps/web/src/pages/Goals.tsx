@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { fullFundTarget, starterFundTarget } from "@cuntas/engine";
 import { goalProgress, newId, type Goal } from "@cuntas/ledger";
-import { ieHelpToBuy, packOn, toMinor } from "@cuntas/rules";
+import { type Currency, ieHelpToBuy, packOn, toMinor } from "@cuntas/rules";
 import { Badge, Button, Card, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Stat, Why } from "../components/ui";
 import { usePlan } from "../lib/derived";
-import { formatDate, money } from "../lib/format";
+import { currencyOptions, formatDate, money } from "../lib/format";
 import { update, useDataset } from "../lib/store";
 
 const TYPES: { value: Goal["type"]; label: string }[] = [
@@ -88,7 +88,7 @@ function GoalForm({ goal, onDone }: { goal: Goal; onDone: () => void }) {
         <Field label="Target amount">{(id) => <MoneyInput id={id} value={g.targetMinor} onChange={(v) => setG({ ...g, targetMinor: v })} />}</Field>
         <Field label="Monthly contribution">{(id) => <MoneyInput id={id} value={g.monthlyContributionMinor} onChange={(v) => setG({ ...g, monthlyContributionMinor: v })} />}</Field>
         <Field label="Saved so far" hint="Ignored when accounts are linked.">{(id) => <MoneyInput id={id} value={g.savedMinor} onChange={(v) => setG({ ...g, savedMinor: v })} />}</Field>
-        <Field label="Currency">{(id) => <Select id={id} value={g.currency} onChange={(e) => setG({ ...g, currency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+        <Field label="Currency">{(id) => <Select id={id} value={g.currency} onChange={(e) => setG({ ...g, currency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
       </div>
       <fieldset className="text-sm">
         <legend className="mb-1 text-xs font-medium text-stone-600">Linked accounts</legend>

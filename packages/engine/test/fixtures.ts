@@ -28,6 +28,7 @@ export function member(over: Partial<MemberState> = {}): MemberState {
 export function snapshot(over: Partial<HouseholdSnapshot> = {}): HouseholdSnapshot {
   return {
     asOf: "2026-10-22",
+    plan: "IE",
     currency: "EUR",
     members: [member({ pension: { ...member().pension, employeeRate: 0.1, employerRate: 0.08, fullMatchEmployeeRate: 0.05 } })],
     netMonthlyPayMinor: toMinor(3200),

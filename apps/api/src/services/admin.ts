@@ -1,3 +1,4 @@
+import type { Currency } from "@cuntas/rules";
 import { and, asc, count, eq, sql } from "drizzle-orm";
 import { households, memberships, newDataKey, users, withTenant, type Db, type Tx } from "@cuntas/db";
 import { audit } from "./audit";
@@ -52,7 +53,7 @@ export async function listAllHouseholds(db: Db, adminId: string): Promise<AdminH
  * Creates a household for someone else. The admin either joins as owner, or gets a one-time
  * owner invite to hand over, so the admin never becomes a member of a household they don't use.
  */
-export async function adminCreateHousehold(db: Db, kek: Buffer, adminId: string, input: { name: string; baseCurrency: "EUR" | "GBP"; joinAsOwner: boolean }) {
+export async function adminCreateHousehold(db: Db, kek: Buffer, adminId: string, input: { name: string; baseCurrency: Currency; joinAsOwner: boolean }) {
   if (input.joinAsOwner) {
     const h = await createHousehold(db, kek, adminId, input);
     return { ...h, inviteToken: null };

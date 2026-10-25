@@ -1,0 +1,33 @@
+# Massachusetts personal income tax, 2026: 5% on taxable income, plus a 4% surtax on taxable income
+# over $1,107,750 per return. Exemptions are set by filing status (2025 Form 1 amounts; the 2026
+# withholding guide uses the same). Each filer deducts Social Security and Medicare paid, up to
+# $2,000. Massachusetts builds income from its own classes; for wages it follows federal wages.
+kind: usState
+state: MA
+parent: US
+taxYear: "2026"
+version: "US-MA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.mass.gov/info-details/massachusetts-tax-rates
+  - https://www.mass.gov/doc/2025-form-1-instructions/download
+  - https://www.mass.gov/doc/massachusetts-circular-m-income-tax-withholding-tables-at-50-effective-january-1-2026/download
+incomeTax:
+  source: https://www.mass.gov/info-details/massachusetts-tax-rates
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 1107750, rate: 0.05 }, { upTo: null, rate: 0.09 }]
+    marriedJoint: [{ upTo: 1107750, rate: 0.05 }, { upTo: null, rate: 0.09 }]
+    marriedSeparate: [{ upTo: 1107750, rate: 0.05 }, { upTo: null, rate: 0.09 }]
+    headOfHousehold: [{ upTo: 1107750, rate: 0.05 }, { upTo: null, rate: 0.09 }]
+  exemption:
+    perFiler: 0
+    byStatus: { single: 4400, marriedJoint: 8800, marriedSeparate: 4400, headOfHousehold: 6800 }
+    perDependent: 1000
+    perAged: 700
+  payrollTaxDeductionMax: 2000
+  # Half the rent on a Massachusetts main home, up to $4,000 ($2,000 married filing separately).
+  rentDeduction: { share: 0.5, max: { single: 4000, marriedJoint: 4000, marriedSeparate: 2000, headOfHousehold: 4000 } }
+  notes:
+    - "The child and family credit ($440 per qualifying dependent) isn't included."

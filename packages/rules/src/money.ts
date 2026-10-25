@@ -1,8 +1,14 @@
-export type Currency = "EUR" | "GBP";
+/** Supported currencies. ECB reference rates are quoted against EUR, so any pair converts via EUR. */
+export const CURRENCIES = ["EUR", "GBP", "USD"] as const;
+export type Currency = (typeof CURRENCIES)[number];
 
-export const CURRENCIES: readonly Currency[] = ["EUR", "GBP"];
+export const CURRENCY_NAMES: Record<Currency, string> = { EUR: "Euro", GBP: "Sterling", USD: "US dollar" };
 
-/** Minor units per major unit for EUR and GBP. */
+export function isCurrency(value: string): value is Currency {
+  return (CURRENCIES as readonly string[]).includes(value);
+}
+
+/** Minor units per major unit; 100 for every supported currency. */
 export const MINOR_PER_MAJOR = 100;
 
 const PPM = 1_000_000;
@@ -50,7 +56,7 @@ export function sumMinor(values: readonly number[]): number {
   return values.reduce((a, b) => a + b, 0);
 }
 
-const symbols: Record<Currency, string> = { EUR: "€", GBP: "£" };
+const symbols: Record<Currency, string> = { EUR: "€", GBP: "£", USD: "$" };
 
 export function formatMoney(
   minor: number,

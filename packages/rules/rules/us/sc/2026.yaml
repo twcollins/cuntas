@@ -1,0 +1,34 @@
+# South Carolina individual income tax, 2026 (Act 110 of 2026): starts from federal AGI; the SC
+# income adjusted deduction (SCIAD) replaces the standard deduction and phases out with AGI; 1.99% to
+# $30,000 then 5.21% less $966. Dependent exemption 2025's; $15,000 for each 65+ person; the
+# two-wage-earner credit.
+kind: usState
+state: SC
+parent: US
+taxYear: "2026"
+version: "US-SC-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dor.sc.gov/sites/dor/files/policies/IL26-20.pdf
+  - https://dor.sc.gov/sites/dor/files/forms/SC1040Instr_2025.pdf
+incomeTax:
+  source: https://dor.sc.gov/sites/dor/files/policies/IL26-20.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 30000, rate: 0.0199, base: 0 }, { upTo: null, rate: 0.0521, base: 597.3 }]
+    marriedJoint: [{ upTo: 30000, rate: 0.0199, base: 0 }, { upTo: null, rate: 0.0521, base: 597.3 }]
+    marriedSeparate: [{ upTo: 30000, rate: 0.0199, base: 0 }, { upTo: null, rate: 0.0521, base: 597.3 }]
+    headOfHousehold: [{ upTo: 30000, rate: 0.0199, base: 0 }, { upTo: null, rate: 0.0521, base: 597.3 }]
+  standardDeduction: { single: 15000, marriedJoint: 30000, marriedSeparate: 15000, headOfHousehold: 22500 }
+  standardDeductionPhaseOut: { from: { single: 40000, marriedJoint: 80000, marriedSeparate: 40000, headOfHousehold: 60000 }, range: { single: 55000, marriedJoint: 110000, marriedSeparate: 55000, headOfHousehold: 82500 } }
+  exemption: { perFiler: 0, perDependent: 4930 }
+  ageDeduction:
+    perPerson: 15000
+    age: 65
+    phaseOutFrom: { single: 0, marriedJoint: 0, marriedSeparate: 0, headOfHousehold: 0 }
+    phaseOutRate: 0
+  twoEarnerCredit: { rate: 0.007, maxIncome: 50000 }
+  notes:
+    - "South Carolina's earned income credit isn't included."
+    - "Social Security isn't taxed in South Carolina."

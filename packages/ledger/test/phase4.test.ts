@@ -109,7 +109,7 @@ describe("residence what-if", () => {
     expect(isa.before.taxedBy).toEqual(["IE"]);
     expect(isa.after.taxedBy).toEqual([]);
     expect(isa.changed).toBe(true);
-    expect(r.members[0]!.payAfter.currency).toBe("GBP");
+    expect(r.members[0]!.payAfter!.currency).toBe("GBP");
     expect(r.notes.length).toBeGreaterThan(0);
   });
   it("keeping an Irish job after moving makes the pay cross-border", () => {
@@ -120,6 +120,28 @@ describe("residence what-if", () => {
     const r = residenceWhatIf(ds, asOf, { memberIds: ["m_aoife"], to: "IE", keepJob: false });
     expect(r.items).toEqual([]);
     expect(r.notes).toEqual([]);
+  });
+  it("moving to the US makes the ISA taxable, pays in dollars under US rules and lists notes from both treaties", () => {
+    const r = residenceWhatIf(ds, asOf, { memberIds: ["m_sean"], to: "US", keepJob: false });
+    const sean = r.members[0]!;
+    expect(sean.to).toBe("US");
+    expect(sean.payAfter.currency).toBe("USD");
+    expect(sean.payAfter.pack).toBe("US-2026.1");
+    expect(sean.payAfter.netAnnualMinor).toBeGreaterThan(0);
+    const isa = r.items.find((i) => i.label.includes("ISA"))!;
+    expect(isa.after.taxedBy).toEqual(["US"]);
+    expect(isa.after.flags).toContain("check-pfic-funds");
+    const ukPension = r.items.find((i) => i.label === "Former employer pension (Belfast)")!;
+    expect(ukPension.after.reference.ref).toBe("UK–US DTC Art. 17(1)");
+    expect(ukPension.changed).toBe(true);
+    expect(r.items.find((i) => i.label === "Employment income")!.after.taxedBy).toEqual(["US"]);
+    const topics = r.notes.map((n) => n.topic);
+    expect(topics).toEqual(expect.arrayContaining(["residence", "funds", "myFutureFund", "isa", "foreignAccounts"]));
+    expect(new Set(topics).size).toBe(topics.length);
+  });
+  it("keeping an Irish job after moving to the US is taxed in Ireland with a US credit", () => {
+    const r = residenceWhatIf(ds, asOf, { memberIds: ["m_sean"], to: "US", keepJob: true });
+    expect(r.items.find((i) => i.label === "Employment income")!.after.taxedBy).toEqual(["IE", "US"]);
   });
   it("closes the open residence period the day before the move", () => {
     const after = withResidence(ds, "m_sean", "UK", asOf);

@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
 import { residenceOn, residenceWhatIf } from "@cuntas/ledger";
-import type { Classification, Jurisdiction } from "@cuntas/rules";
+import { COUNTRY_INFO, TAX_JURISDICTIONS, type Classification, type Jurisdiction } from "@cuntas/rules";
 import { Badge, Card, Disclaimer, Empty, Field, PageHeader, Select, Stat } from "../components/ui";
 import { useAsOf } from "../lib/derived";
 import { money } from "../lib/format";
 import { useDataset } from "../lib/store";
 
-const COUNTRY: Record<Jurisdiction, string> = { IE: "Ireland", UK: "the UK" };
 
 function Taxed({ c }: { c: Classification }) {
   return c.taxedBy.length === 0 ? <Badge tone="good">Tax-free</Badge> : <span className="flex flex-wrap gap-1">{c.taxedBy.map((t) => <Badge key={t} tone="info">Taxed in {t}</Badge>)}</span>;
@@ -28,10 +27,10 @@ export function WhatIfPage() {
 
   return (
     <div>
-      <PageHeader title="What if we moved" subtitle="See which pay, pensions, ISAs and accounts would change tax treatment if members of the household moved between Ireland and the UK. Your declared residence isn't changed." />
+      <PageHeader title="What if we moved" subtitle="See which pay, pensions, ISAs and accounts would change tax treatment if members of the household moved to Ireland, the UK or the US. Your declared residence isn't changed." />
       <Card className="mb-4">
         <div className="flex flex-wrap items-end gap-4">
-          <Field label="Move to">{(id) => <Select id={id} className="w-40" value={to} onChange={(e) => setTo(e.target.value as Jurisdiction)} options={[{ value: "UK", label: "The UK" }, { value: "IE", label: "Ireland" }]} />}</Field>
+          <Field label="Move to">{(id) => <Select id={id} className="w-40" value={to} onChange={(e) => setTo(e.target.value as Jurisdiction)} options={TAX_JURISDICTIONS.map((c) => ({ value: c, label: COUNTRY_INFO[c].inSentence.replace(/^the/, "The") }))} />}</Field>
           <fieldset className="text-sm">
             <legend className="mb-1 text-xs font-medium text-stone-600 dark:text-stone-400">Who moves</legend>
             {ds.members.map((m) => (
@@ -41,21 +40,32 @@ export function WhatIfPage() {
               </label>
             ))}
           </fieldset>
-          <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={keepJob} onChange={(e) => setKeepJob(e.target.checked)} />Keep current jobs and commute across the border</label>
+          <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={keepJob} onChange={(e) => setKeepJob(e.target.checked)} />{to === "US" ? "Keep current jobs and work remotely" : "Keep current jobs and commute across the border"}</label>
         </div>
       </Card>
 
       {r.members.length > 0 && (
         <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {r.members.map((m) => (
-            <Stat
-              key={m.id}
-              label={`${m.name}: take-home a year`}
-              value={m.from === m.to ? money(m.payBefore.netAnnualMinor, m.payBefore.currency) : <>{money(m.payBefore.netAnnualMinor, m.payBefore.currency)} → {money(m.payAfter.netAnnualMinor, m.payAfter.currency)}</>}
-              hint={m.from === m.to ? `Already lives in ${COUNTRY[m.to]}` : keepJob ? `Same job; ${m.payAfter.pack} rules, before any cross-border credit` : `Same gross pay converted to ${m.payAfter.currency}, under ${m.payAfter.pack}`}
-            />
-          ))}
+          {r.members.map((m) => {
+            const before = money(m.payBefore.netAnnualMinor, m.payBefore.currency);
+            if (m.from === m.to) return <Stat key={m.id} label={`${m.name}: take-home a year`} value={before} hint={`Already lives in ${COUNTRY_INFO[m.to].inSentence}`} />;
+            const after = m.payAfter;
+            return (
+              <Stat
+                key={m.id}
+                label={`${m.name}: take-home a year`}
+                value={<>{before} → {money(after.netAnnualMinor, after.currency)}</>}
+                hint={`${keepJob ? `Same job; ${after.pack} rules, before any cross-border credit` : `Same gross pay converted to ${after.currency}, under ${after.pack}`}${m.to === "US" ? "; federal tax only" : ""}`}
+              />
+            );
+          })}
         </div>
+      )}
+
+      {to === "US" && r.members.some((m) => m.from !== m.to) && (
+        <p role="note" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
+          US take-home is federal only: state and local income tax aren't included yet. Which country taxes each item, and the notes on moving, come from the Ireland–US and UK–US tax treaties.
+        </p>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -91,7 +101,7 @@ export function WhatIfPage() {
               ))}
             </ul>
           )}
-          <p className="mt-4 text-xs text-stone-500">Tax residence depends on days present and your ties, tested year by year. Cúntas never decides it for you; check the move with Revenue, HMRC or an adviser.</p>
+          <p className="mt-4 text-xs text-stone-500">Tax residence depends on days present and your ties, tested year by year. Cúntas never decides it for you; check the move with Revenue, HMRC, the IRS or an adviser.</p>
         </Card>
       </div>
       <Disclaimer />

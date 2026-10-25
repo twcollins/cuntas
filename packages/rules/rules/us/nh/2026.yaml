@@ -1,0 +1,15 @@
+# New Hampshire: no personal income tax on wages in 2026.
+kind: usState
+state: NH
+parent: US
+taxYear: "2026"
+version: "US-NH-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.revenue.nh.gov/taxes-glance/interest-dividends-tax
+incomeTax:
+  source: https://www.revenue.nh.gov/taxes-glance/interest-dividends-tax
+  none: true
+  notes:
+    - "New Hampshire's interest and dividends tax was repealed from 2025."

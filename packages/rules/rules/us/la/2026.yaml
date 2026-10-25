@@ -1,0 +1,18 @@
+# Louisiana individual income tax, 2026: a flat 3% on federal AGI less the standard deduction.
+# Personal and dependent exemptions were repealed from 2025.
+kind: usState
+state: LA
+parent: US
+taxYear: "2026"
+version: "US-LA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dam.ldr.la.gov/lawspolicies/RIB%2026-019.pdf
+  - https://dam.ldr.la.gov/taxforms/IT540i-WEB-2025.pdf
+# RIB 26-019 sets the 2026 standard deduction (the withholding tables use provisional figures).
+incomeTax:
+  source: https://dam.ldr.la.gov/lawspolicies/RIB%2026-019.pdf
+  base: federalAgi
+  rate: 0.03
+  standardDeduction: { single: 12838, marriedJoint: 25676, marriedSeparate: 12838, headOfHousehold: 25676 }

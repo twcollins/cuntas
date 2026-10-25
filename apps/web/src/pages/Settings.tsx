@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { exportCsv, exportJson, importJson } from "@cuntas/ledger";
-import { addDays, MANIFEST } from "@cuntas/rules";
+import { Link } from "@tanstack/react-router";
+import { addDays, CURRENCIES, today } from "@cuntas/rules";
 import { ThemeSwitch } from "../components/Layout";
-import { Button, Card, Field, Input, PageHeader } from "../components/ui";
+import { Badge, Button, Card, Field, Input, PageHeader } from "../components/ui";
 import { decryptBackup, encryptBackup } from "../lib/backup";
 import { download, formatDate } from "../lib/format";
 import { fetchEcbRates, mergeRates } from "../lib/fx";
+import { clearRulePacks, restoreRulePacks, rulePackData, useRulePacks, useRulePrompts, type RulePackData } from "../lib/rulepacks";
 import { replaceDataset, update, useDataset, wipeAll } from "../lib/store";
+
+const PAYLOAD = "cuntas-backup-payload";
+
+/** The encrypted backup carries the household and this device's tax rule files. */
+function backupJson(ds: ReturnType<typeof useDataset>): string {
+  return JSON.stringify({ format: PAYLOAD, v: 1, dataset: JSON.parse(exportJson(ds)), rules: rulePackData() });
+}
 
 export function SettingsPage() {
   const ds = useDataset();
@@ -14,12 +23,20 @@ export function SettingsPage() {
   const [pass, setPass] = useState("");
   const [confirmText, setConfirmText] = useState("");
   const lastRate = ds.fxRates.at(-1);
+  const rules = useRulePacks();
+  const prompts = useRulePrompts(ds, today());
 
   async function restore(file: File, encrypted: boolean) {
     try {
       const text = await file.text();
       const json = encrypted ? await decryptBackup(text, pass) : text;
-      replaceDataset(importJson(json));
+      const parsed = JSON.parse(json) as { format?: string; dataset?: unknown; rules?: RulePackData };
+      if (parsed.format === PAYLOAD) {
+        replaceDataset(importJson(JSON.stringify(parsed.dataset)));
+        if (parsed.rules) await restoreRulePacks(parsed.rules);
+      } else {
+        replaceDataset(importJson(json));
+      }
       setMsg("Data restored.");
     } catch (e) {
       setMsg(`Could not restore: ${(e as Error).message}`);
@@ -43,10 +60,10 @@ export function SettingsPage() {
         </Card>
 
         <Card title="Encrypted backup">
-          <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">AES-256-GCM, with a key derived from your passphrase in this browser. Without the passphrase the backup cannot be opened.</p>
+          <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">AES-256-GCM, with a key derived from your passphrase in this browser. Without the passphrase the backup cannot be opened. It includes your tax rule files and checks.</p>
           <Field label="Passphrase">{(id) => <Input id={id} type="password" value={pass} onChange={(e) => setPass(e.target.value)} autoComplete="new-password" />}</Field>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Button variant="primary" disabled={pass.length < 8} onClick={async () => download(`cuntas-${new Date().toISOString().slice(0, 10)}.cuntas`, await encryptBackup(exportJson(ds), pass))}>Download backup</Button>
+            <Button variant="primary" disabled={pass.length < 8} onClick={async () => download(`cuntas-${new Date().toISOString().slice(0, 10)}.cuntas`, await encryptBackup(backupJson(ds), pass))}>Download backup</Button>
             <label className="text-sm">Restore: <input type="file" accept=".cuntas" disabled={pass.length < 8} onChange={(e) => e.target.files?.[0] && restore(e.target.files[0], true)} /></label>
           </div>
           {pass.length > 0 && pass.length < 8 && <p className="mt-1 text-xs text-stone-500">Use at least 8 characters.</p>}
@@ -54,7 +71,7 @@ export function SettingsPage() {
 
         <Card title="Exchange rates">
           <p className="text-sm text-stone-600 dark:text-stone-400">
-            {ds.fxRates.length} EUR/GBP rates stored{lastRate && <>, latest {formatDate(lastRate.date)} ({lastRate.rate}, {lastRate.source})</>}.
+            {CURRENCIES.filter((c) => c !== "EUR").map((c) => `${ds.fxRates.filter((r) => r.quote === c).length} EUR/${c}`).join(", ")} rates stored{lastRate && <>, latest {formatDate(lastRate.date)} ({lastRate.source})</>}. Other pairs convert through EUR.
           </p>
           <Button className="mt-3" onClick={async () => {
             try {
@@ -68,11 +85,11 @@ export function SettingsPage() {
           }}>Update ECB rates</Button>
         </Card>
 
-        <Card title="Rule packs">
-          <ul className="space-y-1 text-sm">
-            {MANIFEST.map((m) => <li key={m.key} className="flex justify-between"><code>{m.version}</code><span className="font-mono text-xs text-stone-500">{m.sha256.slice(0, 12)}…</span></li>)}
-          </ul>
-          <p className="mt-2 text-xs text-stone-500">Provisional packs reflect Budget announcements not yet in a Finance Act. Verify figures with Revenue and HMRC before relying on them.</p>
+        <Card title="Tax rules" actions={prompts.length > 0 ? <Badge tone="warn">{prompts.length} to do</Badge> : undefined}>
+          <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">
+            {rules.files.length === 0 ? "Using the packs that ship with the app." : `${rules.files.length} rule ${rules.files.length === 1 ? "file" : "files"} loaded on this device.`} Provisional packs reflect Budget announcements not yet in law; verify figures with Revenue and HMRC before relying on them.
+          </p>
+          <Link to="/tax-rules" className="text-sm font-medium text-brand-700 underline dark:text-brand-500">Open Tax rules</Link>
         </Card>
 
         <Card title="Appearance">
@@ -81,10 +98,10 @@ export function SettingsPage() {
         </Card>
 
         <Card title="Delete everything" className="border-rose-200 dark:border-rose-900">
-          <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">Removes every household and your sign-in from this device. Export first if you want to keep it. Type DELETE to confirm.</p>
+          <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">Removes every household, your tax rule files and your sign-in from this device. Export first if you want to keep it. Type DELETE to confirm.</p>
           <div className="flex gap-2">
             <Input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} aria-label="Type DELETE to confirm" placeholder="DELETE" />
-            <Button variant="danger" disabled={confirmText !== "DELETE"} onClick={() => void wipeAll()}>Delete all data</Button>
+            <Button variant="danger" disabled={confirmText !== "DELETE"} onClick={() => void Promise.all([wipeAll(), clearRulePacks()])}>Delete all data</Button>
           </div>
         </Card>
       </div>

@@ -1,0 +1,13 @@
+# Alaska: no personal income tax on wages in 2026.
+kind: usState
+state: AK
+parent: US
+taxYear: "2026"
+version: "US-AK-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.akleg.gov/basis/statutes.asp#43.20.010
+incomeTax:
+  source: https://www.akleg.gov/basis/statutes.asp#43.20.010
+  none: true

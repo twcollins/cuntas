@@ -873,6 +873,6644 @@ export const RAW_PACKS: Record<string, unknown> = {
       ]
     }
   },
+  "us/2026": {
+    "jurisdiction": "US",
+    "taxYear": "2026",
+    "version": "US-2026.1",
+    "status": "provisional",
+    "currency": "USD",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill"
+    ],
+    "incomeTax": {
+      "source": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 12400,
+            "rate": 0.1
+          },
+          {
+            "upTo": 50400,
+            "rate": 0.12
+          },
+          {
+            "upTo": 105700,
+            "rate": 0.22
+          },
+          {
+            "upTo": 201775,
+            "rate": 0.24
+          },
+          {
+            "upTo": 256225,
+            "rate": 0.32
+          },
+          {
+            "upTo": 640600,
+            "rate": 0.35
+          },
+          {
+            "upTo": null,
+            "rate": 0.37
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 24800,
+            "rate": 0.1
+          },
+          {
+            "upTo": 100800,
+            "rate": 0.12
+          },
+          {
+            "upTo": 211400,
+            "rate": 0.22
+          },
+          {
+            "upTo": 403550,
+            "rate": 0.24
+          },
+          {
+            "upTo": 512450,
+            "rate": 0.32
+          },
+          {
+            "upTo": 768700,
+            "rate": 0.35
+          },
+          {
+            "upTo": null,
+            "rate": 0.37
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 12400,
+            "rate": 0.1
+          },
+          {
+            "upTo": 50400,
+            "rate": 0.12
+          },
+          {
+            "upTo": 105700,
+            "rate": 0.22
+          },
+          {
+            "upTo": 201775,
+            "rate": 0.24
+          },
+          {
+            "upTo": 256225,
+            "rate": 0.32
+          },
+          {
+            "upTo": 384350,
+            "rate": 0.35
+          },
+          {
+            "upTo": null,
+            "rate": 0.37
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 17700,
+            "rate": 0.1
+          },
+          {
+            "upTo": 67450,
+            "rate": 0.12
+          },
+          {
+            "upTo": 105700,
+            "rate": 0.22
+          },
+          {
+            "upTo": 201750,
+            "rate": 0.24
+          },
+          {
+            "upTo": 256200,
+            "rate": 0.32
+          },
+          {
+            "upTo": 640600,
+            "rate": 0.35
+          },
+          {
+            "upTo": null,
+            "rate": 0.37
+          }
+        ]
+      }
+    },
+    "standardDeduction": {
+      "source": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "single": 16100,
+      "marriedJoint": 32200,
+      "marriedSeparate": 16100,
+      "headOfHousehold": 24150,
+      "additionalAged": {
+        "age": 65,
+        "married": 1650,
+        "unmarried": 2050
+      }
+    },
+    "seniorDeduction": {
+      "source": "https://www.irs.gov/newsroom/one-big-beautiful-bill-act-tax-deductions-for-working-americans-and-seniors",
+      "status": "provisional",
+      "perPerson": 6000,
+      "age": 65,
+      "phaseOut": {
+        "single": 75000,
+        "marriedJoint": 150000,
+        "rate": 0.06
+      }
+    },
+    "childTaxCredit": {
+      "source": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "perChild": 2200,
+      "underAge": 17,
+      "phaseOut": {
+        "marriedJoint": 400000,
+        "other": 200000,
+        "step": 1000,
+        "reductionPerStep": 50
+      },
+      "refundable": {
+        "perChild": 1700,
+        "earnedIncomeFloor": 2500,
+        "rate": 0.15
+      }
+    },
+    "fica": {
+      "source": "https://www.ssa.gov/oact/cola/cbb.html",
+      "socialSecurityRate": 0.062,
+      "socialSecurityWageBase": 184500,
+      "medicareRate": 0.0145,
+      "additionalMedicare": {
+        "source": "https://www.irs.gov/taxtopics/tc560",
+        "rate": 0.009,
+        "thresholds": {
+          "single": 200000,
+          "marriedJoint": 250000,
+          "marriedSeparate": 125000,
+          "headOfHousehold": 200000
+        }
+      }
+    },
+    "selfEmployment": {
+      "source": "https://www.irs.gov/businesses/small-businesses-self-employed/self-employment-tax-social-security-and-medicare-taxes",
+      "earningsFactor": 0.9235,
+      "socialSecurityRate": 0.124,
+      "medicareRate": 0.029,
+      "deductibleShare": 0.5
+    },
+    "qualifiedBusinessIncome": {
+      "source": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "rate": 0.2,
+      "minimumIncome": 1000,
+      "threshold": {
+        "single": 201750,
+        "marriedJoint": 403500,
+        "marriedSeparate": 201775,
+        "headOfHousehold": 201750
+      }
+    },
+    "retirement": {
+      "source": "https://www.irs.gov/newsroom/401k-limit-increases-to-24500-for-2026-ira-limit-increases-to-7500",
+      "employeeDeferral": 24500,
+      "catchUpAge": 50,
+      "catchUp50": 8000,
+      "superCatchUpAges": [
+        60,
+        63
+      ],
+      "catchUp60to63": 11250,
+      "ira": 7500,
+      "iraCatchUp50": 1100,
+      "rothIraPhaseOut": {
+        "single": [
+          153000,
+          168000
+        ],
+        "marriedJoint": [
+          242000,
+          252000
+        ],
+        "marriedSeparate": [
+          0,
+          10000
+        ]
+      },
+      "iraDeductionPhaseOut": {
+        "coveredSingle": [
+          81000,
+          91000
+        ],
+        "coveredMarriedJoint": [
+          129000,
+          149000
+        ],
+        "spouseCoveredMarriedJoint": [
+          242000,
+          252000
+        ],
+        "marriedSeparate": [
+          0,
+          10000
+        ]
+      },
+      "phaseOutRounding": {
+        "step": 10,
+        "minimum": 200,
+        "rothRatioDecimals": 3
+      }
+    },
+    "hsa": {
+      "source": "https://www.irs.gov/pub/irs-drop/rp-25-19.pdf",
+      "selfOnly": 4400,
+      "family": 8750,
+      "catchUpAge": 55,
+      "catchUp55": 1000
+    },
+    "estimatedTax": {
+      "source": "https://www.irs.gov/publications/p505",
+      "currentYearShare": 0.9,
+      "priorYearShare": 1,
+      "priorYearShareHighIncome": 1.1,
+      "highIncomeAgi": {
+        "other": 150000,
+        "marriedSeparate": 75000
+      },
+      "minimumOwed": 1000,
+      "dueDates": [
+        {
+          "monthDay": "04-15",
+          "yearOffset": 0
+        },
+        {
+          "monthDay": "06-15",
+          "yearOffset": 0
+        },
+        {
+          "monthDay": "09-15",
+          "yearOffset": 0
+        },
+        {
+          "monthDay": "01-15",
+          "yearOffset": 1
+        }
+      ]
+    },
+    "deadlines": {
+      "source": "https://www.irs.gov/filing/individuals/when-to-file",
+      "federalReturn": {
+        "monthDay": "04-15",
+        "yearOffset": 1
+      }
+    }
+  },
+  "us/ak/2026": {
+    "kind": "usState",
+    "state": "AK",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-AK-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.akleg.gov/basis/statutes.asp#43.20.010"
+    ],
+    "incomeTax": {
+      "source": "https://www.akleg.gov/basis/statutes.asp#43.20.010",
+      "none": true
+    }
+  },
+  "us/al/2026": {
+    "kind": "usState",
+    "state": "AL",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-AL-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/whbooklet_0126.pdf",
+      "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40bk.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40bk.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 500,
+            "rate": 0.02
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": null,
+            "rate": 0.05
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 1000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 6000,
+            "rate": 0.04
+          },
+          {
+            "upTo": null,
+            "rate": 0.05
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 500,
+            "rate": 0.02
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": null,
+            "rate": 0.05
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 500,
+            "rate": 0.02
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": null,
+            "rate": 0.05
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 3000,
+        "marriedJoint": 8500,
+        "marriedSeparate": 4250,
+        "headOfHousehold": 5200
+      },
+      "standardDeductionSteps": {
+        "single": {
+          "from": 25999,
+          "step": 500,
+          "reduction": 25,
+          "min": 2500
+        },
+        "marriedJoint": {
+          "from": 25999,
+          "step": 500,
+          "reduction": 175,
+          "min": 5000
+        },
+        "marriedSeparate": {
+          "from": 12999,
+          "step": 250,
+          "reduction": 88,
+          "min": 2500
+        },
+        "headOfHousehold": {
+          "from": 25999,
+          "step": 500,
+          "reduction": 135,
+          "min": 2500
+        }
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 1000,
+        "byStatus": {
+          "single": 1500,
+          "marriedJoint": 3000,
+          "marriedSeparate": 1500,
+          "headOfHousehold": 3000
+        },
+        "amountByAgi": {
+          "single": [
+            {
+              "upTo": 50000,
+              "amount": 1000
+            },
+            {
+              "upTo": 100000,
+              "amount": 500
+            },
+            {
+              "upTo": null,
+              "amount": 300
+            }
+          ],
+          "marriedJoint": [
+            {
+              "upTo": 50000,
+              "amount": 1000
+            },
+            {
+              "upTo": 100000,
+              "amount": 500
+            },
+            {
+              "upTo": null,
+              "amount": 300
+            }
+          ],
+          "marriedSeparate": [
+            {
+              "upTo": 50000,
+              "amount": 1000
+            },
+            {
+              "upTo": 100000,
+              "amount": 500
+            },
+            {
+              "upTo": null,
+              "amount": 300
+            }
+          ],
+          "headOfHousehold": [
+            {
+              "upTo": 50000,
+              "amount": 1000
+            },
+            {
+              "upTo": 100000,
+              "amount": 500
+            },
+            {
+              "upTo": null,
+              "amount": 300
+            }
+          ]
+        }
+      },
+      "federalTaxDeduction": {},
+      "notes": [
+        "Social Security isn't taxed in Alabama."
+      ]
+    },
+    "localTax": {
+      "source": "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/whbooklet_0126.pdf",
+      "note": "Some Alabama cities and counties (Birmingham among them) levy occupational taxes on wages."
+    }
+  },
+  "us/ar/2026": {
+    "kind": "usState",
+    "state": "AR",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-AR-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.dfa.arkansas.gov/wp-content/uploads/Withholding-Tax-Formula.pdf",
+      "https://www.dfa.arkansas.gov/wp-content/uploads/2025_AR1000F_and_AR1000NR_Instructions.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.dfa.arkansas.gov/wp-content/uploads/Withholding-Tax-Formula.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 5599,
+            "rate": 0
+          },
+          {
+            "upTo": 11199,
+            "rate": 0.02
+          },
+          {
+            "upTo": 15999,
+            "rate": 0.03
+          },
+          {
+            "upTo": 26399,
+            "rate": 0.034
+          },
+          {
+            "upTo": null,
+            "rate": 0.037
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 5599,
+            "rate": 0
+          },
+          {
+            "upTo": 11199,
+            "rate": 0.02
+          },
+          {
+            "upTo": 15999,
+            "rate": 0.03
+          },
+          {
+            "upTo": 26399,
+            "rate": 0.034
+          },
+          {
+            "upTo": null,
+            "rate": 0.037
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 5599,
+            "rate": 0
+          },
+          {
+            "upTo": 11199,
+            "rate": 0.02
+          },
+          {
+            "upTo": 15999,
+            "rate": 0.03
+          },
+          {
+            "upTo": 26399,
+            "rate": 0.034
+          },
+          {
+            "upTo": null,
+            "rate": 0.037
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 5599,
+            "rate": 0
+          },
+          {
+            "upTo": 11199,
+            "rate": 0.02
+          },
+          {
+            "upTo": 15999,
+            "rate": 0.03
+          },
+          {
+            "upTo": 26399,
+            "rate": 0.034
+          },
+          {
+            "upTo": null,
+            "rate": 0.037
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 2470,
+        "marriedJoint": 4940,
+        "marriedSeparate": 2470,
+        "headOfHousehold": 2470
+      },
+      "exemptionCredit": {
+        "perFiler": 29,
+        "perDependent": 29,
+        "perAged": 29
+      },
+      "notes": [
+        "Arkansas's low-income tax tables and additional tax credit for qualified individuals aren't included."
+      ]
+    }
+  },
+  "us/az/2026": {
+    "kind": "usState",
+    "state": "AZ",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-AZ-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.azleg.gov/legtext/57leg/1R/summary/S.1318FIN_REVISED.DOCX.htm",
+      "https://www.azleg.gov/ars/43/01041.htm",
+      "https://www.azleg.gov/ars/43/01073-01.htm"
+    ],
+    "incomeTax": {
+      "source": "https://www.azleg.gov/legtext/57leg/1R/summary/S.1318FIN_REVISED.DOCX.htm",
+      "base": "federalAgi",
+      "rate": 0.025,
+      "standardDeduction": "federal",
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 0,
+        "perAged": 2100
+      },
+      "exemptionCredit": {
+        "perFiler": 0,
+        "perDependent": 125
+      }
+    }
+  },
+  "us/ca/2026": {
+    "kind": "usState",
+    "state": "CA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-CA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.ftb.ca.gov/forms/2025/2025-540-tax-rate-schedules.pdf",
+      "https://www.ftb.ca.gov/forms/2025/2025-540-booklet.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.ftb.ca.gov/forms/2025/2025-540-tax-rate-schedules.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 11079,
+            "rate": 0.01
+          },
+          {
+            "upTo": 26264,
+            "rate": 0.02
+          },
+          {
+            "upTo": 41452,
+            "rate": 0.04
+          },
+          {
+            "upTo": 57542,
+            "rate": 0.06
+          },
+          {
+            "upTo": 72724,
+            "rate": 0.08
+          },
+          {
+            "upTo": 371479,
+            "rate": 0.093
+          },
+          {
+            "upTo": 445771,
+            "rate": 0.103
+          },
+          {
+            "upTo": 742953,
+            "rate": 0.113
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.123
+          },
+          {
+            "upTo": null,
+            "rate": 0.133
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 22158,
+            "rate": 0.01
+          },
+          {
+            "upTo": 52528,
+            "rate": 0.02
+          },
+          {
+            "upTo": 82904,
+            "rate": 0.04
+          },
+          {
+            "upTo": 115084,
+            "rate": 0.06
+          },
+          {
+            "upTo": 145448,
+            "rate": 0.08
+          },
+          {
+            "upTo": 742958,
+            "rate": 0.093
+          },
+          {
+            "upTo": 891542,
+            "rate": 0.103
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.113
+          },
+          {
+            "upTo": 1485906,
+            "rate": 0.123
+          },
+          {
+            "upTo": null,
+            "rate": 0.133
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 11079,
+            "rate": 0.01
+          },
+          {
+            "upTo": 26264,
+            "rate": 0.02
+          },
+          {
+            "upTo": 41452,
+            "rate": 0.04
+          },
+          {
+            "upTo": 57542,
+            "rate": 0.06
+          },
+          {
+            "upTo": 72724,
+            "rate": 0.08
+          },
+          {
+            "upTo": 371479,
+            "rate": 0.093
+          },
+          {
+            "upTo": 445771,
+            "rate": 0.103
+          },
+          {
+            "upTo": 742953,
+            "rate": 0.113
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.123
+          },
+          {
+            "upTo": null,
+            "rate": 0.133
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 22173,
+            "rate": 0.01
+          },
+          {
+            "upTo": 52530,
+            "rate": 0.02
+          },
+          {
+            "upTo": 67716,
+            "rate": 0.04
+          },
+          {
+            "upTo": 83805,
+            "rate": 0.06
+          },
+          {
+            "upTo": 98990,
+            "rate": 0.08
+          },
+          {
+            "upTo": 505208,
+            "rate": 0.093
+          },
+          {
+            "upTo": 606251,
+            "rate": 0.103
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.113
+          },
+          {
+            "upTo": 1010417,
+            "rate": 0.123
+          },
+          {
+            "upTo": null,
+            "rate": 0.133
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 5706,
+        "marriedJoint": 11412,
+        "marriedSeparate": 5706,
+        "headOfHousehold": 11412
+      },
+      "exemptionCredit": {
+        "perFiler": 153,
+        "perDependent": 475,
+        "perAged": 153,
+        "phaseOut": {
+          "from": {
+            "single": 252203,
+            "marriedJoint": 504411,
+            "marriedSeparate": 252203,
+            "headOfHousehold": 378310
+          },
+          "step": {
+            "single": 2500,
+            "marriedJoint": 2500,
+            "marriedSeparate": 1250,
+            "headOfHousehold": 2500
+          },
+          "reductionPerStep": 6
+        }
+      },
+      "renterCredit": {
+        "amount": {
+          "single": 60,
+          "marriedJoint": 120,
+          "marriedSeparate": 60,
+          "headOfHousehold": 120
+        },
+        "incomeLimit": {
+          "single": 53994,
+          "marriedJoint": 107988,
+          "marriedSeparate": 53994,
+          "headOfHousehold": 107988
+        }
+      },
+      "notes": [
+        "California's earned income tax credit and young child tax credit aren't included.",
+        "Social Security isn't taxed in California."
+      ]
+    }
+  },
+  "us/co/2026": {
+    "kind": "usState",
+    "state": "CO",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-CO-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.colorado.gov/sites/tax/files/documents/DR_1098_Colorado_Withholding_Worksheet_for_Employees.pdf",
+      "https://tax.colorado.gov/colorado-individual-income-tax-glossary"
+    ],
+    "incomeTax": {
+      "source": "https://tax.colorado.gov/sites/tax/files/documents/DR_1098_Colorado_Withholding_Worksheet_for_Employees.pdf",
+      "base": "federalTaxableIncome",
+      "rate": 0.044,
+      "notes": [
+        "Above $300,000 of federal AGI, Colorado adds back part of the deductions; that isn't included."
+      ]
+    },
+    "localTax": {
+      "source": "https://tax.colorado.gov/sites/default/files/documents/Book104_2025.pdf",
+      "note": "Denver, Aurora and some other Colorado cities charge a flat occupational privilege tax on wages."
+    }
+  },
+  "us/ct/2026": {
+    "kind": "usState",
+    "state": "CT",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-CT-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://portal.ct.gov/-/media/drs/forms/2025/income/2025-ct-1040-instructions_1225.pdf",
+      "https://portal.ct.gov/-/media/drs/forms/2025/wth/tpg-211_1225.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://portal.ct.gov/-/media/drs/forms/2025/income/2025-ct-1040-instructions_1225.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 10000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.045
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 200000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.069
+          },
+          {
+            "upTo": null,
+            "rate": 0.0699
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 20000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.045
+          },
+          {
+            "upTo": 200000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 400000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.069
+          },
+          {
+            "upTo": null,
+            "rate": 0.0699
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 10000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.045
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 200000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.069
+          },
+          {
+            "upTo": null,
+            "rate": 0.0699
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 16000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 80000,
+            "rate": 0.045
+          },
+          {
+            "upTo": 160000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 320000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 400000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 800000,
+            "rate": 0.069
+          },
+          {
+            "upTo": null,
+            "rate": 0.0699
+          }
+        ]
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 0,
+        "byStatus": {
+          "single": 15000,
+          "marriedJoint": 24000,
+          "marriedSeparate": 12000,
+          "headOfHousehold": 19000
+        },
+        "reduction": {
+          "from": {
+            "single": 30000,
+            "marriedJoint": 48000,
+            "marriedSeparate": 24000,
+            "headOfHousehold": 38000
+          },
+          "rate": 1
+        }
+      },
+      "addBacks": {
+        "single": [
+          {
+            "from": 56500,
+            "step": 5000,
+            "amount": 25,
+            "cap": 250
+          },
+          {
+            "from": 105000,
+            "step": 5000,
+            "amount": 25,
+            "cap": 250
+          },
+          {
+            "from": 200000,
+            "step": 5000,
+            "amount": 90,
+            "cap": 2700
+          },
+          {
+            "from": 500000,
+            "step": 5000,
+            "amount": 50,
+            "cap": 450
+          }
+        ],
+        "marriedJoint": [
+          {
+            "from": 100500,
+            "step": 5000,
+            "amount": 50,
+            "cap": 500
+          },
+          {
+            "from": 210000,
+            "step": 10000,
+            "amount": 50,
+            "cap": 500
+          },
+          {
+            "from": 400000,
+            "step": 10000,
+            "amount": 180,
+            "cap": 5400
+          },
+          {
+            "from": 1000000,
+            "step": 10000,
+            "amount": 100,
+            "cap": 900
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "from": 50250,
+            "step": 2500,
+            "amount": 25,
+            "cap": 250
+          },
+          {
+            "from": 105000,
+            "step": 5000,
+            "amount": 25,
+            "cap": 250
+          },
+          {
+            "from": 200000,
+            "step": 5000,
+            "amount": 90,
+            "cap": 2700
+          },
+          {
+            "from": 500000,
+            "step": 5000,
+            "amount": 50,
+            "cap": 450
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "from": 78500,
+            "step": 4000,
+            "amount": 40,
+            "cap": 400
+          },
+          {
+            "from": 168000,
+            "step": 8000,
+            "amount": 40,
+            "cap": 400
+          },
+          {
+            "from": 320000,
+            "step": 8000,
+            "amount": 140,
+            "cap": 4200
+          },
+          {
+            "from": 800000,
+            "step": 8000,
+            "amount": 80,
+            "cap": 720
+          }
+        ]
+      },
+      "personalCreditRateByAgi": {
+        "single": [
+          {
+            "upTo": 15000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 18800,
+            "rate": 0.75
+          },
+          {
+            "upTo": 19300,
+            "rate": 0.7
+          },
+          {
+            "upTo": 19800,
+            "rate": 0.65
+          },
+          {
+            "upTo": 20300,
+            "rate": 0.6
+          },
+          {
+            "upTo": 20800,
+            "rate": 0.55
+          },
+          {
+            "upTo": 21300,
+            "rate": 0.5
+          },
+          {
+            "upTo": 21800,
+            "rate": 0.45
+          },
+          {
+            "upTo": 22300,
+            "rate": 0.4
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.35
+          },
+          {
+            "upTo": 25500,
+            "rate": 0.3
+          },
+          {
+            "upTo": 26000,
+            "rate": 0.25
+          },
+          {
+            "upTo": 26500,
+            "rate": 0.2
+          },
+          {
+            "upTo": 31300,
+            "rate": 0.15
+          },
+          {
+            "upTo": 31800,
+            "rate": 0.14
+          },
+          {
+            "upTo": 32300,
+            "rate": 0.13
+          },
+          {
+            "upTo": 32800,
+            "rate": 0.12
+          },
+          {
+            "upTo": 33300,
+            "rate": 0.11
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.1
+          },
+          {
+            "upTo": 60500,
+            "rate": 0.09
+          },
+          {
+            "upTo": 61000,
+            "rate": 0.08
+          },
+          {
+            "upTo": 61500,
+            "rate": 0.07
+          },
+          {
+            "upTo": 62000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 62500,
+            "rate": 0.05
+          },
+          {
+            "upTo": 63000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 63500,
+            "rate": 0.03
+          },
+          {
+            "upTo": 64000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 64500,
+            "rate": 0.01
+          },
+          {
+            "upTo": null,
+            "rate": 0
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 24000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 30000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 30500,
+            "rate": 0.7
+          },
+          {
+            "upTo": 31000,
+            "rate": 0.65
+          },
+          {
+            "upTo": 31500,
+            "rate": 0.6
+          },
+          {
+            "upTo": 32000,
+            "rate": 0.55
+          },
+          {
+            "upTo": 32500,
+            "rate": 0.5
+          },
+          {
+            "upTo": 33000,
+            "rate": 0.45
+          },
+          {
+            "upTo": 33500,
+            "rate": 0.4
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.35
+          },
+          {
+            "upTo": 40500,
+            "rate": 0.3
+          },
+          {
+            "upTo": 41000,
+            "rate": 0.25
+          },
+          {
+            "upTo": 41500,
+            "rate": 0.2
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.15
+          },
+          {
+            "upTo": 50500,
+            "rate": 0.14
+          },
+          {
+            "upTo": 51000,
+            "rate": 0.13
+          },
+          {
+            "upTo": 51500,
+            "rate": 0.12
+          },
+          {
+            "upTo": 52000,
+            "rate": 0.11
+          },
+          {
+            "upTo": 96000,
+            "rate": 0.1
+          },
+          {
+            "upTo": 96500,
+            "rate": 0.09
+          },
+          {
+            "upTo": 97000,
+            "rate": 0.08
+          },
+          {
+            "upTo": 97500,
+            "rate": 0.07
+          },
+          {
+            "upTo": 98000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 98500,
+            "rate": 0.05
+          },
+          {
+            "upTo": 99000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 99500,
+            "rate": 0.03
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 100500,
+            "rate": 0.01
+          },
+          {
+            "upTo": null,
+            "rate": 0
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 12000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 15000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 15500,
+            "rate": 0.7
+          },
+          {
+            "upTo": 16000,
+            "rate": 0.65
+          },
+          {
+            "upTo": 16500,
+            "rate": 0.6
+          },
+          {
+            "upTo": 17000,
+            "rate": 0.55
+          },
+          {
+            "upTo": 17500,
+            "rate": 0.5
+          },
+          {
+            "upTo": 18000,
+            "rate": 0.45
+          },
+          {
+            "upTo": 18500,
+            "rate": 0.4
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.35
+          },
+          {
+            "upTo": 20500,
+            "rate": 0.3
+          },
+          {
+            "upTo": 21000,
+            "rate": 0.25
+          },
+          {
+            "upTo": 21500,
+            "rate": 0.2
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.15
+          },
+          {
+            "upTo": 25500,
+            "rate": 0.14
+          },
+          {
+            "upTo": 26000,
+            "rate": 0.13
+          },
+          {
+            "upTo": 26500,
+            "rate": 0.12
+          },
+          {
+            "upTo": 27000,
+            "rate": 0.11
+          },
+          {
+            "upTo": 48000,
+            "rate": 0.1
+          },
+          {
+            "upTo": 48500,
+            "rate": 0.09
+          },
+          {
+            "upTo": 49000,
+            "rate": 0.08
+          },
+          {
+            "upTo": 49500,
+            "rate": 0.07
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 50500,
+            "rate": 0.05
+          },
+          {
+            "upTo": 51000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 51500,
+            "rate": 0.03
+          },
+          {
+            "upTo": 52000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 52500,
+            "rate": 0.01
+          },
+          {
+            "upTo": null,
+            "rate": 0
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 19000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 24000,
+            "rate": 0.75
+          },
+          {
+            "upTo": 24500,
+            "rate": 0.7
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.65
+          },
+          {
+            "upTo": 25500,
+            "rate": 0.6
+          },
+          {
+            "upTo": 26000,
+            "rate": 0.55
+          },
+          {
+            "upTo": 26500,
+            "rate": 0.5
+          },
+          {
+            "upTo": 27000,
+            "rate": 0.45
+          },
+          {
+            "upTo": 27500,
+            "rate": 0.4
+          },
+          {
+            "upTo": 34000,
+            "rate": 0.35
+          },
+          {
+            "upTo": 34500,
+            "rate": 0.3
+          },
+          {
+            "upTo": 35000,
+            "rate": 0.25
+          },
+          {
+            "upTo": 35500,
+            "rate": 0.2
+          },
+          {
+            "upTo": 44000,
+            "rate": 0.15
+          },
+          {
+            "upTo": 44500,
+            "rate": 0.14
+          },
+          {
+            "upTo": 45000,
+            "rate": 0.13
+          },
+          {
+            "upTo": 45500,
+            "rate": 0.12
+          },
+          {
+            "upTo": 46000,
+            "rate": 0.11
+          },
+          {
+            "upTo": 74000,
+            "rate": 0.1
+          },
+          {
+            "upTo": 74500,
+            "rate": 0.09
+          },
+          {
+            "upTo": 75000,
+            "rate": 0.08
+          },
+          {
+            "upTo": 75500,
+            "rate": 0.07
+          },
+          {
+            "upTo": 76000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 76500,
+            "rate": 0.05
+          },
+          {
+            "upTo": 77000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 77500,
+            "rate": 0.03
+          },
+          {
+            "upTo": 78000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 78500,
+            "rate": 0.01
+          },
+          {
+            "upTo": null,
+            "rate": 0
+          }
+        ]
+      },
+      "notes": [
+        "Connecticut's property tax credit (up to $300) and earned income credit aren't included."
+      ]
+    }
+  },
+  "us/dc/2026": {
+    "kind": "usState",
+    "state": "DC",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-DC-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://otr.cfo.dc.gov/page/dc-individual-and-fiduciary-income-tax-rates",
+      "https://code.dccouncil.gov/us/dc/council/code/sections/47-1806.03",
+      "https://otr.cfo.dc.gov/sites/default/files/dc/sites/otr/publication/attachments/2025_D40_Book_082026_v1.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://otr.cfo.dc.gov/page/dc-individual-and-fiduciary-income-tax-rates",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 10000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.085
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0925
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 10000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.085
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0925
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 10000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.085
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0925
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 10000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.06
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.065
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.085
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0925
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0975
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 15000,
+        "marriedJoint": 30000,
+        "marriedSeparate": 15000,
+        "headOfHousehold": 22500
+      },
+      "agedStandardDeduction": {
+        "married": 1650,
+        "unmarried": 2050
+      },
+      "notes": [
+        "DC's earned income credit (85% of the federal one in 2026) and the Schedule H property tax credit aren't included."
+      ]
+    }
+  },
+  "us/de/2026": {
+    "kind": "usState",
+    "state": "DE",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-DE-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://delcode.delaware.gov/title30/c011/sc01/index.html",
+      "https://delcode.delaware.gov/title30/c011/sc02/index.html",
+      "https://revenue.delaware.gov/employers-guide-withholding-regulations-employers-duties/"
+    ],
+    "incomeTax": {
+      "source": "https://delcode.delaware.gov/title30/c011/sc01/index.html",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 2000,
+            "rate": 0
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.022
+          },
+          {
+            "upTo": 10000,
+            "rate": 0.039
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.048
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.052
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0555
+          },
+          {
+            "upTo": null,
+            "rate": 0.066
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 2000,
+            "rate": 0
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.022
+          },
+          {
+            "upTo": 10000,
+            "rate": 0.039
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.048
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.052
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0555
+          },
+          {
+            "upTo": null,
+            "rate": 0.066
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 2000,
+            "rate": 0
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.022
+          },
+          {
+            "upTo": 10000,
+            "rate": 0.039
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.048
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.052
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0555
+          },
+          {
+            "upTo": null,
+            "rate": 0.066
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 2000,
+            "rate": 0
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.022
+          },
+          {
+            "upTo": 10000,
+            "rate": 0.039
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.048
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.052
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0555
+          },
+          {
+            "upTo": null,
+            "rate": 0.066
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 3250,
+        "marriedJoint": 6500,
+        "marriedSeparate": 3250,
+        "headOfHousehold": 3250
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 0,
+        "perAged": 2500
+      },
+      "exemptionCredit": {
+        "perFiler": 110,
+        "perDependent": 110,
+        "perAged": 110
+      },
+      "notes": [
+        "Delaware's earned income credit and pension exclusions aren't included."
+      ]
+    },
+    "localTax": {
+      "source": "https://revenue.delaware.gov/employers-guide-withholding-regulations-employers-duties/",
+      "note": "Wilmington levies a city wage tax."
+    }
+  },
+  "us/fl/2026": {
+    "kind": "usState",
+    "state": "FL",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-FL-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://floridarevenue.com/taxes/compliance/Pages/violations.aspx"
+    ],
+    "incomeTax": {
+      "source": "https://floridarevenue.com/taxes/compliance/Pages/violations.aspx",
+      "none": true
+    }
+  },
+  "us/flowchart": {
+    "id": "chart-us-pf",
+    "version": "CHART-US-1",
+    "status": "provisional",
+    "source": "https://www.reddit.com/r/personalfinance/wiki/commontopics/",
+    "starterFund": {
+      "floor": 1000,
+      "months": 1
+    },
+    "fullFund": {
+      "floorLow": 0,
+      "floorHigh": 0,
+      "monthsLow": 3,
+      "monthsHigh": 6
+    },
+    "debt": {
+      "highAprAbove": 0.1,
+      "moderateAprFrom": 0.04
+    },
+    "retirement": {
+      "shareOfAge": 0.5
+    },
+    "mortgageOverpay": {
+      "rate": 0.1
+    },
+    "goals": {
+      "savingsHorizonYears": 5
+    },
+    "reminders": {
+      "renewalDaysAhead": 30,
+      "consentDaysAhead": 7
+    },
+    "debtPlanner": {
+      "extraPaymentProbe": 50
+    },
+    "projections": {
+      "nominalReturn": 0.05,
+      "inflation": 0.02,
+      "scenarioSpread": 0.02,
+      "withdrawalRate": 0.04,
+      "depositRate": 0.025,
+      "dividendYield": 0.02,
+      "years": 20
+    }
+  },
+  "us/ga/2026": {
+    "kind": "usState",
+    "state": "GA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-GA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dor.georgia.gov/document/document/2026-employers-tax-guide-updated-june-2026/download",
+      "https://www.legis.ga.gov/api/legislation/document/20252026/249080"
+    ],
+    "incomeTax": {
+      "source": "https://dor.georgia.gov/document/document/2026-employers-tax-guide-updated-june-2026/download",
+      "base": "federalAgi",
+      "rate": 0.0499,
+      "standardDeduction": {
+        "single": 15000,
+        "marriedJoint": 30000,
+        "marriedSeparate": 15000,
+        "headOfHousehold": 15000
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 5000
+      },
+      "notes": [
+        "Georgia's low income credit (federal AGI under $20,000) isn't included."
+      ]
+    }
+  },
+  "us/hi/2026": {
+    "kind": "usState",
+    "state": "HI",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-HI-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://files.hawaii.gov/tax/news/announce/ann24-03.pdf",
+      "https://files.hawaii.gov/tax/forms/2025/n11ins.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://files.hawaii.gov/tax/news/announce/ann24-03.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 9600,
+            "rate": 0.014
+          },
+          {
+            "upTo": 14400,
+            "rate": 0.032
+          },
+          {
+            "upTo": 19200,
+            "rate": 0.055
+          },
+          {
+            "upTo": 24000,
+            "rate": 0.064
+          },
+          {
+            "upTo": 36000,
+            "rate": 0.068
+          },
+          {
+            "upTo": 48000,
+            "rate": 0.072
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.076
+          },
+          {
+            "upTo": 175000,
+            "rate": 0.079
+          },
+          {
+            "upTo": 225000,
+            "rate": 0.0825
+          },
+          {
+            "upTo": 275000,
+            "rate": 0.09
+          },
+          {
+            "upTo": 325000,
+            "rate": 0.1
+          },
+          {
+            "upTo": null,
+            "rate": 0.11
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 19200,
+            "rate": 0.014
+          },
+          {
+            "upTo": 28800,
+            "rate": 0.032
+          },
+          {
+            "upTo": 38400,
+            "rate": 0.055
+          },
+          {
+            "upTo": 48000,
+            "rate": 0.064
+          },
+          {
+            "upTo": 72000,
+            "rate": 0.068
+          },
+          {
+            "upTo": 96000,
+            "rate": 0.072
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.076
+          },
+          {
+            "upTo": 350000,
+            "rate": 0.079
+          },
+          {
+            "upTo": 450000,
+            "rate": 0.0825
+          },
+          {
+            "upTo": 550000,
+            "rate": 0.09
+          },
+          {
+            "upTo": 650000,
+            "rate": 0.1
+          },
+          {
+            "upTo": null,
+            "rate": 0.11
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 9600,
+            "rate": 0.014
+          },
+          {
+            "upTo": 14400,
+            "rate": 0.032
+          },
+          {
+            "upTo": 19200,
+            "rate": 0.055
+          },
+          {
+            "upTo": 24000,
+            "rate": 0.064
+          },
+          {
+            "upTo": 36000,
+            "rate": 0.068
+          },
+          {
+            "upTo": 48000,
+            "rate": 0.072
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.076
+          },
+          {
+            "upTo": 175000,
+            "rate": 0.079
+          },
+          {
+            "upTo": 225000,
+            "rate": 0.0825
+          },
+          {
+            "upTo": 275000,
+            "rate": 0.09
+          },
+          {
+            "upTo": 325000,
+            "rate": 0.1
+          },
+          {
+            "upTo": null,
+            "rate": 0.11
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 14400,
+            "rate": 0.014
+          },
+          {
+            "upTo": 21600,
+            "rate": 0.032
+          },
+          {
+            "upTo": 28800,
+            "rate": 0.055
+          },
+          {
+            "upTo": 36000,
+            "rate": 0.064
+          },
+          {
+            "upTo": 54000,
+            "rate": 0.068
+          },
+          {
+            "upTo": 72000,
+            "rate": 0.072
+          },
+          {
+            "upTo": 187500,
+            "rate": 0.076
+          },
+          {
+            "upTo": 262500,
+            "rate": 0.079
+          },
+          {
+            "upTo": 337500,
+            "rate": 0.0825
+          },
+          {
+            "upTo": 412500,
+            "rate": 0.09
+          },
+          {
+            "upTo": 487500,
+            "rate": 0.1
+          },
+          {
+            "upTo": null,
+            "rate": 0.11
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 8000,
+        "marriedJoint": 16000,
+        "marriedSeparate": 8000,
+        "headOfHousehold": 12000
+      },
+      "exemption": {
+        "perFiler": 1144,
+        "perDependent": 1144,
+        "perAged": 1144
+      },
+      "notes": [
+        "Hawaii's earned income credit, food/excise tax credit and renters credit aren't included."
+      ]
+    }
+  },
+  "us/ia/2026": {
+    "kind": "usState",
+    "state": "IA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-IA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://revenue.iowa.gov/media/53/download?inline",
+      "https://revenue.iowa.gov/media/4400/download?inline="
+    ],
+    "incomeTax": {
+      "source": "https://revenue.iowa.gov/media/53/download?inline",
+      "base": "federalTaxableIncome",
+      "rate": 0.038,
+      "exemptionCredit": {
+        "perFiler": 40,
+        "perDependent": 40,
+        "perAged": 20
+      }
+    },
+    "localTax": {
+      "source": "https://revenue.iowa.gov/media/4400/download?inline=",
+      "note": "Some Iowa school districts and EMS districts add a surtax on Iowa income tax."
+    }
+  },
+  "us/id/2026": {
+    "kind": "usState",
+    "state": "ID",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-ID-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.idaho.gov/document-mngr/pubs_EPB00744",
+      "https://tax.idaho.gov/document-mngr/forms_ein00046/"
+    ],
+    "incomeTax": {
+      "source": "https://tax.idaho.gov/document-mngr/forms_ein00046/",
+      "base": "federalAgi",
+      "standardDeduction": "federal",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 4811,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.053
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 9622,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.053
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 4811,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.053
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 9622,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.053
+          }
+        ]
+      },
+      "notes": [
+        "Idaho's $10 Permanent Building Fund tax and the refundable grocery credit ($155 a person) aren't included."
+      ]
+    }
+  },
+  "us/il/2026": {
+    "kind": "usState",
+    "state": "IL",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-IL-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/withholding/documents/currentyear/il-700-t.pdf",
+      "https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/incometax/documents/currentyear/individual/il-1040-instr.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/withholding/documents/currentyear/il-700-t.pdf",
+      "base": "federalAgi",
+      "rate": 0.0495,
+      "exemption": {
+        "perFiler": 2925,
+        "perDependent": 2925,
+        "perAged": 1000,
+        "incomeLimit": {
+          "single": 250000,
+          "marriedJoint": 500000,
+          "marriedSeparate": 250000,
+          "headOfHousehold": 250000
+        }
+      }
+    }
+  },
+  "us/in/2026": {
+    "kind": "usState",
+    "state": "IN",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-IN-2026.2",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.in.gov/dor/resources/tax-rates-and-reports/rates-fees-and-penalties/",
+      "https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf",
+      "https://forms.in.gov/Download.aspx?id=16915"
+    ],
+    "incomeTax": {
+      "source": "https://forms.in.gov/Download.aspx?id=16915",
+      "base": "federalAgi",
+      "rate": 0.0295,
+      "exemption": {
+        "perFiler": 1000,
+        "perDependent": 2500,
+        "perAged": 1000,
+        "agedLowIncome": {
+          "extra": 500,
+          "below": {
+            "single": 40000,
+            "marriedJoint": 40000,
+            "marriedSeparate": 20000,
+            "headOfHousehold": 40000
+          }
+        }
+      },
+      "rentDeduction": {
+        "share": 1,
+        "max": {
+          "single": 3000,
+          "marriedJoint": 3000,
+          "marriedSeparate": 1500,
+          "headOfHousehold": 3000
+        }
+      },
+      "notes": [
+        "Indiana's refundable earned income credit (10% of the federal one) isn't included.",
+        "The homeowner's property tax deduction (up to $2,500), the 2026 tips, overtime and car loan interest deductions, and the extra exemptions for a first or adopted child aren't included."
+      ]
+    },
+    "localTax": {
+      "source": "https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf",
+      "note": "Every Indiana county levies a county income tax, set by where you lived on January 1."
+    },
+    "localities": {
+      "source": "https://web.archive.org/web/20260116121024/https://www.in.gov/dor/files/dn01.pdf",
+      "status": "provisional",
+      "kind": "county",
+      "list": [
+        {
+          "id": "adams",
+          "name": "Adams",
+          "rate": 0.016
+        },
+        {
+          "id": "allen",
+          "name": "Allen",
+          "rate": 0.0159
+        },
+        {
+          "id": "bartholomew",
+          "name": "Bartholomew",
+          "rate": 0.0175
+        },
+        {
+          "id": "benton",
+          "name": "Benton",
+          "rate": 0.0179
+        },
+        {
+          "id": "blackford",
+          "name": "Blackford",
+          "rate": 0.025
+        },
+        {
+          "id": "boone",
+          "name": "Boone",
+          "rate": 0.017
+        },
+        {
+          "id": "brown",
+          "name": "Brown",
+          "rate": 0.025234
+        },
+        {
+          "id": "carroll",
+          "name": "Carroll",
+          "rate": 0.024733
+        },
+        {
+          "id": "cass",
+          "name": "Cass",
+          "rate": 0.0295
+        },
+        {
+          "id": "clark",
+          "name": "Clark",
+          "rate": 0.02
+        },
+        {
+          "id": "clay",
+          "name": "Clay",
+          "rate": 0.0235
+        },
+        {
+          "id": "clinton",
+          "name": "Clinton",
+          "rate": 0.0265
+        },
+        {
+          "id": "crawford",
+          "name": "Crawford",
+          "rate": 0.0165
+        },
+        {
+          "id": "daviess",
+          "name": "Daviess",
+          "rate": 0.015
+        },
+        {
+          "id": "dearborn",
+          "name": "Dearborn",
+          "rate": 0.014
+        },
+        {
+          "id": "decatur",
+          "name": "Decatur",
+          "rate": 0.0245
+        },
+        {
+          "id": "dekalb",
+          "name": "DeKalb",
+          "rate": 0.0213
+        },
+        {
+          "id": "delaware",
+          "name": "Delaware",
+          "rate": 0.015
+        },
+        {
+          "id": "dubois",
+          "name": "Dubois",
+          "rate": 0.012
+        },
+        {
+          "id": "elkhart",
+          "name": "Elkhart",
+          "rate": 0.02
+        },
+        {
+          "id": "fayette",
+          "name": "Fayette",
+          "rate": 0.0282
+        },
+        {
+          "id": "floyd",
+          "name": "Floyd",
+          "rate": 0.0189
+        },
+        {
+          "id": "fountain",
+          "name": "Fountain",
+          "rate": 0.021
+        },
+        {
+          "id": "franklin",
+          "name": "Franklin",
+          "rate": 0.017
+        },
+        {
+          "id": "fulton",
+          "name": "Fulton",
+          "rate": 0.0288
+        },
+        {
+          "id": "gibson",
+          "name": "Gibson",
+          "rate": 0.013
+        },
+        {
+          "id": "grant",
+          "name": "Grant",
+          "rate": 0.0275
+        },
+        {
+          "id": "greene",
+          "name": "Greene",
+          "rate": 0.0235
+        },
+        {
+          "id": "hamilton",
+          "name": "Hamilton",
+          "rate": 0.011
+        },
+        {
+          "id": "hancock",
+          "name": "Hancock",
+          "rate": 0.0194
+        },
+        {
+          "id": "harrison",
+          "name": "Harrison",
+          "rate": 0.01
+        },
+        {
+          "id": "hendricks",
+          "name": "Hendricks",
+          "rate": 0.017
+        },
+        {
+          "id": "henry",
+          "name": "Henry",
+          "rate": 0.0202
+        },
+        {
+          "id": "howard",
+          "name": "Howard",
+          "rate": 0.0235
+        },
+        {
+          "id": "huntington",
+          "name": "Huntington",
+          "rate": 0.0195
+        },
+        {
+          "id": "jackson",
+          "name": "Jackson",
+          "rate": 0.021
+        },
+        {
+          "id": "jasper",
+          "name": "Jasper",
+          "rate": 0.02864
+        },
+        {
+          "id": "jay",
+          "name": "Jay",
+          "rate": 0.025
+        },
+        {
+          "id": "jefferson",
+          "name": "Jefferson",
+          "rate": 0.0103
+        },
+        {
+          "id": "jennings",
+          "name": "Jennings",
+          "rate": 0.025
+        },
+        {
+          "id": "johnson",
+          "name": "Johnson",
+          "rate": 0.014
+        },
+        {
+          "id": "knox",
+          "name": "Knox",
+          "rate": 0.017
+        },
+        {
+          "id": "kosciusko",
+          "name": "Kosciusko",
+          "rate": 0.01
+        },
+        {
+          "id": "lagrange",
+          "name": "LaGrange",
+          "rate": 0.0165
+        },
+        {
+          "id": "lake",
+          "name": "Lake",
+          "rate": 0.015
+        },
+        {
+          "id": "laporte",
+          "name": "LaPorte",
+          "rate": 0.0145
+        },
+        {
+          "id": "lawrence",
+          "name": "Lawrence",
+          "rate": 0.0175
+        },
+        {
+          "id": "madison",
+          "name": "Madison",
+          "rate": 0.0225
+        },
+        {
+          "id": "marion",
+          "name": "Marion",
+          "rate": 0.0202
+        },
+        {
+          "id": "marshall",
+          "name": "Marshall",
+          "rate": 0.0125
+        },
+        {
+          "id": "martin",
+          "name": "Martin",
+          "rate": 0.025
+        },
+        {
+          "id": "miami",
+          "name": "Miami",
+          "rate": 0.0254
+        },
+        {
+          "id": "monroe",
+          "name": "Monroe",
+          "rate": 0.0214
+        },
+        {
+          "id": "montgomery",
+          "name": "Montgomery",
+          "rate": 0.0265
+        },
+        {
+          "id": "morgan",
+          "name": "Morgan",
+          "rate": 0.0272
+        },
+        {
+          "id": "newton",
+          "name": "Newton",
+          "rate": 0.01
+        },
+        {
+          "id": "noble",
+          "name": "Noble",
+          "rate": 0.0175
+        },
+        {
+          "id": "ohio",
+          "name": "Ohio",
+          "rate": 0.02
+        },
+        {
+          "id": "orange",
+          "name": "Orange",
+          "rate": 0.0175
+        },
+        {
+          "id": "owen",
+          "name": "Owen",
+          "rate": 0.025
+        },
+        {
+          "id": "parke",
+          "name": "Parke",
+          "rate": 0.0265
+        },
+        {
+          "id": "perry",
+          "name": "Perry",
+          "rate": 0.014
+        },
+        {
+          "id": "pike",
+          "name": "Pike",
+          "rate": 0.012
+        },
+        {
+          "id": "porter",
+          "name": "Porter",
+          "rate": 0.005
+        },
+        {
+          "id": "posey",
+          "name": "Posey",
+          "rate": 0.0145
+        },
+        {
+          "id": "pulaski",
+          "name": "Pulaski",
+          "rate": 0.0285
+        },
+        {
+          "id": "putnam",
+          "name": "Putnam",
+          "rate": 0.023
+        },
+        {
+          "id": "randolph",
+          "name": "Randolph",
+          "rate": 0.03
+        },
+        {
+          "id": "ripley",
+          "name": "Ripley",
+          "rate": 0.0238
+        },
+        {
+          "id": "rush",
+          "name": "Rush",
+          "rate": 0.0215
+        },
+        {
+          "id": "stjoseph",
+          "name": "St. Joseph",
+          "rate": 0.0175
+        },
+        {
+          "id": "scott",
+          "name": "Scott",
+          "rate": 0.0216
+        },
+        {
+          "id": "shelby",
+          "name": "Shelby",
+          "rate": 0.017
+        },
+        {
+          "id": "spencer",
+          "name": "Spencer",
+          "rate": 0.008
+        },
+        {
+          "id": "starke",
+          "name": "Starke",
+          "rate": 0.0171
+        },
+        {
+          "id": "steuben",
+          "name": "Steuben",
+          "rate": 0.0199
+        },
+        {
+          "id": "sullivan",
+          "name": "Sullivan",
+          "rate": 0.017
+        },
+        {
+          "id": "switzerland",
+          "name": "Switzerland",
+          "rate": 0.0145
+        },
+        {
+          "id": "tippecanoe",
+          "name": "Tippecanoe",
+          "rate": 0.0128
+        },
+        {
+          "id": "tipton",
+          "name": "Tipton",
+          "rate": 0.026
+        },
+        {
+          "id": "union",
+          "name": "Union",
+          "rate": 0.0275
+        },
+        {
+          "id": "vanderburgh",
+          "name": "Vanderburgh",
+          "rate": 0.0125
+        },
+        {
+          "id": "vermillion",
+          "name": "Vermillion",
+          "rate": 0.015
+        },
+        {
+          "id": "vigo",
+          "name": "Vigo",
+          "rate": 0.02
+        },
+        {
+          "id": "wabash",
+          "name": "Wabash",
+          "rate": 0.029
+        },
+        {
+          "id": "warren",
+          "name": "Warren",
+          "rate": 0.0212
+        },
+        {
+          "id": "warrick",
+          "name": "Warrick",
+          "rate": 0.01
+        },
+        {
+          "id": "washington",
+          "name": "Washington",
+          "rate": 0.02
+        },
+        {
+          "id": "wayne",
+          "name": "Wayne",
+          "rate": 0.0125
+        },
+        {
+          "id": "wells",
+          "name": "Wells",
+          "rate": 0.021
+        },
+        {
+          "id": "white",
+          "name": "White",
+          "rate": 0.0232
+        },
+        {
+          "id": "whitley",
+          "name": "Whitley",
+          "rate": 0.016829
+        }
+      ]
+    }
+  },
+  "us/ks/2026": {
+    "kind": "usState",
+    "state": "KS",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-KS-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://ksrevisor.gov/statutes/chapters/ch79/079_032_0110.html",
+      "https://ksrevisor.gov/statutes/chapters/ch79/079_032_0119.html",
+      "https://ksrevisor.gov/statutes/chapters/ch79/079_032_0121.html"
+    ],
+    "incomeTax": {
+      "source": "https://ksrevisor.gov/statutes/chapters/ch79/079_032_0110.html",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 23000,
+            "rate": 0.052
+          },
+          {
+            "upTo": null,
+            "rate": 0.0558
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 46000,
+            "rate": 0.052
+          },
+          {
+            "upTo": null,
+            "rate": 0.0558
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 23000,
+            "rate": 0.052
+          },
+          {
+            "upTo": null,
+            "rate": 0.0558
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 23000,
+            "rate": 0.052
+          },
+          {
+            "upTo": null,
+            "rate": 0.0558
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 3605,
+        "marriedJoint": 8240,
+        "marriedSeparate": 4120,
+        "headOfHousehold": 6180
+      },
+      "agedStandardDeduction": {
+        "married": 700,
+        "unmarried": 850
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 2320,
+        "byStatus": {
+          "single": 9160,
+          "marriedJoint": 18320,
+          "marriedSeparate": 9160,
+          "headOfHousehold": 9160
+        }
+      },
+      "notes": [
+        "Kansas's earned income credit (17% of the federal one) isn't included.",
+        "Social Security isn't taxed in Kansas."
+      ]
+    }
+  },
+  "us/ky/2026": {
+    "kind": "usState",
+    "state": "KY",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-KY-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://revenue.ky.gov/Business/Pages/Employer-Payroll-Withholding.aspx",
+      "https://revenue.ky.gov/News/Pages/Kentucky-DOR-Announces-2026-Standard-Deduction.aspx",
+      "https://revenue.ky.gov/Forms/2026%20Withholding%20Formula.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://revenue.ky.gov/News/Pages/Kentucky-DOR-Announces-2026-Standard-Deduction.aspx",
+      "base": "federalAgi",
+      "rate": 0.035,
+      "standardDeduction": {
+        "single": 3360,
+        "marriedJoint": 3360,
+        "marriedSeparate": 3360,
+        "headOfHousehold": 3360
+      }
+    },
+    "localTax": {
+      "source": "https://revenue.ky.gov/Business/Pages/Employer-Payroll-Withholding.aspx",
+      "note": "Many Kentucky cities and counties levy occupational license taxes on wages."
+    }
+  },
+  "us/la/2026": {
+    "kind": "usState",
+    "state": "LA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-LA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dam.ldr.la.gov/lawspolicies/RIB%2026-019.pdf",
+      "https://dam.ldr.la.gov/taxforms/IT540i-WEB-2025.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://dam.ldr.la.gov/lawspolicies/RIB%2026-019.pdf",
+      "base": "federalAgi",
+      "rate": 0.03,
+      "standardDeduction": {
+        "single": 12838,
+        "marriedJoint": 25676,
+        "marriedSeparate": 12838,
+        "headOfHousehold": 25676
+      }
+    }
+  },
+  "us/ma/2026": {
+    "kind": "usState",
+    "state": "MA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.mass.gov/info-details/massachusetts-tax-rates",
+      "https://www.mass.gov/doc/2025-form-1-instructions/download",
+      "https://www.mass.gov/doc/massachusetts-circular-m-income-tax-withholding-tables-at-50-effective-january-1-2026/download"
+    ],
+    "incomeTax": {
+      "source": "https://www.mass.gov/info-details/massachusetts-tax-rates",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 1107750,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.09
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 1107750,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.09
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 1107750,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.09
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 1107750,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.09
+          }
+        ]
+      },
+      "exemption": {
+        "perFiler": 0,
+        "byStatus": {
+          "single": 4400,
+          "marriedJoint": 8800,
+          "marriedSeparate": 4400,
+          "headOfHousehold": 6800
+        },
+        "perDependent": 1000,
+        "perAged": 700
+      },
+      "payrollTaxDeductionMax": 2000,
+      "rentDeduction": {
+        "share": 0.5,
+        "max": {
+          "single": 4000,
+          "marriedJoint": 4000,
+          "marriedSeparate": 2000,
+          "headOfHousehold": 4000
+        }
+      },
+      "notes": [
+        "The child and family credit ($440 per qualifying dependent) isn't included."
+      ]
+    }
+  },
+  "us/md/2026": {
+    "kind": "usState",
+    "state": "MD",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MD-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-105&enactments=false",
+      "https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/instructions/withholding/2026/withholding-guide.pdf",
+      "https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-211&enactments=false"
+    ],
+    "incomeTax": {
+      "source": "https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gtg&section=10-105&enactments=false",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 1000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 2000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.05
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.0525
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0575
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0625
+          },
+          {
+            "upTo": null,
+            "rate": 0.065
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 1000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 2000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 175000,
+            "rate": 0.05
+          },
+          {
+            "upTo": 225000,
+            "rate": 0.0525
+          },
+          {
+            "upTo": 300000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 600000,
+            "rate": 0.0575
+          },
+          {
+            "upTo": 1200000,
+            "rate": 0.0625
+          },
+          {
+            "upTo": null,
+            "rate": 0.065
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 1000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 2000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.05
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.0525
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0575
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0625
+          },
+          {
+            "upTo": null,
+            "rate": 0.065
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 1000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 2000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 3000,
+            "rate": 0.04
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 175000,
+            "rate": 0.05
+          },
+          {
+            "upTo": 225000,
+            "rate": 0.0525
+          },
+          {
+            "upTo": 300000,
+            "rate": 0.055
+          },
+          {
+            "upTo": 600000,
+            "rate": 0.0575
+          },
+          {
+            "upTo": 1200000,
+            "rate": 0.0625
+          },
+          {
+            "upTo": null,
+            "rate": 0.065
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 3400,
+        "marriedJoint": 6700,
+        "marriedSeparate": 3400,
+        "headOfHousehold": 6700
+      },
+      "exemption": {
+        "perFiler": 3200,
+        "perDependent": 3200,
+        "perAged": 1000,
+        "amountByAgi": {
+          "single": [
+            {
+              "upTo": 100000,
+              "amount": 3200
+            },
+            {
+              "upTo": 125000,
+              "amount": 1600
+            },
+            {
+              "upTo": 150000,
+              "amount": 800
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedJoint": [
+            {
+              "upTo": 150000,
+              "amount": 3200
+            },
+            {
+              "upTo": 175000,
+              "amount": 1600
+            },
+            {
+              "upTo": 200000,
+              "amount": 800
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedSeparate": [
+            {
+              "upTo": 100000,
+              "amount": 3200
+            },
+            {
+              "upTo": 125000,
+              "amount": 1600
+            },
+            {
+              "upTo": 150000,
+              "amount": 800
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "headOfHousehold": [
+            {
+              "upTo": 150000,
+              "amount": 3200
+            },
+            {
+              "upTo": 175000,
+              "amount": 1600
+            },
+            {
+              "upTo": 200000,
+              "amount": 800
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ]
+        }
+      },
+      "twoEarnerDeduction": {
+        "max": 1200
+      },
+      "notes": [
+        "Maryland's earned income credit, poverty level credit, senior credit and child tax credit aren't included.",
+        "Social Security is fully subtracted in Maryland."
+      ]
+    },
+    "localTax": {
+      "source": "https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/instructions/withholding/2026/withholding-guide.pdf",
+      "note": "Every Maryland county and Baltimore City levies a local income tax (2.25% to 3.30%)."
+    }
+  },
+  "us/me/2026": {
+    "kind": "usState",
+    "state": "ME",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-ME-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/2026-05/ind_tax_rate_sched_2026_rev.pdf",
+      "https://legislature.maine.gov/statutes/36/title36sec5124-C.html",
+      "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/26_item_stand_%20ded_phaseout_wksht_0.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/2026-05/ind_tax_rate_sched_2026_rev.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 27400,
+            "rate": 0.058
+          },
+          {
+            "upTo": 64850,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0715
+          },
+          {
+            "upTo": null,
+            "rate": 0.0915
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 54850,
+            "rate": 0.058
+          },
+          {
+            "upTo": 129750,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 1500000,
+            "rate": 0.0715
+          },
+          {
+            "upTo": null,
+            "rate": 0.0915
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 27400,
+            "rate": 0.058
+          },
+          {
+            "upTo": 64850,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 750000,
+            "rate": 0.0715
+          },
+          {
+            "upTo": null,
+            "rate": 0.0915
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 41100,
+            "rate": 0.058
+          },
+          {
+            "upTo": 97300,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 1500000,
+            "rate": 0.0715
+          },
+          {
+            "upTo": null,
+            "rate": 0.0915
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 15700,
+        "marriedJoint": 31400,
+        "marriedSeparate": 15700,
+        "headOfHousehold": 23550
+      },
+      "agedStandardDeduction": {
+        "married": 1650,
+        "unmarried": 2050
+      },
+      "standardDeductionPhaseOut": {
+        "from": {
+          "single": 102250,
+          "marriedJoint": 204550,
+          "marriedSeparate": 102250,
+          "headOfHousehold": 153400
+        },
+        "range": {
+          "single": 75000,
+          "marriedJoint": 150000,
+          "marriedSeparate": 75000,
+          "headOfHousehold": 112500
+        }
+      },
+      "exemption": {
+        "perFiler": 5300,
+        "perDependent": 0,
+        "phaseOut": {
+          "from": {
+            "single": 341000,
+            "marriedJoint": 409150,
+            "marriedSeparate": 204575,
+            "headOfHousehold": 375050
+          },
+          "range": {
+            "single": 125000,
+            "marriedJoint": 125000,
+            "marriedSeparate": 62500,
+            "headOfHousehold": 125000
+          }
+        }
+      },
+      "exemptionCredit": {
+        "perFiler": 0,
+        "perDependent": 300,
+        "dependentPhaseOut": {
+          "from": {
+            "single": 100000,
+            "marriedJoint": 150000,
+            "marriedSeparate": 75000,
+            "headOfHousehold": 125000
+          },
+          "step": 500,
+          "reductionPerStep": 20
+        }
+      },
+      "notes": [
+        "Maine's earned income credit (25% of the federal one) and the property and sales tax fairness credits aren't included.",
+        "Social Security is fully subtracted in Maine."
+      ]
+    }
+  },
+  "us/mi/2026": {
+    "kind": "usState",
+    "state": "MI",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MI-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.michigan.gov/taxes/-/media/Project/Websites/taxes/Forms/SUW/TY2026/446_Withholding-Guide_2026.pdf",
+      "https://www.michigan.gov/taxes/business-taxes/withholding/calendar-year-tax-information"
+    ],
+    "incomeTax": {
+      "source": "https://www.michigan.gov/taxes/-/media/Project/Websites/taxes/Forms/SUW/TY2026/446_Withholding-Guide_2026.pdf",
+      "base": "federalAgi",
+      "rate": 0.0425,
+      "exemption": {
+        "perFiler": 5900,
+        "perDependent": 5900
+      }
+    },
+    "localTax": {
+      "source": "https://www.michigan.gov/citytax",
+      "note": "Detroit and some other Michigan cities levy a city income tax."
+    }
+  },
+  "us/mn/2026": {
+    "kind": "usState",
+    "state": "MN",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MN-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.revenue.state.mn.us/sites/default/files/2025-12/inflation-adjusted-amounts-2026.pdf",
+      "https://www.revenue.state.mn.us/sites/default/files/2026-10/m1-inst-26.pdf",
+      "https://www.revenue.state.mn.us/sites/default/files/2026-10/m1cwfc-26.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.revenue.state.mn.us/sites/default/files/2025-12/inflation-adjusted-amounts-2026.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 33310,
+            "rate": 0.0535
+          },
+          {
+            "upTo": 109430,
+            "rate": 0.068
+          },
+          {
+            "upTo": 203150,
+            "rate": 0.0785
+          },
+          {
+            "upTo": null,
+            "rate": 0.0985
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 48700,
+            "rate": 0.0535
+          },
+          {
+            "upTo": 193480,
+            "rate": 0.068
+          },
+          {
+            "upTo": 337930,
+            "rate": 0.0785
+          },
+          {
+            "upTo": null,
+            "rate": 0.0985
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 24350,
+            "rate": 0.0535
+          },
+          {
+            "upTo": 96740,
+            "rate": 0.068
+          },
+          {
+            "upTo": 168965,
+            "rate": 0.0785
+          },
+          {
+            "upTo": null,
+            "rate": 0.0985
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 41010,
+            "rate": 0.0535
+          },
+          {
+            "upTo": 164800,
+            "rate": 0.068
+          },
+          {
+            "upTo": 270060,
+            "rate": 0.0785
+          },
+          {
+            "upTo": null,
+            "rate": 0.0985
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 15300,
+        "marriedJoint": 30600,
+        "marriedSeparate": 15300,
+        "headOfHousehold": 23000
+      },
+      "agedStandardDeduction": {
+        "married": 1600,
+        "unmarried": 2000
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 5300
+      },
+      "childCredit": {
+        "perChild": 1800,
+        "phaseOutFrom": {
+          "single": 32680,
+          "marriedJoint": 38770,
+          "marriedSeparate": 32680,
+          "headOfHousehold": 32680
+        },
+        "phaseOutRate": 0.12
+      },
+      "notes": [
+        "Minnesota's working family credit, renter's credit and marriage credit aren't included."
+      ]
+    }
+  },
+  "us/mo/2026": {
+    "kind": "usState",
+    "state": "MO",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MO-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dor.mo.gov/forms/MO-1040ES_2026.pdf",
+      "https://dor.mo.gov/forms/Withholding%20Formula_2026.pdf",
+      "https://dor.mo.gov/forms/MO-1040%20Instructions_2025.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://dor.mo.gov/forms/MO-1040ES_2026.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 1348,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": 2696,
+            "rate": 0.02,
+            "base": 0
+          },
+          {
+            "upTo": 4044,
+            "rate": 0.025,
+            "base": 27
+          },
+          {
+            "upTo": 5392,
+            "rate": 0.03,
+            "base": 61
+          },
+          {
+            "upTo": 6740,
+            "rate": 0.035,
+            "base": 101
+          },
+          {
+            "upTo": 8088,
+            "rate": 0.04,
+            "base": 148
+          },
+          {
+            "upTo": 9436,
+            "rate": 0.045,
+            "base": 202
+          },
+          {
+            "upTo": null,
+            "rate": 0.047,
+            "base": 263
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 1348,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": 2696,
+            "rate": 0.02,
+            "base": 0
+          },
+          {
+            "upTo": 4044,
+            "rate": 0.025,
+            "base": 27
+          },
+          {
+            "upTo": 5392,
+            "rate": 0.03,
+            "base": 61
+          },
+          {
+            "upTo": 6740,
+            "rate": 0.035,
+            "base": 101
+          },
+          {
+            "upTo": 8088,
+            "rate": 0.04,
+            "base": 148
+          },
+          {
+            "upTo": 9436,
+            "rate": 0.045,
+            "base": 202
+          },
+          {
+            "upTo": null,
+            "rate": 0.047,
+            "base": 263
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 1348,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": 2696,
+            "rate": 0.02,
+            "base": 0
+          },
+          {
+            "upTo": 4044,
+            "rate": 0.025,
+            "base": 27
+          },
+          {
+            "upTo": 5392,
+            "rate": 0.03,
+            "base": 61
+          },
+          {
+            "upTo": 6740,
+            "rate": 0.035,
+            "base": 101
+          },
+          {
+            "upTo": 8088,
+            "rate": 0.04,
+            "base": 148
+          },
+          {
+            "upTo": 9436,
+            "rate": 0.045,
+            "base": 202
+          },
+          {
+            "upTo": null,
+            "rate": 0.047,
+            "base": 263
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 1348,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": 2696,
+            "rate": 0.02,
+            "base": 0
+          },
+          {
+            "upTo": 4044,
+            "rate": 0.025,
+            "base": 27
+          },
+          {
+            "upTo": 5392,
+            "rate": 0.03,
+            "base": 61
+          },
+          {
+            "upTo": 6740,
+            "rate": 0.035,
+            "base": 101
+          },
+          {
+            "upTo": 8088,
+            "rate": 0.04,
+            "base": 148
+          },
+          {
+            "upTo": 9436,
+            "rate": 0.045,
+            "base": 202
+          },
+          {
+            "upTo": null,
+            "rate": 0.047,
+            "base": 263
+          }
+        ]
+      },
+      "standardDeduction": "federal",
+      "agedStandardDeduction": {
+        "married": 1600,
+        "unmarried": 2000
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 0,
+        "byStatus": {
+          "single": 0,
+          "marriedJoint": 0,
+          "marriedSeparate": 0,
+          "headOfHousehold": 1400
+        }
+      },
+      "federalTaxDeduction": {
+        "shareByAgi": [
+          {
+            "upTo": 25000,
+            "share": 0.35
+          },
+          {
+            "upTo": 50000,
+            "share": 0.25
+          },
+          {
+            "upTo": 100000,
+            "share": 0.15
+          },
+          {
+            "upTo": 125000,
+            "share": 0.05
+          },
+          {
+            "upTo": null,
+            "share": 0
+          }
+        ],
+        "max": {
+          "single": 5000,
+          "marriedJoint": 10000,
+          "marriedSeparate": 5000,
+          "headOfHousehold": 5000
+        }
+      },
+      "splitJointIncome": true,
+      "notes": [
+        "Missouri's working family credit and property tax credit aren't included."
+      ]
+    },
+    "localTax": {
+      "source": "https://dor.mo.gov/forms/MO-1040%20Instructions_2025.pdf",
+      "note": "Kansas City and St. Louis levy an earnings tax."
+    }
+  },
+  "us/ms/2026": {
+    "kind": "usState",
+    "state": "MS",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MS-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.dor.ms.gov/general-information",
+      "https://www.dor.ms.gov/sites/default/files/tax-forms/business/89700251revised1.13.2026.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.dor.ms.gov/general-information",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 10000,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.04
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 10000,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.04
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 10000,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.04
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 10000,
+            "rate": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.04
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 2300,
+        "marriedJoint": 4600,
+        "marriedSeparate": 2300,
+        "headOfHousehold": 3400
+      },
+      "exemption": {
+        "perFiler": 0,
+        "byStatus": {
+          "single": 6000,
+          "marriedJoint": 12000,
+          "marriedSeparate": 6000,
+          "headOfHousehold": 8000
+        },
+        "perDependent": 1500,
+        "perAged": 1500
+      }
+    }
+  },
+  "us/mt/2026": {
+    "kind": "usState",
+    "state": "MT",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-MT-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://revenue.mt.gov/news/recent-news/HB-337",
+      "https://revenuefiles.mt.gov/files/Forms/Montana_Employer_and_Information_Agent_Guide_with_Tax_Tables.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://revenue.mt.gov/news/recent-news/HB-337",
+      "base": "federalTaxableIncome",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 47500,
+            "rate": 0.047
+          },
+          {
+            "upTo": null,
+            "rate": 0.0565
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 95000,
+            "rate": 0.047
+          },
+          {
+            "upTo": null,
+            "rate": 0.0565
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 47500,
+            "rate": 0.047
+          },
+          {
+            "upTo": null,
+            "rate": 0.0565
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 71250,
+            "rate": 0.047
+          },
+          {
+            "upTo": null,
+            "rate": 0.0565
+          }
+        ]
+      },
+      "ageDeduction": {
+        "perPerson": 5660,
+        "age": 65,
+        "phaseOutFrom": {
+          "single": 0,
+          "marriedJoint": 0,
+          "marriedSeparate": 0,
+          "headOfHousehold": 0
+        },
+        "phaseOutRate": 0
+      },
+      "notes": [
+        "Montana's earned income credit (20% of the federal one) and elderly homeowner/renter credit aren't included."
+      ]
+    }
+  },
+  "us/nc/2026": {
+    "kind": "usState",
+    "state": "NC",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NC-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.ncdor.gov/income-tax-withholding-tables-and-instructions-employers/open",
+      "https://www.ncdor.gov/taxes-forms/individual-income-tax/north-carolina-standard-deduction-or-north-carolina-itemized-deductions",
+      "https://www.ncdor.gov/taxes-forms/individual-income-tax/north-carolina-child-deduction"
+    ],
+    "incomeTax": {
+      "source": "https://www.ncdor.gov/income-tax-withholding-tables-and-instructions-employers/open",
+      "base": "federalAgi",
+      "rate": 0.0399,
+      "standardDeduction": {
+        "single": 12750,
+        "marriedJoint": 25500,
+        "marriedSeparate": 12750,
+        "headOfHousehold": 19125
+      },
+      "childDeduction": {
+        "max": 3000,
+        "reductionPerStep": 500,
+        "from": {
+          "single": 20000,
+          "marriedJoint": 40000,
+          "marriedSeparate": 20000,
+          "headOfHousehold": 30000
+        },
+        "step": {
+          "single": 10000,
+          "marriedJoint": 20000,
+          "marriedSeparate": 10000,
+          "headOfHousehold": 15000
+        }
+      }
+    }
+  },
+  "us/nd/2026": {
+    "kind": "usState",
+    "state": "ND",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-ND-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.tax.nd.gov/sites/www/files/documents/forms/individual/2025-iit/28709-form-nd-1es-2026.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.tax.nd.gov/sites/www/files/documents/forms/individual/2025-iit/28709-form-nd-1es-2026.pdf",
+      "base": "federalTaxableIncome",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 49575,
+            "rate": 0
+          },
+          {
+            "upTo": 250400,
+            "rate": 0.0195
+          },
+          {
+            "upTo": null,
+            "rate": 0.025
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 82800,
+            "rate": 0
+          },
+          {
+            "upTo": 304850,
+            "rate": 0.0195
+          },
+          {
+            "upTo": null,
+            "rate": 0.025
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 41400,
+            "rate": 0
+          },
+          {
+            "upTo": 152425,
+            "rate": 0.0195
+          },
+          {
+            "upTo": null,
+            "rate": 0.025
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 66400,
+            "rate": 0
+          },
+          {
+            "upTo": 277600,
+            "rate": 0.0195
+          },
+          {
+            "upTo": null,
+            "rate": 0.025
+          }
+        ]
+      },
+      "notes": [
+        "North Dakota's marriage penalty credit isn't included."
+      ]
+    }
+  },
+  "us/ne/2026": {
+    "kind": "usState",
+    "state": "NE",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NE-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/2025/f_1040N-ES.pdf",
+      "https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/drafts/f_1040n.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/2025/f_1040N-ES.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 4130,
+            "rate": 0.0246
+          },
+          {
+            "upTo": 24760,
+            "rate": 0.0351
+          },
+          {
+            "upTo": null,
+            "rate": 0.0455
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 8250,
+            "rate": 0.0246
+          },
+          {
+            "upTo": 49530,
+            "rate": 0.0351
+          },
+          {
+            "upTo": null,
+            "rate": 0.0455
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 4130,
+            "rate": 0.0246
+          },
+          {
+            "upTo": 24760,
+            "rate": 0.0351
+          },
+          {
+            "upTo": null,
+            "rate": 0.0455
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 7700,
+            "rate": 0.0246
+          },
+          {
+            "upTo": 39620,
+            "rate": 0.0351
+          },
+          {
+            "upTo": null,
+            "rate": 0.0455
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 8850,
+        "marriedJoint": 17700,
+        "marriedSeparate": 8850,
+        "headOfHousehold": 12950
+      },
+      "agedStandardDeduction": {
+        "married": 1700,
+        "unmarried": 2050
+      },
+      "exemptionCredit": {
+        "perFiler": 176,
+        "perDependent": 176
+      },
+      "notes": [
+        "Nebraska's earned income credit isn't included.",
+        "Social Security isn't taxed in Nebraska."
+      ]
+    }
+  },
+  "us/nh/2026": {
+    "kind": "usState",
+    "state": "NH",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NH-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.revenue.nh.gov/taxes-glance/interest-dividends-tax"
+    ],
+    "incomeTax": {
+      "source": "https://www.revenue.nh.gov/taxes-glance/interest-dividends-tax",
+      "none": true,
+      "notes": [
+        "New Hampshire's interest and dividends tax was repealed from 2025."
+      ]
+    }
+  },
+  "us/nj/2026": {
+    "kind": "usState",
+    "state": "NJ",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NJ-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.nj.gov/treasury/taxation/pdf/current/1040esi.pdf",
+      "https://www.nj.gov/treasury/taxation/pdf/current/1040i.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.nj.gov/treasury/taxation/pdf/current/1040esi.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 20000,
+            "rate": 0.014
+          },
+          {
+            "upTo": 35000,
+            "rate": 0.0175
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.035
+          },
+          {
+            "upTo": 75000,
+            "rate": 0.05525
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0637
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 20000,
+            "rate": 0.014
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.0175
+          },
+          {
+            "upTo": 70000,
+            "rate": 0.0245
+          },
+          {
+            "upTo": 80000,
+            "rate": 0.035
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.05525
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0637
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 20000,
+            "rate": 0.014
+          },
+          {
+            "upTo": 35000,
+            "rate": 0.0175
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.035
+          },
+          {
+            "upTo": 75000,
+            "rate": 0.05525
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0637
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 20000,
+            "rate": 0.014
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.0175
+          },
+          {
+            "upTo": 70000,
+            "rate": 0.0245
+          },
+          {
+            "upTo": 80000,
+            "rate": 0.035
+          },
+          {
+            "upTo": 150000,
+            "rate": 0.05525
+          },
+          {
+            "upTo": 500000,
+            "rate": 0.0637
+          },
+          {
+            "upTo": 1000000,
+            "rate": 0.0897
+          },
+          {
+            "upTo": null,
+            "rate": 0.1075
+          }
+        ]
+      },
+      "exemption": {
+        "perFiler": 1000,
+        "perDependent": 1500,
+        "perAged": 1000
+      },
+      "rentDeduction": {
+        "share": 0.18,
+        "max": {
+          "single": 15000,
+          "marriedJoint": 15000,
+          "marriedSeparate": 7500,
+          "headOfHousehold": 15000
+        }
+      },
+      "noTaxBelow": {
+        "single": 10000,
+        "marriedJoint": 20000,
+        "marriedSeparate": 10000,
+        "headOfHousehold": 20000
+      },
+      "notes": [
+        "New Jersey's child tax credit, earned income credit and pension exclusion aren't included."
+      ]
+    }
+  },
+  "us/nm/2026": {
+    "kind": "usState",
+    "state": "NM",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NM-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://realfile.tax.newmexico.gov/FYI-104.pdf",
+      "https://realfile.tax.newmexico.gov/2025pit-1-ins.pdf",
+      "https://realfile.tax.newmexico.gov/2025trt.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://realfile.tax.newmexico.gov/FYI-104.pdf",
+      "base": "federalAgi",
+      "standardDeduction": "federal",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 5500,
+            "rate": 0.015
+          },
+          {
+            "upTo": 16500,
+            "rate": 0.032
+          },
+          {
+            "upTo": 33500,
+            "rate": 0.043
+          },
+          {
+            "upTo": 66500,
+            "rate": 0.047
+          },
+          {
+            "upTo": 210000,
+            "rate": 0.049
+          },
+          {
+            "upTo": null,
+            "rate": 0.059
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 8000,
+            "rate": 0.015
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.032
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.043
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.047
+          },
+          {
+            "upTo": 315000,
+            "rate": 0.049
+          },
+          {
+            "upTo": null,
+            "rate": 0.059
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 4000,
+            "rate": 0.015
+          },
+          {
+            "upTo": 12500,
+            "rate": 0.032
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.043
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.047
+          },
+          {
+            "upTo": 157500,
+            "rate": 0.049
+          },
+          {
+            "upTo": null,
+            "rate": 0.059
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 8000,
+            "rate": 0.015
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.032
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.043
+          },
+          {
+            "upTo": 100000,
+            "rate": 0.047
+          },
+          {
+            "upTo": 315000,
+            "rate": 0.049
+          },
+          {
+            "upTo": null,
+            "rate": 0.059
+          }
+        ]
+      },
+      "notes": [
+        "New Mexico's low- and middle-income exemption, dependent deduction, age 65 exemption and child income tax credit aren't included."
+      ]
+    }
+  },
+  "us/nv/2026": {
+    "kind": "usState",
+    "state": "NV",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NV-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.nv.gov/about-nevada-department-of-taxation/income-tax-in-nevada/"
+    ],
+    "incomeTax": {
+      "source": "https://tax.nv.gov/about-nevada-department-of-taxation/income-tax-in-nevada/",
+      "none": true
+    }
+  },
+  "us/ny/2026": {
+    "kind": "usState",
+    "state": "NY",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-NY-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.nysenate.gov/legislation/laws/TAX/601",
+      "https://www.tax.ny.gov/pit/file/standard_deductions.htm",
+      "https://www.tax.ny.gov/pdf/current_forms/it/it201i.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.nysenate.gov/legislation/laws/TAX/601",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 8500,
+            "rate": 0.039,
+            "base": 0
+          },
+          {
+            "upTo": 11700,
+            "rate": 0.044,
+            "base": 332
+          },
+          {
+            "upTo": 13900,
+            "rate": 0.0515,
+            "base": 473
+          },
+          {
+            "upTo": 80650,
+            "rate": 0.054,
+            "base": 586
+          },
+          {
+            "upTo": 215400,
+            "rate": 0.059,
+            "base": 4191
+          },
+          {
+            "upTo": 1077550,
+            "rate": 0.0685,
+            "base": 12141
+          },
+          {
+            "upTo": 5000000,
+            "rate": 0.0965,
+            "base": 71198
+          },
+          {
+            "upTo": 25000000,
+            "rate": 0.103,
+            "base": 449714
+          },
+          {
+            "upTo": null,
+            "rate": 0.109,
+            "base": 2509714
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 17150,
+            "rate": 0.039,
+            "base": 0
+          },
+          {
+            "upTo": 23600,
+            "rate": 0.044,
+            "base": 669
+          },
+          {
+            "upTo": 27900,
+            "rate": 0.0515,
+            "base": 953
+          },
+          {
+            "upTo": 161550,
+            "rate": 0.054,
+            "base": 1174
+          },
+          {
+            "upTo": 323200,
+            "rate": 0.059,
+            "base": 8391
+          },
+          {
+            "upTo": 2155350,
+            "rate": 0.0685,
+            "base": 17928
+          },
+          {
+            "upTo": 5000000,
+            "rate": 0.0965,
+            "base": 143430
+          },
+          {
+            "upTo": 25000000,
+            "rate": 0.103,
+            "base": 417939
+          },
+          {
+            "upTo": null,
+            "rate": 0.109,
+            "base": 2477939
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 8500,
+            "rate": 0.039,
+            "base": 0
+          },
+          {
+            "upTo": 11700,
+            "rate": 0.044,
+            "base": 332
+          },
+          {
+            "upTo": 13900,
+            "rate": 0.0515,
+            "base": 473
+          },
+          {
+            "upTo": 80650,
+            "rate": 0.054,
+            "base": 586
+          },
+          {
+            "upTo": 215400,
+            "rate": 0.059,
+            "base": 4191
+          },
+          {
+            "upTo": 1077550,
+            "rate": 0.0685,
+            "base": 12141
+          },
+          {
+            "upTo": 5000000,
+            "rate": 0.0965,
+            "base": 71198
+          },
+          {
+            "upTo": 25000000,
+            "rate": 0.103,
+            "base": 449714
+          },
+          {
+            "upTo": null,
+            "rate": 0.109,
+            "base": 2509714
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 12800,
+            "rate": 0.039,
+            "base": 0
+          },
+          {
+            "upTo": 17650,
+            "rate": 0.044,
+            "base": 499
+          },
+          {
+            "upTo": 20900,
+            "rate": 0.0515,
+            "base": 712
+          },
+          {
+            "upTo": 107650,
+            "rate": 0.054,
+            "base": 879
+          },
+          {
+            "upTo": 269300,
+            "rate": 0.059,
+            "base": 5564
+          },
+          {
+            "upTo": 1616450,
+            "rate": 0.0685,
+            "base": 15101
+          },
+          {
+            "upTo": 5000000,
+            "rate": 0.0965,
+            "base": 107381
+          },
+          {
+            "upTo": 25000000,
+            "rate": 0.103,
+            "base": 433894
+          },
+          {
+            "upTo": null,
+            "rate": 0.109,
+            "base": 2493894
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 8000,
+        "marriedJoint": 16050,
+        "marriedSeparate": 8000,
+        "headOfHousehold": 11200
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 1000
+      },
+      "benefitRecapture": {
+        "agiAbove": 107650,
+        "width": 50000,
+        "fractionDecimals": 4,
+        "bands": {
+          "single": [
+            {
+              "upTo": 80650,
+              "agiFrom": 107650,
+              "flatRate": 0.059
+            },
+            {
+              "upTo": 215400,
+              "agiFrom": 107650,
+              "base": 0,
+              "benefit": 567
+            },
+            {
+              "upTo": 1077550,
+              "agiFrom": 215400,
+              "base": 567,
+              "benefit": 2047
+            },
+            {
+              "upTo": 5000000,
+              "agiFrom": 1077550,
+              "base": 2614,
+              "benefit": 30172
+            },
+            {
+              "upTo": null,
+              "agiFrom": 5000000,
+              "base": 32786,
+              "benefit": 32500
+            }
+          ],
+          "marriedJoint": [
+            {
+              "upTo": 27900,
+              "agiFrom": 107650,
+              "flatRate": 0.054
+            },
+            {
+              "upTo": 161550,
+              "agiFrom": 107650,
+              "base": 0,
+              "benefit": 333
+            },
+            {
+              "upTo": 323200,
+              "agiFrom": 161550,
+              "base": 333,
+              "benefit": 807
+            },
+            {
+              "upTo": 2155350,
+              "agiFrom": 323200,
+              "base": 1140,
+              "benefit": 3071
+            },
+            {
+              "upTo": 5000000,
+              "agiFrom": 2155350,
+              "base": 4211,
+              "benefit": 60350
+            },
+            {
+              "upTo": null,
+              "agiFrom": 5000000,
+              "base": 64561,
+              "benefit": 32500
+            }
+          ],
+          "marriedSeparate": [
+            {
+              "upTo": 80650,
+              "agiFrom": 107650,
+              "flatRate": 0.059
+            },
+            {
+              "upTo": 215400,
+              "agiFrom": 107650,
+              "base": 0,
+              "benefit": 567
+            },
+            {
+              "upTo": 1077550,
+              "agiFrom": 215400,
+              "base": 567,
+              "benefit": 2047
+            },
+            {
+              "upTo": 5000000,
+              "agiFrom": 1077550,
+              "base": 2614,
+              "benefit": 30172
+            },
+            {
+              "upTo": null,
+              "agiFrom": 5000000,
+              "base": 32786,
+              "benefit": 32500
+            }
+          ],
+          "headOfHousehold": [
+            {
+              "upTo": 107650,
+              "agiFrom": 107650,
+              "flatRate": 0.059
+            },
+            {
+              "upTo": 269300,
+              "agiFrom": 107650,
+              "base": 0,
+              "benefit": 787
+            },
+            {
+              "upTo": 1616450,
+              "agiFrom": 269300,
+              "base": 787,
+              "benefit": 2559
+            },
+            {
+              "upTo": 5000000,
+              "agiFrom": 1616450,
+              "base": 3346,
+              "benefit": 45260
+            },
+            {
+              "upTo": null,
+              "agiFrom": 5000000,
+              "base": 48606,
+              "benefit": 32500
+            }
+          ]
+        }
+      },
+      "notes": [
+        "New York's Empire State child credit, earned income credit and household credit aren't included.",
+        "Social Security isn't taxed in New York."
+      ]
+    },
+    "localTax": {
+      "source": "https://www.tax.ny.gov/pdf/current_forms/it/it201i.pdf",
+      "note": "New York City and Yonkers levy their own income tax on residents."
+    }
+  },
+  "us/oh/2026": {
+    "kind": "usState",
+    "state": "OH",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-OH-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://codes.ohio.gov/assets/laws/revised-code/authenticated/57/5747/5747.02/9-30-2025/5747.02-9-30-2025.pdf",
+      "https://codes.ohio.gov/ohio-revised-code/section-5747.025",
+      "https://codes.ohio.gov/ohio-revised-code/section-5747.05"
+    ],
+    "incomeTax": {
+      "source": "https://codes.ohio.gov/assets/laws/revised-code/authenticated/57/5747/5747.02/9-30-2025/5747.02-9-30-2025.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 26050,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0275,
+            "base": 332
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 26050,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0275,
+            "base": 332
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 26050,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0275,
+            "base": 332
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 26050,
+            "rate": 0,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0275,
+            "base": 332
+          }
+        ]
+      },
+      "noTaxIfTaxableAtMost": 26050,
+      "exemption": {
+        "perFiler": 2400,
+        "perDependent": 2400,
+        "amountByAgi": {
+          "single": [
+            {
+              "upTo": 40000,
+              "amount": 2400
+            },
+            {
+              "upTo": 80000,
+              "amount": 2150
+            },
+            {
+              "upTo": 499999,
+              "amount": 1900
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedJoint": [
+            {
+              "upTo": 40000,
+              "amount": 2400
+            },
+            {
+              "upTo": 80000,
+              "amount": 2150
+            },
+            {
+              "upTo": 499999,
+              "amount": 1900
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedSeparate": [
+            {
+              "upTo": 40000,
+              "amount": 2400
+            },
+            {
+              "upTo": 80000,
+              "amount": 2150
+            },
+            {
+              "upTo": 499999,
+              "amount": 1900
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "headOfHousehold": [
+            {
+              "upTo": 40000,
+              "amount": 2400
+            },
+            {
+              "upTo": 80000,
+              "amount": 2150
+            },
+            {
+              "upTo": 499999,
+              "amount": 1900
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ]
+        }
+      },
+      "exemptionCredit": {
+        "perFiler": 20,
+        "perDependent": 20,
+        "incomeLimit": {
+          "single": 30000,
+          "marriedJoint": 30000,
+          "marriedSeparate": 30000,
+          "headOfHousehold": 30000
+        }
+      },
+      "jointFilingCredit": {
+        "minEachIncome": 500,
+        "max": 650,
+        "rateByIncome": [
+          {
+            "upTo": 25000,
+            "rate": 0.2
+          },
+          {
+            "upTo": 50000,
+            "rate": 0.15
+          },
+          {
+            "upTo": 75000,
+            "rate": 0.1
+          },
+          {
+            "upTo": null,
+            "rate": 0.05
+          }
+        ]
+      },
+      "notes": [
+        "Ohio's senior, retirement income and earned income credits aren't included.",
+        "Social Security isn't taxed in Ohio."
+      ]
+    },
+    "localTax": {
+      "source": "https://codes.ohio.gov/ohio-revised-code/section-5747.05",
+      "note": "Most Ohio cities and many school districts levy their own income tax."
+    }
+  },
+  "us/ok/2026": {
+    "kind": "usState",
+    "state": "OK",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-OK-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.oklegislature.gov/BillInfo.aspx?Bill=HB2764&Session=2500",
+      "https://oklahoma.gov/content/dam/ok/en/tax/documents/forms/individuals/current/511-Pkt.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.oklegislature.gov/BillInfo.aspx?Bill=HB2764&Session=2500",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 3750,
+            "rate": 0
+          },
+          {
+            "upTo": 4900,
+            "rate": 0.025
+          },
+          {
+            "upTo": 7200,
+            "rate": 0.035
+          },
+          {
+            "upTo": null,
+            "rate": 0.045
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 7500,
+            "rate": 0
+          },
+          {
+            "upTo": 9800,
+            "rate": 0.025
+          },
+          {
+            "upTo": 14400,
+            "rate": 0.035
+          },
+          {
+            "upTo": null,
+            "rate": 0.045
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 3750,
+            "rate": 0
+          },
+          {
+            "upTo": 4900,
+            "rate": 0.025
+          },
+          {
+            "upTo": 7200,
+            "rate": 0.035
+          },
+          {
+            "upTo": null,
+            "rate": 0.045
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 7500,
+            "rate": 0
+          },
+          {
+            "upTo": 9800,
+            "rate": 0.025
+          },
+          {
+            "upTo": 14400,
+            "rate": 0.035
+          },
+          {
+            "upTo": null,
+            "rate": 0.045
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 6350,
+        "marriedJoint": 12700,
+        "marriedSeparate": 6350,
+        "headOfHousehold": 9350
+      },
+      "exemption": {
+        "perFiler": 1000,
+        "perDependent": 1000,
+        "agedLowIncome": {
+          "extra": 1000,
+          "below": {
+            "single": 15001,
+            "marriedJoint": 25001,
+            "marriedSeparate": 12501,
+            "headOfHousehold": 19001
+          }
+        }
+      },
+      "notes": [
+        "Oklahoma's child tax credit, earned income credit and sales tax relief credit aren't included."
+      ]
+    }
+  },
+  "us/or/2026": {
+    "kind": "usState",
+    "state": "OR",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-OR-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.oregon.gov/dor/forms/FormsPubs/publication-or-estimate_101-026_2026.pdf",
+      "https://www.oregon.gov/dor/forms/FormsPubs/withholding-tax-formulas_206-436_2026.pdf",
+      "https://www.oregon.gov/dor/programs/businesses/Pages/statewide-transit-tax.aspx"
+    ],
+    "incomeTax": {
+      "source": "https://www.oregon.gov/dor/forms/FormsPubs/publication-or-estimate_101-026_2026.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 4550,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 11400,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.0875
+          },
+          {
+            "upTo": null,
+            "rate": 0.099
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 9100,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 22800,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.0875
+          },
+          {
+            "upTo": null,
+            "rate": 0.099
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 4550,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 11400,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 125000,
+            "rate": 0.0875
+          },
+          {
+            "upTo": null,
+            "rate": 0.099
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 9100,
+            "rate": 0.0475
+          },
+          {
+            "upTo": 22800,
+            "rate": 0.0675
+          },
+          {
+            "upTo": 250000,
+            "rate": 0.0875
+          },
+          {
+            "upTo": null,
+            "rate": 0.099
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 2900,
+        "marriedJoint": 5800,
+        "marriedSeparate": 2900,
+        "headOfHousehold": 4650
+      },
+      "agedStandardDeduction": {
+        "married": 1000,
+        "unmarried": 1200
+      },
+      "exemptionCredit": {
+        "perFiler": 260,
+        "perDependent": 260,
+        "incomeLimit": {
+          "single": 100000,
+          "marriedJoint": 200000,
+          "marriedSeparate": 100000,
+          "headOfHousehold": 200000
+        }
+      },
+      "federalTaxDeduction": {
+        "capByAgi": {
+          "single": [
+            {
+              "upTo": 125000,
+              "amount": 8750
+            },
+            {
+              "upTo": 130000,
+              "amount": 7000
+            },
+            {
+              "upTo": 135000,
+              "amount": 5250
+            },
+            {
+              "upTo": 140000,
+              "amount": 3500
+            },
+            {
+              "upTo": 145000,
+              "amount": 1750
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedJoint": [
+            {
+              "upTo": 250000,
+              "amount": 8750
+            },
+            {
+              "upTo": 260000,
+              "amount": 7000
+            },
+            {
+              "upTo": 270000,
+              "amount": 5250
+            },
+            {
+              "upTo": 280000,
+              "amount": 3500
+            },
+            {
+              "upTo": 290000,
+              "amount": 1750
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "marriedSeparate": [
+            {
+              "upTo": 125000,
+              "amount": 4375
+            },
+            {
+              "upTo": 130000,
+              "amount": 3500
+            },
+            {
+              "upTo": 135000,
+              "amount": 2625
+            },
+            {
+              "upTo": 140000,
+              "amount": 1750
+            },
+            {
+              "upTo": 145000,
+              "amount": 875
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ],
+          "headOfHousehold": [
+            {
+              "upTo": 250000,
+              "amount": 8750
+            },
+            {
+              "upTo": 260000,
+              "amount": 7000
+            },
+            {
+              "upTo": 270000,
+              "amount": 5250
+            },
+            {
+              "upTo": 280000,
+              "amount": 3500
+            },
+            {
+              "upTo": 290000,
+              "amount": 1750
+            },
+            {
+              "upTo": null,
+              "amount": 0
+            }
+          ]
+        }
+      },
+      "wageLevy": {
+        "name": "statewide transit tax",
+        "rate": 0.001
+      },
+      "notes": [
+        "Oregon's earned income credit and Oregon Kids Credit aren't included.",
+        "Social Security isn't taxed in Oregon."
+      ]
+    },
+    "localTax": {
+      "source": "https://www.oregon.gov/dor/programs/businesses/Pages/statewide-transit-tax.aspx",
+      "note": "Portland Metro and Multnomah County tax high incomes, and some transit districts tax self-employment income."
+    }
+  },
+  "us/pa/2026": {
+    "kind": "usState",
+    "state": "PA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-PA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.pa.gov/en/agencies/revenue/resources/tax-types-and-information/personal-income-tax.html",
+      "https://www.pa.gov/agencies/revenue/forms-and-publications/pa-personal-income-tax-guide/gross-compensation.html"
+    ],
+    "incomeTax": {
+      "source": "https://www.pa.gov/en/agencies/revenue/resources/tax-types-and-information/personal-income-tax.html",
+      "base": "wages",
+      "rate": 0.0307,
+      "notes": [
+        "Tax Forgiveness (Schedule SP) can reduce or remove the tax on low incomes; it isn't included."
+      ]
+    },
+    "localTax": {
+      "source": "https://dced.pa.gov/local-government/local-income-tax-information/",
+      "note": "Pennsylvania municipalities and school districts levy a local earned income tax, and Philadelphia a wage tax."
+    }
+  },
+  "us/ri/2026": {
+    "kind": "usState",
+    "state": "RI",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-RI-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.ri.gov/sites/g/files/xkgbur541/files/2025-11/ADV_2025_22_Inflation_Adjustments.pdf",
+      "https://tax.ri.gov/sites/g/files/xkgbur541/files/2026-01/2026%20RI-1040ES_w.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://tax.ri.gov/sites/g/files/xkgbur541/files/2025-11/ADV_2025_22_Inflation_Adjustments.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 82050,
+            "rate": 0.0375,
+            "base": 0
+          },
+          {
+            "upTo": 186450,
+            "rate": 0.0475,
+            "base": 3076.88
+          },
+          {
+            "upTo": null,
+            "rate": 0.0599,
+            "base": 8035.88
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 82050,
+            "rate": 0.0375,
+            "base": 0
+          },
+          {
+            "upTo": 186450,
+            "rate": 0.0475,
+            "base": 3076.88
+          },
+          {
+            "upTo": null,
+            "rate": 0.0599,
+            "base": 8035.88
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 82050,
+            "rate": 0.0375,
+            "base": 0
+          },
+          {
+            "upTo": 186450,
+            "rate": 0.0475,
+            "base": 3076.88
+          },
+          {
+            "upTo": null,
+            "rate": 0.0599,
+            "base": 8035.88
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 82050,
+            "rate": 0.0375,
+            "base": 0
+          },
+          {
+            "upTo": 186450,
+            "rate": 0.0475,
+            "base": 3076.88
+          },
+          {
+            "upTo": null,
+            "rate": 0.0599,
+            "base": 8035.88
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 11200,
+        "marriedJoint": 22400,
+        "marriedSeparate": 11200,
+        "headOfHousehold": 16800
+      },
+      "standardDeductionPhaseOut": {
+        "from": {
+          "single": 261000,
+          "marriedJoint": 261000,
+          "marriedSeparate": 261000,
+          "headOfHousehold": 261000
+        },
+        "range": {
+          "single": 37250,
+          "marriedJoint": 37250,
+          "marriedSeparate": 37250,
+          "headOfHousehold": 37250
+        },
+        "steps": 5
+      },
+      "exemption": {
+        "perFiler": 5250,
+        "perDependent": 5250,
+        "phaseOut": {
+          "from": {
+            "single": 261000,
+            "marriedJoint": 261000,
+            "marriedSeparate": 261000,
+            "headOfHousehold": 261000
+          },
+          "range": {
+            "single": 37250,
+            "marriedJoint": 37250,
+            "marriedSeparate": 37250,
+            "headOfHousehold": 37250
+          },
+          "steps": 5
+        }
+      },
+      "notes": [
+        "Rhode Island's earned income credit (16% of the federal one) and property tax relief credit aren't included."
+      ]
+    }
+  },
+  "us/sc/2026": {
+    "kind": "usState",
+    "state": "SC",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-SC-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dor.sc.gov/sites/dor/files/policies/IL26-20.pdf",
+      "https://dor.sc.gov/sites/dor/files/forms/SC1040Instr_2025.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://dor.sc.gov/sites/dor/files/policies/IL26-20.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 30000,
+            "rate": 0.0199,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0521,
+            "base": 597.3
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 30000,
+            "rate": 0.0199,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0521,
+            "base": 597.3
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 30000,
+            "rate": 0.0199,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0521,
+            "base": 597.3
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 30000,
+            "rate": 0.0199,
+            "base": 0
+          },
+          {
+            "upTo": null,
+            "rate": 0.0521,
+            "base": 597.3
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 15000,
+        "marriedJoint": 30000,
+        "marriedSeparate": 15000,
+        "headOfHousehold": 22500
+      },
+      "standardDeductionPhaseOut": {
+        "from": {
+          "single": 40000,
+          "marriedJoint": 80000,
+          "marriedSeparate": 40000,
+          "headOfHousehold": 60000
+        },
+        "range": {
+          "single": 55000,
+          "marriedJoint": 110000,
+          "marriedSeparate": 55000,
+          "headOfHousehold": 82500
+        }
+      },
+      "exemption": {
+        "perFiler": 0,
+        "perDependent": 4930
+      },
+      "ageDeduction": {
+        "perPerson": 15000,
+        "age": 65,
+        "phaseOutFrom": {
+          "single": 0,
+          "marriedJoint": 0,
+          "marriedSeparate": 0,
+          "headOfHousehold": 0
+        },
+        "phaseOutRate": 0
+      },
+      "twoEarnerCredit": {
+        "rate": 0.007,
+        "maxIncome": 50000
+      },
+      "notes": [
+        "South Carolina's earned income credit isn't included.",
+        "Social Security isn't taxed in South Carolina."
+      ]
+    }
+  },
+  "us/sd/2026": {
+    "kind": "usState",
+    "state": "SD",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-SD-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dor.sd.gov/individuals/taxes/"
+    ],
+    "incomeTax": {
+      "source": "https://dor.sd.gov/individuals/taxes/",
+      "none": true
+    }
+  },
+  "us/tn/2026": {
+    "kind": "usState",
+    "state": "TN",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-TN-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.tn.gov/revenue/taxes/hall-income-tax.html"
+    ],
+    "incomeTax": {
+      "source": "https://www.tn.gov/revenue/taxes/hall-income-tax.html",
+      "none": true
+    }
+  },
+  "us/tx/2026": {
+    "kind": "usState",
+    "state": "TX",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-TX-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://comptroller.texas.gov/economy/fiscal-notes/industry/2025/small-biz-info/"
+    ],
+    "incomeTax": {
+      "source": "https://comptroller.texas.gov/economy/fiscal-notes/industry/2025/small-biz-info/",
+      "none": true
+    }
+  },
+  "us/ut/2026": {
+    "kind": "usState",
+    "state": "UT",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-UT-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://le.utah.gov/Session/2026/bills/enrolled/SB0060.pdf",
+      "https://le.utah.gov/xcode/Title59/Chapter10/C59-10-S1018_2026050620260506.html",
+      "https://files.tax.utah.gov/tax/forms/drafts/tc-40.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://le.utah.gov/Session/2026/bills/enrolled/SB0060.pdf",
+      "base": "federalAgi",
+      "rate": 0.0445,
+      "taxpayerCredit": {
+        "rate": 0.06,
+        "perDependent": 2167,
+        "phaseOutRate": 0.013,
+        "base": {
+          "single": 18696,
+          "marriedJoint": 37392,
+          "marriedSeparate": 18696,
+          "headOfHousehold": 28045
+        }
+      },
+      "notes": [
+        "Utah's child tax credit for children 5 and under isn't included."
+      ]
+    }
+  },
+  "us/va/2026": {
+    "kind": "usState",
+    "state": "VA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-VA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-320/",
+      "https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-322.03/",
+      "https://www.tax.virginia.gov/sites/default/files/vatax-pdf/employer-withholding-instructions.pdf",
+      "https://www.tax.virginia.gov/sites/default/files/vatax-pdf/2025-760-instructions.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-320/",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 3000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 17000,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.0575
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 3000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 17000,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.0575
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 3000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 17000,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.0575
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 3000,
+            "rate": 0.02
+          },
+          {
+            "upTo": 5000,
+            "rate": 0.03
+          },
+          {
+            "upTo": 17000,
+            "rate": 0.05
+          },
+          {
+            "upTo": null,
+            "rate": 0.0575
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 8750,
+        "marriedJoint": 17500,
+        "marriedSeparate": 8750,
+        "headOfHousehold": 8750
+      },
+      "exemption": {
+        "perFiler": 930,
+        "perDependent": 930,
+        "perAged": 800
+      },
+      "ageDeduction": {
+        "perPerson": 12000,
+        "age": 65,
+        "phaseOutFrom": {
+          "single": 50000,
+          "marriedJoint": 75000,
+          "marriedSeparate": 75000,
+          "headOfHousehold": 50000
+        },
+        "phaseOutRate": 1
+      },
+      "noTaxBelow": {
+        "single": 11950,
+        "marriedJoint": 23900,
+        "marriedSeparate": 11950,
+        "headOfHousehold": 11950
+      },
+      "lowIncomeCredit": {
+        "perPerson": 300,
+        "incomeLimitByFamilySize": [
+          15650,
+          21150,
+          26650,
+          32150,
+          37650,
+          43150,
+          48650,
+          54150
+        ],
+        "perExtraPerson": 5500
+      },
+      "spouseAdjustment": {
+        "cap": 259,
+        "minJointTaxable": 3000
+      },
+      "notes": [
+        "Virginia's refundable earned income credit (20% of the federal one) isn't included.",
+        "Social Security benefits are fully subtracted in Virginia."
+      ]
+    }
+  },
+  "us/vt/2026": {
+    "kind": "usState",
+    "state": "VT",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-VT-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.vermont.gov/sites/tax/files/documents/IN-114-Instr-2026.pdf",
+      "https://tax.vermont.gov/sites/tax/files/documents/IN-111-Instr-2025.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://tax.vermont.gov/sites/tax/files/documents/IN-114-Instr-2026.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 50750,
+            "rate": 0.0335,
+            "base": 0
+          },
+          {
+            "upTo": 122850,
+            "rate": 0.066,
+            "base": 1700
+          },
+          {
+            "upTo": 256300,
+            "rate": 0.076,
+            "base": 6459
+          },
+          {
+            "upTo": null,
+            "rate": 0.0875,
+            "base": 16601
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 84700,
+            "rate": 0.0335,
+            "base": 0
+          },
+          {
+            "upTo": 204750,
+            "rate": 0.066,
+            "base": 2837
+          },
+          {
+            "upTo": 312050,
+            "rate": 0.076,
+            "base": 10761
+          },
+          {
+            "upTo": null,
+            "rate": 0.0875,
+            "base": 18916
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 42350,
+            "rate": 0.0335,
+            "base": 0
+          },
+          {
+            "upTo": 102375,
+            "rate": 0.066,
+            "base": 1419
+          },
+          {
+            "upTo": 156025,
+            "rate": 0.076,
+            "base": 5380
+          },
+          {
+            "upTo": null,
+            "rate": 0.0875,
+            "base": 9458
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 68000,
+            "rate": 0.0335,
+            "base": 0
+          },
+          {
+            "upTo": 175500,
+            "rate": 0.066,
+            "base": 2278
+          },
+          {
+            "upTo": 284150,
+            "rate": 0.076,
+            "base": 9373
+          },
+          {
+            "upTo": null,
+            "rate": 0.0875,
+            "base": 17630
+          }
+        ]
+      },
+      "standardDeduction": {
+        "single": 7650,
+        "marriedJoint": 15300,
+        "marriedSeparate": 7650,
+        "headOfHousehold": 11450
+      },
+      "agedStandardDeduction": {
+        "married": 1250,
+        "unmarried": 1250
+      },
+      "exemption": {
+        "perFiler": 5300,
+        "perDependent": 5300
+      },
+      "notes": [
+        "Vermont's child tax credit, earned income credit and renter credit aren't included, nor its minimum tax above $150,000 AGI."
+      ]
+    }
+  },
+  "us/wa/2026": {
+    "kind": "usState",
+    "state": "WA",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-WA-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://dor.wa.gov/taxes-rates/income-tax"
+    ],
+    "incomeTax": {
+      "source": "https://dor.wa.gov/taxes-rates/income-tax",
+      "none": true,
+      "notes": [
+        "Washington taxes long-term capital gains above a large standard deduction (7%, and 9.9% on gains over $1 million); that isn't included.",
+        "A 9.9% tax on income over $1 million starts in 2028 (SB 6346)."
+      ]
+    }
+  },
+  "us/wi/2026": {
+    "kind": "usState",
+    "state": "WI",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-WI-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://www.revenue.wi.gov/TaxForms2026/2026-Form1-ES-Inst.pdf",
+      "https://www.revenue.wi.gov/TaxForms2025/2025-Form1-inst.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://www.revenue.wi.gov/TaxForms2026/2026-Form1-ES-Inst.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 15110,
+            "rate": 0.035
+          },
+          {
+            "upTo": 51950,
+            "rate": 0.044
+          },
+          {
+            "upTo": 332720,
+            "rate": 0.053
+          },
+          {
+            "upTo": null,
+            "rate": 0.0765
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 20150,
+            "rate": 0.035
+          },
+          {
+            "upTo": 69260,
+            "rate": 0.044
+          },
+          {
+            "upTo": 443630,
+            "rate": 0.053
+          },
+          {
+            "upTo": null,
+            "rate": 0.0765
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 10080,
+            "rate": 0.035
+          },
+          {
+            "upTo": 34630,
+            "rate": 0.044
+          },
+          {
+            "upTo": 221820,
+            "rate": 0.053
+          },
+          {
+            "upTo": null,
+            "rate": 0.0765
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 15110,
+            "rate": 0.035
+          },
+          {
+            "upTo": 51950,
+            "rate": 0.044
+          },
+          {
+            "upTo": 332720,
+            "rate": 0.053
+          },
+          {
+            "upTo": null,
+            "rate": 0.0765
+          }
+        ]
+      },
+      "slidingStandardDeduction": {
+        "single": [
+          {
+            "upTo": null,
+            "max": 13960,
+            "from": 20120,
+            "rate": 0.12
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": null,
+            "max": 25840,
+            "from": 29040,
+            "rate": 0.19778
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": null,
+            "max": 12280,
+            "from": 13780,
+            "rate": 0.19778
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 58827,
+            "max": 18030,
+            "from": 20120,
+            "rate": 0.22515
+          },
+          {
+            "upTo": null,
+            "max": 13960,
+            "from": 20120,
+            "rate": 0.12
+          }
+        ]
+      },
+      "exemption": {
+        "perFiler": 700,
+        "perDependent": 700,
+        "perAged": 250
+      },
+      "twoEarnerCredit": {
+        "rate": 0.03,
+        "maxIncome": 16000
+      },
+      "notes": [
+        "Wisconsin's earned income credit, renter's school property tax credit and homestead credit aren't included.",
+        "Social Security isn't taxed in Wisconsin."
+      ]
+    }
+  },
+  "us/wv/2026": {
+    "kind": "usState",
+    "state": "WV",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-WV-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://tax.wv.gov/Individuals/Pages/PersonalIncomeTaxReductionBill.aspx",
+      "https://www.wvlegislature.gov/Bill_Text_HTML/2026_SESSIONS/RS/bills/sb392%20sub1%20enr.pdf",
+      "https://tax.wv.gov/Documents/Withholding/it100.2a.pdf"
+    ],
+    "incomeTax": {
+      "source": "https://tax.wv.gov/Documents/Withholding/it100.2a.pdf",
+      "base": "federalAgi",
+      "brackets": {
+        "single": [
+          {
+            "upTo": 10000,
+            "rate": 0.0211
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.0281
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.0316
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0422
+          },
+          {
+            "upTo": null,
+            "rate": 0.0458
+          }
+        ],
+        "marriedJoint": [
+          {
+            "upTo": 10000,
+            "rate": 0.0211
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.0281
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.0316
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0422
+          },
+          {
+            "upTo": null,
+            "rate": 0.0458
+          }
+        ],
+        "marriedSeparate": [
+          {
+            "upTo": 5000,
+            "rate": 0.0211
+          },
+          {
+            "upTo": 12500,
+            "rate": 0.0281
+          },
+          {
+            "upTo": 20000,
+            "rate": 0.0316
+          },
+          {
+            "upTo": 30000,
+            "rate": 0.0422
+          },
+          {
+            "upTo": null,
+            "rate": 0.0458
+          }
+        ],
+        "headOfHousehold": [
+          {
+            "upTo": 10000,
+            "rate": 0.0211
+          },
+          {
+            "upTo": 25000,
+            "rate": 0.0281
+          },
+          {
+            "upTo": 40000,
+            "rate": 0.0316
+          },
+          {
+            "upTo": 60000,
+            "rate": 0.0422
+          },
+          {
+            "upTo": null,
+            "rate": 0.0458
+          }
+        ]
+      },
+      "exemption": {
+        "perFiler": 2000,
+        "perDependent": 2000
+      },
+      "ageDeduction": {
+        "perPerson": 8000,
+        "age": 65,
+        "phaseOutFrom": {
+          "single": 0,
+          "marriedJoint": 0,
+          "marriedSeparate": 0,
+          "headOfHousehold": 0
+        },
+        "phaseOutRate": 0
+      },
+      "noTaxBelow": {
+        "single": 10000,
+        "marriedJoint": 10000,
+        "marriedSeparate": 5000,
+        "headOfHousehold": 10000
+      },
+      "notes": [
+        "West Virginia's family tax credit for incomes near the poverty line isn't included."
+      ]
+    }
+  },
+  "us/wy/2026": {
+    "kind": "usState",
+    "state": "WY",
+    "parent": "US",
+    "taxYear": "2026",
+    "version": "US-WY-2026.1",
+    "status": "provisional",
+    "effective": {
+      "from": "2026-01-01",
+      "to": "2026-12-31"
+    },
+    "sources": [
+      "https://governor.wyo.gov/news-releases/governor-gordon-urges-property-tax-refund-program-applications"
+    ],
+    "incomeTax": {
+      "source": "https://governor.wyo.gov/news-releases/governor-gordon-urges-property-tax-refund-program-applications",
+      "none": true
+    }
+  },
   "xb/ie-uk": {
     "id": "IE-UK-DTA",
     "version": "XB-2026.1",
@@ -974,6 +7612,199 @@ export const RAW_PACKS: Record<string, unknown> = {
         }
       ]
     }
+  },
+  "xb/ie-us": {
+    "id": "IE-US-DTA",
+    "version": "XB-US-2026.1",
+    "status": "provisional",
+    "source": "https://www.revenue.ie/en/tax-professionals/documents/double-taxation-treaties/u/usa-1997.pdf",
+    "articles": {
+      "employment": {
+        "ref": "IE–US DTA Art. 15",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-15"
+      },
+      "privatePension": {
+        "ref": "IE–US DTA Art. 18(1)(a)",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18"
+      },
+      "socialSecurity": {
+        "ref": "IE–US DTA Art. 18(1)(b)",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18"
+      },
+      "governmentService": {
+        "ref": "IE–US DTA Art. 19",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-19"
+      },
+      "interest": {
+        "ref": "IE–US DTA Art. 11",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-11"
+      },
+      "eliminationOfDoubleTax": {
+        "ref": "IE–US DTA Art. 24",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-24"
+      },
+      "savingClause": {
+        "ref": "IE–US DTA Art. 1(4)",
+        "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-1"
+      }
+    },
+    "pfic": {
+      "ref": "PFIC rules, IRS Form 8621",
+      "source": "https://www.irs.gov/forms-pubs/about-form-8621"
+    },
+    "relocation": {
+      "source": "https://www.irs.gov/businesses/international-businesses/ireland-tax-treaty-documents",
+      "toUS": [
+        {
+          "topic": "residence",
+          "text": "US tax residence comes from a green card or the substantial presence test (183 days, counting part of the two years before). The US tax year is the calendar year, and the year you arrive you may file as dual-status.",
+          "source": "https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test"
+        },
+        {
+          "topic": "states",
+          "text": "Most US states tax income as well as the federal government, and each sets its own rules. Where you settle matters as much as the move.",
+          "source": "https://www.usa.gov/state-taxes"
+        },
+        {
+          "topic": "funds",
+          "text": "Irish-domiciled funds and ETFs are PFICs for US tax: without an election, gains are taxed at the top rate plus an interest charge, and each fund needs Form 8621 every year.",
+          "source": "https://www.irs.gov/forms-pubs/about-form-8621"
+        },
+        {
+          "topic": "pensions",
+          "text": "Irish occupational pensions and PRSAs paid to a US resident are taxed only in the US (IE–US DTA Art. 18(1)(a)), and so is the Irish State Pension (Art. 18(1)(b)).",
+          "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18"
+        },
+        {
+          "topic": "governmentPension",
+          "text": "Irish public service pensions stay taxable only in Ireland unless you are a US citizen living in the US (IE–US DTA Art. 19).",
+          "source": "https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-19"
+        },
+        {
+          "topic": "investmentAccount",
+          "text": "The Irish Investment Account is for Irish residents; check what happens to it when you leave before moving.",
+          "source": "https://www.rsm.global/ireland/node/768"
+        },
+        {
+          "topic": "myFutureFund",
+          "text": "MyFutureFund contributions stop when you leave Irish employment; the pot stays invested.",
+          "source": "https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/"
+        },
+        {
+          "topic": "foreignAccounts",
+          "text": "US residents report foreign bank and investment accounts each year: FinCEN Form 114 (FBAR) once their combined balance passes $10,000 at any point in the year, and Form 8938 above higher limits.",
+          "source": "https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar"
+        },
+        {
+          "topic": "statePension",
+          "text": "Under the US–Ireland social security agreement, PRSI and US Social Security credits can be combined to qualify for either country's pension.",
+          "source": "https://www.ssa.gov/international/Agreement_Pamphlets/ireland.html"
+        }
+      ]
+    }
+  },
+  "xb/uk-us": {
+    "id": "UK-US-DTA",
+    "version": "XB-US-2026.1",
+    "status": "provisional",
+    "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force",
+    "articles": {
+      "employment": {
+        "ref": "UK–US DTC Art. 14",
+        "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+      },
+      "privatePension": {
+        "ref": "UK–US DTC Art. 17(1)",
+        "source": "https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made"
+      },
+      "socialSecurity": {
+        "ref": "UK–US DTC Art. 17(3)",
+        "source": "https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made"
+      },
+      "lumpSum": {
+        "ref": "UK–US DTC Art. 17(2)",
+        "source": "https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made"
+      },
+      "governmentService": {
+        "ref": "UK–US DTC Art. 19",
+        "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+      },
+      "interest": {
+        "ref": "UK–US DTC Art. 11",
+        "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+      },
+      "eliminationOfDoubleTax": {
+        "ref": "UK–US DTC Art. 24",
+        "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+      },
+      "savingClause": {
+        "ref": "UK–US DTC Art. 1(4)",
+        "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+      }
+    },
+    "isa": {
+      "ref": "No US exemption for ISAs",
+      "source": "https://www.irs.gov/forms-pubs/about-form-8621"
+    },
+    "pfic": {
+      "ref": "PFIC rules, IRS Form 8621",
+      "source": "https://www.irs.gov/forms-pubs/about-form-8621"
+    },
+    "relocation": {
+      "source": "https://www.irs.gov/businesses/international-businesses/united-kingdom-tax-treaty-documents",
+      "toUS": [
+        {
+          "topic": "residence",
+          "text": "US tax residence comes from a green card or the substantial presence test (183 days, counting part of the two years before). The US tax year is the calendar year, and the year you arrive you may file as dual-status.",
+          "source": "https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test"
+        },
+        {
+          "topic": "states",
+          "text": "Most US states tax income as well as the federal government, and each sets its own rules. Where you settle matters as much as the move.",
+          "source": "https://www.usa.gov/state-taxes"
+        },
+        {
+          "topic": "isa",
+          "text": "An ISA is not tax-free in the US: interest, dividends and gains inside it are taxable each year. You can keep it, but you can't pay in once you're no longer UK resident.",
+          "source": "https://www.gov.uk/individual-savings-accounts/if-you-move-abroad"
+        },
+        {
+          "topic": "funds",
+          "text": "UK-domiciled funds, including most held in a stocks and shares ISA, are PFICs for US tax: without an election, gains are taxed at the top rate plus an interest charge, and each fund needs Form 8621 every year.",
+          "source": "https://www.irs.gov/forms-pubs/about-form-8621"
+        },
+        {
+          "topic": "pensions",
+          "text": "UK private and workplace pensions and the UK State Pension paid to a US resident are taxed only in the US (UK–US DTC Art. 17(1) and 17(3)): claim relief at source from HMRC so UK tax is not deducted. Lump sums are taxed only as the UK would tax them (Art. 17(2)).",
+          "source": "https://legislation.gov.uk/uksi/2002/2848/schedule/part/I/crossheading/pensions-social-security-annuities-alimony-and-child-support/made"
+        },
+        {
+          "topic": "governmentPension",
+          "text": "UK government service pensions stay taxable only in the UK unless you are a US citizen living in the US (UK–US DTC Art. 19).",
+          "source": "https://www.gov.uk/government/publications/usa-tax-treaties/2001-uk-usa-double-taxation-convention-as-amended-by-the-2002-protocol-in-force"
+        },
+        {
+          "topic": "lisa",
+          "text": "Lifetime ISA bonuses and withdrawal charges still apply; the US gives no exemption.",
+          "source": "https://www.gov.uk/lifetime-isa"
+        },
+        {
+          "topic": "gains",
+          "text": "UK temporary non-residence rules can tax gains made while abroad if you return to the UK within five years.",
+          "source": "https://www.gov.uk/hmrc-internal-manuals/capital-gains-manual/cg26500"
+        },
+        {
+          "topic": "foreignAccounts",
+          "text": "US residents report foreign bank and investment accounts each year: FinCEN Form 114 (FBAR) once their combined balance passes $10,000 at any point in the year, and Form 8938 above higher limits.",
+          "source": "https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar"
+        },
+        {
+          "topic": "statePension",
+          "text": "Under the US–UK social security agreement, National Insurance and US Social Security credits can be combined to qualify for either country's pension. Voluntary NI contributions from abroad need ten years of UK residence or contributions.",
+          "source": "https://www.ssa.gov/international/Agreement_Pamphlets/uk.html"
+        }
+      ]
+    }
   }
 };
 
@@ -1009,8 +7840,283 @@ export const MANIFEST = [
     "sha256": "d21b91ab94a5adc54bf6a6844f63ec5db31a39325689efd436e6d92985ffa5a5"
   },
   {
+    "key": "us/2026",
+    "version": "US-2026.1",
+    "sha256": "ca8701606e4848d808aeab475bb907fe0c4b48a5b58d4729d73e428c109d3079"
+  },
+  {
+    "key": "us/ak/2026",
+    "version": "US-AK-2026.1",
+    "sha256": "ae737b9dd7cd4a422a2b3962e17451c038e2a35e95ffb2acb43ef659c4e775f7"
+  },
+  {
+    "key": "us/al/2026",
+    "version": "US-AL-2026.1",
+    "sha256": "da51449c0ea0ee66951d63c96b46e41d271210d816c59c0d660481ac3dd5be70"
+  },
+  {
+    "key": "us/ar/2026",
+    "version": "US-AR-2026.1",
+    "sha256": "e258939a52dc0abdec48079471f5c1678bc62940b769e0265e717d4e8f00b1ea"
+  },
+  {
+    "key": "us/az/2026",
+    "version": "US-AZ-2026.1",
+    "sha256": "097d7f390b33b0981493b6359d3106c5f4541afb14d7f7ce86efbb270d709253"
+  },
+  {
+    "key": "us/ca/2026",
+    "version": "US-CA-2026.1",
+    "sha256": "857077f276b861303046826f57eadd2a6257c29984da8a8aafd0b93ac435af85"
+  },
+  {
+    "key": "us/co/2026",
+    "version": "US-CO-2026.1",
+    "sha256": "c4d4069105d8cfdb1071597bda07c458b14380f93c4a4a4b4916091e7a91dfad"
+  },
+  {
+    "key": "us/ct/2026",
+    "version": "US-CT-2026.1",
+    "sha256": "4ba65f87c3950f3a1ecf0519d4e0ee02fb75f2d29017d6c137e720ef9fdde30f"
+  },
+  {
+    "key": "us/dc/2026",
+    "version": "US-DC-2026.1",
+    "sha256": "188e9f2117c522bdcf245b4371ad0903950deae4e8d04249e5168e7ad85047cc"
+  },
+  {
+    "key": "us/de/2026",
+    "version": "US-DE-2026.1",
+    "sha256": "e6a6cb6d12f81852a00ea7e9822c3af494c9fa1240cd24b9ae0c386ef55aa564"
+  },
+  {
+    "key": "us/fl/2026",
+    "version": "US-FL-2026.1",
+    "sha256": "412900a60f2a3866adbd9849be6353613a6d86443038d936fa1f028c5b2fbb99"
+  },
+  {
+    "key": "us/flowchart",
+    "version": "CHART-US-1",
+    "sha256": "7a1b5877b03be009c3945729550d3428cf901b62c0e7874c7bdd34c0cb3e92a5"
+  },
+  {
+    "key": "us/ga/2026",
+    "version": "US-GA-2026.1",
+    "sha256": "257fb8aaf0d4366a75fc0d4f6d30e2d9095688b02654eacd3a39e7db26bc49db"
+  },
+  {
+    "key": "us/hi/2026",
+    "version": "US-HI-2026.1",
+    "sha256": "5c03f9e08a07576e144155ef67342e157018aabac522459ba3b3e86b7229f6e7"
+  },
+  {
+    "key": "us/ia/2026",
+    "version": "US-IA-2026.1",
+    "sha256": "86252a862b91eafe2f7a1417662a8c19590a81d6cc15506ac1cd8f950fc77d4d"
+  },
+  {
+    "key": "us/id/2026",
+    "version": "US-ID-2026.1",
+    "sha256": "377a36ea3e5abb8364e87cc006ef28f1a86e9be1075d4f8b67519b34083b1776"
+  },
+  {
+    "key": "us/il/2026",
+    "version": "US-IL-2026.1",
+    "sha256": "86491c108dd6960864446b8c08410fd21a3993c357f75d8d3e87b906d2b7d217"
+  },
+  {
+    "key": "us/in/2026",
+    "version": "US-IN-2026.2",
+    "sha256": "963fffd9133fe769cf6044cec834eab59c4b7af6e538dd7934fa29e08435db61"
+  },
+  {
+    "key": "us/ks/2026",
+    "version": "US-KS-2026.1",
+    "sha256": "c746d8bf1690f79467166aad3381274a7824911003e119a39210d00813d2e359"
+  },
+  {
+    "key": "us/ky/2026",
+    "version": "US-KY-2026.1",
+    "sha256": "0efa54bb42b4e129aa54e2f803aa5c74b2b5c096915c60f4324e42fb7fe61440"
+  },
+  {
+    "key": "us/la/2026",
+    "version": "US-LA-2026.1",
+    "sha256": "0d79361ad173d7e4b540cf7c33ee7584349d9ab6ebb9e2e1f8c638ba2a972d59"
+  },
+  {
+    "key": "us/ma/2026",
+    "version": "US-MA-2026.1",
+    "sha256": "94ae61870c79ac0b003e96b100a2a2e32cfc13970aed089fe97db44163d4caa5"
+  },
+  {
+    "key": "us/md/2026",
+    "version": "US-MD-2026.1",
+    "sha256": "33d9c5dc3a4bc4baca6fce1dad566bfdc4459b2dc0489ef1657726c42e845dbd"
+  },
+  {
+    "key": "us/me/2026",
+    "version": "US-ME-2026.1",
+    "sha256": "ad0f9324078bcfcf6db932a117ddfe130778c69d0f44de6f9c479bea6f51f8c8"
+  },
+  {
+    "key": "us/mi/2026",
+    "version": "US-MI-2026.1",
+    "sha256": "2529905e8e978efe10a146ad61f86eeea4d26e2834efe7cf99816edd1424041b"
+  },
+  {
+    "key": "us/mn/2026",
+    "version": "US-MN-2026.1",
+    "sha256": "e2ee1a645ccf78a3fe07fad2a702b6a11965698bd81c2074880310f57cc27d75"
+  },
+  {
+    "key": "us/mo/2026",
+    "version": "US-MO-2026.1",
+    "sha256": "c0502d081b9110a00cbcda4fd61d58d54a38e82fda194b22468bc90d8e6a8ed0"
+  },
+  {
+    "key": "us/ms/2026",
+    "version": "US-MS-2026.1",
+    "sha256": "b3182fcef8904e032a2eda83d9dbf71d78b73b5ea620265a15639839bcee96ef"
+  },
+  {
+    "key": "us/mt/2026",
+    "version": "US-MT-2026.1",
+    "sha256": "6235bf11db63c9f9af4490fe04d0f83ff145d54a9e3c952517316a4181bab887"
+  },
+  {
+    "key": "us/nc/2026",
+    "version": "US-NC-2026.1",
+    "sha256": "3aa78170953963e2649a8f95e54b7dc34e4506d240ba147afc6ab7bd2df105e5"
+  },
+  {
+    "key": "us/nd/2026",
+    "version": "US-ND-2026.1",
+    "sha256": "cd515dc60a3b51164e5e818bf51bf454a73929613118b552f090f836ac1ec1f3"
+  },
+  {
+    "key": "us/ne/2026",
+    "version": "US-NE-2026.1",
+    "sha256": "ded0b186978ec1190f7257a8ee4145449b9b2c5e90bd217696f783fb7a6b6c35"
+  },
+  {
+    "key": "us/nh/2026",
+    "version": "US-NH-2026.1",
+    "sha256": "a2780c0423135a34fd1afef5b6397cd38c203835a82db38d103b45ebcbfed95f"
+  },
+  {
+    "key": "us/nj/2026",
+    "version": "US-NJ-2026.1",
+    "sha256": "04e4c3985fa0b16865b9450bed0b2de39e6c4005876de78df908b2e61588a5b7"
+  },
+  {
+    "key": "us/nm/2026",
+    "version": "US-NM-2026.1",
+    "sha256": "fb95716c72b59e6e3dd0448a8c6c74d43012e8ca90105363f7035f0c03b10edf"
+  },
+  {
+    "key": "us/nv/2026",
+    "version": "US-NV-2026.1",
+    "sha256": "9b59f5fbcde793b5d6dd6edb312cba7fbaa2119e1ed8276be0761f1619a721b4"
+  },
+  {
+    "key": "us/ny/2026",
+    "version": "US-NY-2026.1",
+    "sha256": "66a8a404802a459bef2146f63dc603dc61af51c627d55dab35b7585ac33153a6"
+  },
+  {
+    "key": "us/oh/2026",
+    "version": "US-OH-2026.1",
+    "sha256": "28da82bb96c9b706e1c2a2fa61f7a62e83c7931060bc6288239501abfec1d81a"
+  },
+  {
+    "key": "us/ok/2026",
+    "version": "US-OK-2026.1",
+    "sha256": "cb9c713a89dff29962930eda67cbefe87e0dd7d4c6959cecf529cdcf9f01f8d2"
+  },
+  {
+    "key": "us/or/2026",
+    "version": "US-OR-2026.1",
+    "sha256": "3047b1efaa4ca0b6af1d7bf3d02d27755bac52e3a1cc64bb40f05d6f0c168365"
+  },
+  {
+    "key": "us/pa/2026",
+    "version": "US-PA-2026.1",
+    "sha256": "bed6db86ce569ac6332c8e94620b570bb195a5bb4a96972161f60ef6ad4e1745"
+  },
+  {
+    "key": "us/ri/2026",
+    "version": "US-RI-2026.1",
+    "sha256": "a2fefd04029b06d1eb768667913a6745a3718bdf2905f00992104a6a0fbd0675"
+  },
+  {
+    "key": "us/sc/2026",
+    "version": "US-SC-2026.1",
+    "sha256": "57ea2cb3b366a4f64ec0335ff2143a5e9219b6a52969f74de624087b91b4f17c"
+  },
+  {
+    "key": "us/sd/2026",
+    "version": "US-SD-2026.1",
+    "sha256": "62b5866e05dec36225bc674686e92e065d3b0f758b00a54e5494548682f27c3c"
+  },
+  {
+    "key": "us/tn/2026",
+    "version": "US-TN-2026.1",
+    "sha256": "a0296178c6bc8bf2c63cfb6ac4e059743ee5455383fb92dc398fb58356f64061"
+  },
+  {
+    "key": "us/tx/2026",
+    "version": "US-TX-2026.1",
+    "sha256": "4008851d03f912664a823089bb051c728ee14b2550cb6e784f19b9b4c66429ae"
+  },
+  {
+    "key": "us/ut/2026",
+    "version": "US-UT-2026.1",
+    "sha256": "fd29daf7ea72871465b7bda494d90149618fb01a60edcdd4307d0fbf291aa547"
+  },
+  {
+    "key": "us/va/2026",
+    "version": "US-VA-2026.1",
+    "sha256": "0fd72f436e1d718b9fe263e799522173104d41692e7f22487d0750dae73596d8"
+  },
+  {
+    "key": "us/vt/2026",
+    "version": "US-VT-2026.1",
+    "sha256": "8b70e9c7fda5bd7aec08dc9b83f707f15433846ef2d7575fb224b1f107d14bd6"
+  },
+  {
+    "key": "us/wa/2026",
+    "version": "US-WA-2026.1",
+    "sha256": "f14904e8d0f43f45691802287d22b32160a37c9724cf76ffe48f88e08edb7d36"
+  },
+  {
+    "key": "us/wi/2026",
+    "version": "US-WI-2026.1",
+    "sha256": "1f3e1893aa68b964f015bb3033c997766fd8c7d940e1b4e9b4e1f2300f4fbc94"
+  },
+  {
+    "key": "us/wv/2026",
+    "version": "US-WV-2026.1",
+    "sha256": "c5f2f225dc243857ead8786d6181c2ede2cd36e69145916f52faab52512e5461"
+  },
+  {
+    "key": "us/wy/2026",
+    "version": "US-WY-2026.1",
+    "sha256": "e357c5b7807f6555ed2f8fc1c6b4c3af1b9993f4c18cf457df16ebcd07b602db"
+  },
+  {
     "key": "xb/ie-uk",
     "version": "XB-2026.1",
     "sha256": "997d5c9612be51e0d2828b0561a53e9906f68dc506bcda21d9ab286862568583"
+  },
+  {
+    "key": "xb/ie-us",
+    "version": "XB-US-2026.1",
+    "sha256": "267d37d018c06454852247b310ee566dd7361fe9d71344208e0a7265d6708ab7"
+  },
+  {
+    "key": "xb/uk-us",
+    "version": "XB-US-2026.1",
+    "sha256": "1f3dd3f2846be37f8a9ff5ad827db3a995417f3d8d433f10608c40badf82597e"
   }
 ] as const;

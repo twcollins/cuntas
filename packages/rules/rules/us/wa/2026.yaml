@@ -1,0 +1,16 @@
+# Washington: no personal income tax on wages in 2026.
+kind: usState
+state: WA
+parent: US
+taxYear: "2026"
+version: "US-WA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dor.wa.gov/taxes-rates/income-tax
+incomeTax:
+  source: https://dor.wa.gov/taxes-rates/income-tax
+  none: true
+  notes:
+    - "Washington taxes long-term capital gains above a large standard deduction (7%, and 9.9% on gains over $1 million); that isn't included."
+    - "A 9.9% tax on income over $1 million starts in 2028 (SB 6346)."

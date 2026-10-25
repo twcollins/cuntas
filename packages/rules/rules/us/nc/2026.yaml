@@ -1,0 +1,25 @@
+# North Carolina individual income tax, 2026: a flat rate on federal AGI less the NC standard
+# deduction and a child deduction that steps down with income. The rate is from NC-30 (2026); the
+# standard deduction and child deduction tables are 2025's, the latest published (NC-30 for 2026
+# uses the same standard deduction).
+kind: usState
+state: NC
+parent: US
+taxYear: "2026"
+version: "US-NC-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.ncdor.gov/income-tax-withholding-tables-and-instructions-employers/open
+  - https://www.ncdor.gov/taxes-forms/individual-income-tax/north-carolina-standard-deduction-or-north-carolina-itemized-deductions
+  - https://www.ncdor.gov/taxes-forms/individual-income-tax/north-carolina-child-deduction
+incomeTax:
+  source: https://www.ncdor.gov/income-tax-withholding-tables-and-instructions-employers/open
+  base: federalAgi
+  rate: 0.0399
+  standardDeduction: { single: 12750, marriedJoint: 25500, marriedSeparate: 12750, headOfHousehold: 19125 }
+  childDeduction:
+    max: 3000
+    reductionPerStep: 500
+    from: { single: 20000, marriedJoint: 40000, marriedSeparate: 20000, headOfHousehold: 30000 }
+    step: { single: 10000, marriedJoint: 20000, marriedSeparate: 10000, headOfHousehold: 15000 }

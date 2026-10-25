@@ -1,0 +1,20 @@
+# Georgia individual income tax, 2026: a flat 4.99% (HB 463, back to January 1) on federal AGI less
+# the standard deduction and $5,000 per dependent. No personal exemption for filers.
+kind: usState
+state: GA
+parent: US
+taxYear: "2026"
+version: "US-GA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dor.georgia.gov/document/document/2026-employers-tax-guide-updated-june-2026/download
+  - https://www.legis.ga.gov/api/legislation/document/20252026/249080
+incomeTax:
+  source: https://dor.georgia.gov/document/document/2026-employers-tax-guide-updated-june-2026/download
+  base: federalAgi
+  rate: 0.0499
+  standardDeduction: { single: 15000, marriedJoint: 30000, marriedSeparate: 15000, headOfHousehold: 15000 }
+  exemption: { perFiler: 0, perDependent: 5000 }
+  notes:
+    - "Georgia's low income credit (federal AGI under $20,000) isn't included."

@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { chartDefaults, toMinor } from "@cuntas/rules";
+import { chartDefaults, type Currency, toMinor } from "@cuntas/rules";
 import { comparePayoff, newId, type Debt } from "@cuntas/ledger";
 import { Badge, Button, Card, Disclaimer, Empty, Field, Input, Modal, MoneyInput, PageHeader, Select, Stat, Table } from "../components/ui";
 import { usePlan } from "../lib/derived";
-import { formatDate, money, pct } from "../lib/format";
+import { currencyOptions, formatDate, money, pct } from "../lib/format";
 import { update, useDataset } from "../lib/store";
 import { useChartColors } from "../lib/theme";
 
@@ -106,7 +106,7 @@ function DebtForm({ debt, onDone }: { debt: Debt; onDone: () => void }) {
         <Field label="APR (%)">{(id) => <Input id={id} type="number" step={0.1} min={0} value={d.aprBps / 100} onChange={(e) => setD({ ...d, aprBps: Math.round(Number(e.target.value) * 100) })} />}</Field>
         <Field label="Balance">{(id) => <MoneyInput id={id} value={d.balanceMinor} onChange={(v) => setD({ ...d, balanceMinor: v })} />}</Field>
         <Field label="Minimum monthly payment">{(id) => <MoneyInput id={id} value={d.minPaymentMinor} onChange={(v) => setD({ ...d, minPaymentMinor: v })} />}</Field>
-        <Field label="Currency">{(id) => <Select id={id} value={d.currency} onChange={(e) => setD({ ...d, currency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+        <Field label="Currency">{(id) => <Select id={id} value={d.currency} onChange={(e) => setD({ ...d, currency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
         <Field label="Linked account" hint="Balance follows the account.">{(id) => <Select id={id} value={d.accountId ?? ""} onChange={(e) => setD({ ...d, accountId: e.target.value || null })} options={[{ value: "", label: "None" }, ...liabilityAccounts.map((a) => ({ value: a.id, label: a.name }))]} />}</Field>
       </div>
       <div className="flex justify-between pt-2">

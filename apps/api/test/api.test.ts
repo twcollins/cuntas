@@ -19,6 +19,13 @@ beforeAll(async () => {
 });
 
 describe("api", () => {
+  it("creates a household with a US dollar base currency, and rejects unknown currencies", async () => {
+    const ok = await alice.call("/households", { method: "POST", body: JSON.stringify({ name: "Dollar HH", baseCurrency: "USD" }) });
+    expect(ok.status).toBe(201);
+    const bad = await alice.call("/households", { method: "POST", body: JSON.stringify({ name: "Yen HH", baseCurrency: "JPY" }) });
+    expect(bad.status).toBe(400);
+  });
+
   it("health, openapi and signed-out rejection", async () => {
     expect((await t.app.request("/health")).status).toBe(200);
     const doc = (await (await t.app.request("/openapi.json")).json()) as { paths: Record<string, unknown> };

@@ -1,0 +1,22 @@
+# Arizona individual income tax, 2026: a flat 2.5% on federal AGI less the standard deduction, with
+# $2,100 more for each filer 65 or over and a $125 credit per dependent under 17. The standard
+# deduction follows the federal one (A.R.S. 43-1041). The rate comes from a legislative summary; the
+# Department of Revenue's pages couldn't be read and a surplus-triggered cut was proposed: check.
+kind: usState
+state: AZ
+parent: US
+taxYear: "2026"
+version: "US-AZ-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.azleg.gov/legtext/57leg/1R/summary/S.1318FIN_REVISED.DOCX.htm
+  - https://www.azleg.gov/ars/43/01041.htm
+  - https://www.azleg.gov/ars/43/01073-01.htm
+incomeTax:
+  source: https://www.azleg.gov/legtext/57leg/1R/summary/S.1318FIN_REVISED.DOCX.htm
+  base: federalAgi
+  rate: 0.025
+  standardDeduction: federal
+  exemption: { perFiler: 0, perDependent: 0, perAged: 2100 }
+  exemptionCredit: { perFiler: 0, perDependent: 125 }

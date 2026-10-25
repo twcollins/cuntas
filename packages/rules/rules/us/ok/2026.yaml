@@ -1,0 +1,27 @@
+# Oklahoma individual income tax, 2026 (HB 2764 rates). Standard deduction 2025's (fixed in
+# statute); $1,000 per exemption, and $1,000 more for each 65+ filer below the income limits.
+kind: usState
+state: OK
+parent: US
+taxYear: "2026"
+version: "US-OK-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.oklegislature.gov/BillInfo.aspx?Bill=HB2764&Session=2500
+  - https://oklahoma.gov/content/dam/ok/en/tax/documents/forms/individuals/current/511-Pkt.pdf
+incomeTax:
+  source: https://www.oklegislature.gov/BillInfo.aspx?Bill=HB2764&Session=2500
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 3750, rate: 0 }, { upTo: 4900, rate: 0.025 }, { upTo: 7200, rate: 0.035 }, { upTo: null, rate: 0.045 }]
+    marriedJoint: [{ upTo: 7500, rate: 0 }, { upTo: 9800, rate: 0.025 }, { upTo: 14400, rate: 0.035 }, { upTo: null, rate: 0.045 }]
+    marriedSeparate: [{ upTo: 3750, rate: 0 }, { upTo: 4900, rate: 0.025 }, { upTo: 7200, rate: 0.035 }, { upTo: null, rate: 0.045 }]
+    headOfHousehold: [{ upTo: 7500, rate: 0 }, { upTo: 9800, rate: 0.025 }, { upTo: 14400, rate: 0.035 }, { upTo: null, rate: 0.045 }]
+  standardDeduction: { single: 6350, marriedJoint: 12700, marriedSeparate: 6350, headOfHousehold: 9350 }
+  exemption:
+    perFiler: 1000
+    perDependent: 1000
+    agedLowIncome: { extra: 1000, below: { single: 15001, marriedJoint: 25001, marriedSeparate: 12501, headOfHousehold: 19001 } }
+  notes:
+    - "Oklahoma's child tax credit, earned income credit and sales tax relief credit aren't included."

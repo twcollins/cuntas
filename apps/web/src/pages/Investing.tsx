@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FxTable, residenceOn } from "@cuntas/ledger";
-import { ageOn, chartDefaults, compareWrappers, iePayroll, latestWith, packOn, toMinor, ukPayroll, ukRateBand, type Jurisdiction } from "@cuntas/rules";
+import { ageOn, chartDefaults, compareWrappers, COUNTRY_INFO, iePayroll, latestWith, packOn, toMinor, ukPayroll, ukRateBand, type Jurisdiction } from "@cuntas/rules";
 import { Badge, Card, Disclaimer, Field, Input, MoneyInput, PageHeader, Select, Table, Why } from "../components/ui";
 import { useAsOf } from "../lib/derived";
 import { money, pct } from "../lib/format";
@@ -21,7 +21,9 @@ export function InvestingPage() {
   const colors = useChartColors();
   const [memberId, setMemberId] = useState(ds.members[0]?.id ?? "");
   const m = ds.members.find((x) => x.id === memberId);
-  const [residence, setResidence] = useState<Jurisdiction>(m ? residenceOn(ds, m.id, asOf) : "IE");
+  const home = m ? residenceOn(ds, m.id, asOf) : "IE";
+  // Wrapper comparisons cover Ireland and the UK; a US resident starts from Ireland's.
+  const [residence, setResidence] = useState<Jurisdiction>(home === "UK" ? "UK" : "IE");
   const cur = residence === "UK" ? "GBP" : "EUR";
   const [contribution, setContribution] = useState(toMinor(3000));
   const [years, setYears] = useState(pj.years);
@@ -38,7 +40,7 @@ export function InvestingPage() {
     // Pay is held in the currency of where the member lives now; convert it for a different residence.
     const actual = m ? residenceOn(ds, m.id, asOf) : residence;
     const raw = m?.grossAnnualMinor || toMinor(50000);
-    const gross = actual === residence ? raw : (new FxTable(ds.fxRates).tryConvert(raw, actual === "UK" ? "GBP" : "EUR", cur, asOf) ?? raw);
+    const gross = actual === residence ? raw : (new FxTable(ds.fxRates).tryConvert(raw, COUNTRY_INFO[actual].currency, cur, asOf) ?? raw);
     const age = m ? ageOn(m.dateOfBirth, asOf) : 40;
     if (residence === "IE") {
       const run = (g: number) => iePayroll(iePack, { grossAnnualMinor: g, frequency: "monthly", assessment: m?.assessment ?? "single", employment: m?.employmentType === "selfEmployed" ? "selfEmployed" : "employee", age });
@@ -64,10 +66,15 @@ export function InvestingPage() {
   return (
     <div>
       <PageHeader title="Compare tax wrappers" subtitle="The same yearly contribution and the same return, after tax, in each wrapper open to you. Treatment follows residence, not where the account is." />
+      {home === "US" && (
+        <p role="note" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
+          {m?.name} lives in the US. This comparison covers Irish and UK wrappers; US accounts (401(k), IRA, HSA) aren't compared yet.
+        </p>
+      )}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card title="Inputs">
           <div className="grid grid-cols-2 gap-2">
-            {ds.members.length > 0 && <Field label="For">{(id) => <Select id={id} value={memberId} onChange={(e) => { setMemberId(e.target.value); setResidence(residenceOn(ds, e.target.value, asOf)); }} options={ds.members.map((x) => ({ value: x.id, label: x.name }))} />}</Field>}
+            {ds.members.length > 0 && <Field label="For">{(id) => <Select id={id} value={memberId} onChange={(e) => { setMemberId(e.target.value); setResidence(residenceOn(ds, e.target.value, asOf) === "UK" ? "UK" : "IE"); }} options={ds.members.map((x) => ({ value: x.id, label: x.name }))} />}</Field>}
             <Field label="Resident in">{(id) => <Select id={id} value={residence} onChange={(e) => setResidence(e.target.value as Jurisdiction)} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />}</Field>
             <Field label="Each year (cost to you)">{(id) => <MoneyInput id={id} value={contribution} onChange={setContribution} />}</Field>
             <Field label="Years">{(id) => <Input id={id} type="number" min={1} max={50} value={years} onChange={(e) => setYears(Math.max(1, Math.min(50, Number(e.target.value))))} />}</Field>

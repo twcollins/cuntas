@@ -1,5 +1,5 @@
 import { createEmptyDataset, type Dataset } from "@cuntas/ledger";
-import type { Currency } from "@cuntas/rules";
+import { isCurrency, type Currency } from "@cuntas/rules";
 import { apiClient, ApiError, withReauth } from "./api";
 import { addHousehold, findSynced, setAccount, setSync, switchHousehold, type ServerAccount, type SyncMeta } from "./store";
 
@@ -58,7 +58,7 @@ export async function openServerHousehold(apiUrl: string, hh: ServerHousehold): 
     await addHousehold(remote.dataset, syncMeta(apiUrl, hh.id, remote.version));
   } else {
     // A household created on the server (for example by an admin) with no data yet.
-    const ds = createEmptyDataset(hh.name, hh.baseCurrency === "GBP" ? "GBP" : "EUR");
+    const ds = createEmptyDataset(hh.name, isCurrency(hh.baseCurrency) ? hh.baseCurrency : "EUR");
     const r = await api.putDocument(hh.id, remote.version, ds);
     await addHousehold(ds, syncMeta(apiUrl, hh.id, r.version));
   }

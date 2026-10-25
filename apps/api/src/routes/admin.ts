@@ -1,3 +1,4 @@
+import { CURRENCIES } from "@cuntas/rules";
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { connections, withTenant } from "@cuntas/db";
@@ -64,7 +65,7 @@ adminRoutes.openapi(
     method: "post",
     path: "/admin/households",
     request: {
-      body: { content: { "application/json": { schema: z.object({ name: z.string().min(1).max(80), baseCurrency: z.enum(["EUR", "GBP"]), joinAsOwner: z.boolean().default(false) }) } } },
+      body: { content: { "application/json": { schema: z.object({ name: z.string().min(1).max(80), baseCurrency: z.enum(CURRENCIES), joinAsOwner: z.boolean().default(false) }) } } },
     },
     responses: { 201: json(z.object({ id: z.string(), name: z.string(), baseCurrency: z.string(), ownerInviteUrl: z.string().nullable() }), "Created") },
   }),

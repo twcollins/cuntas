@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { evaluate } from "@cuntas/engine";
+import { evaluate, evaluateUs } from "@cuntas/engine";
 import { balancesByAccount, buildSnapshot, FxTable, type Dataset } from "@cuntas/ledger";
-import { packOn, today } from "@cuntas/rules";
+import { figuresNote, packOn, today } from "@cuntas/rules";
+import { useRulePacks } from "./rulepacks";
 
 export function useAsOf() {
   return today();
@@ -10,11 +11,19 @@ export function useAsOf() {
 /** Engine output and household snapshot, recomputed when the dataset changes. */
 export function usePlan(ds: Dataset) {
   const asOf = useAsOf();
-  return useMemo(() => {
+  const rules = useRulePacks();
+  const plan = useMemo(() => {
     const snapshot = buildSnapshot(ds, asOf);
+    // The Irish pack serves the Irish/UK screens (pension relief, MyFutureFund) whichever ladder runs.
     const pack = packOn("IE", asOf);
-    return { snapshot, pack, result: evaluate(snapshot, pack), asOf };
-  }, [ds, asOf]);
+    const result = snapshot.plan === "US" ? evaluateUs(snapshot, packOn("US", asOf)) : evaluate(snapshot, pack);
+    return { snapshot, pack, result, asOf };
+    // rules.revision: a loaded rule file can replace the pack in use.
+  }, [ds, asOf, rules.revision]);
+  /** "Figures not checked …" when the plan uses unchecked or last year's figures. */
+  const ladder = plan.snapshot.plan;
+  const figures = useMemo(() => figuresNote(ladder, asOf, rules.checks).label, [ladder, asOf, rules.checks, rules.revision]);
+  return { ...plan, figures };
 }
 
 export function useBalances(ds: Dataset) {

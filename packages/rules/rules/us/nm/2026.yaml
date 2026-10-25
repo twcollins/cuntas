@@ -1,0 +1,24 @@
+# New Mexico personal income tax, 2026 (2026 withholding tables FYI-104; rates as 2025): federal AGI
+# less the federal standard deduction. Married filing separately thresholds are half the joint ones.
+kind: usState
+state: NM
+parent: US
+taxYear: "2026"
+version: "US-NM-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://realfile.tax.newmexico.gov/FYI-104.pdf
+  - https://realfile.tax.newmexico.gov/2025pit-1-ins.pdf
+  - https://realfile.tax.newmexico.gov/2025trt.pdf
+incomeTax:
+  source: https://realfile.tax.newmexico.gov/FYI-104.pdf
+  base: federalAgi
+  standardDeduction: federal
+  brackets:
+    single: [{ upTo: 5500, rate: 0.015 }, { upTo: 16500, rate: 0.032 }, { upTo: 33500, rate: 0.043 }, { upTo: 66500, rate: 0.047 }, { upTo: 210000, rate: 0.049 }, { upTo: null, rate: 0.059 }]
+    marriedJoint: [{ upTo: 8000, rate: 0.015 }, { upTo: 25000, rate: 0.032 }, { upTo: 50000, rate: 0.043 }, { upTo: 100000, rate: 0.047 }, { upTo: 315000, rate: 0.049 }, { upTo: null, rate: 0.059 }]
+    marriedSeparate: [{ upTo: 4000, rate: 0.015 }, { upTo: 12500, rate: 0.032 }, { upTo: 25000, rate: 0.043 }, { upTo: 50000, rate: 0.047 }, { upTo: 157500, rate: 0.049 }, { upTo: null, rate: 0.059 }]
+    headOfHousehold: [{ upTo: 8000, rate: 0.015 }, { upTo: 25000, rate: 0.032 }, { upTo: 50000, rate: 0.043 }, { upTo: 100000, rate: 0.047 }, { upTo: 315000, rate: 0.049 }, { upTo: null, rate: 0.059 }]
+  notes:
+    - "New Mexico's low- and middle-income exemption, dependent deduction, age 65 exemption and child income tax credit aren't included."

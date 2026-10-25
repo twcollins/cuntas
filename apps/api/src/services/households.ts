@@ -1,3 +1,4 @@
+import type { Currency } from "@cuntas/rules";
 import { and, eq } from "drizzle-orm";
 import {
   decrypt,
@@ -29,7 +30,7 @@ export async function householdKey(tx: Tx, kek: Buffer, householdId: string): Pr
   return unwrapDataKey(kek, h.dek);
 }
 
-export async function createHousehold(db: Db, kek: Buffer, userId: string, input: { name: string; baseCurrency: "EUR" | "GBP" }) {
+export async function createHousehold(db: Db, kek: Buffer, userId: string, input: { name: string; baseCurrency: Currency }) {
   const id = globalThis.crypto.randomUUID();
   const { dekEncrypted } = newDataKey(kek);
   await withTenant(db, { householdId: id, userId }, async (tx) => {

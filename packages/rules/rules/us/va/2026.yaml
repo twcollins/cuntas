@@ -1,0 +1,45 @@
+# Virginia individual income tax, 2026. Brackets (Code of Virginia 58.1-320), standard deduction
+# and exemptions (58.1-322.03) and the age deduction are 2026 law. The low-income credit's poverty
+# guidelines and the spouse tax adjustment cap are from the 2025 Form 760 instructions, the latest
+# published. No Virginia locality may tax income (58.1-300).
+kind: usState
+state: VA
+parent: US
+taxYear: "2026"
+version: "US-VA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-320/
+  - https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-322.03/
+  - https://www.tax.virginia.gov/sites/default/files/vatax-pdf/employer-withholding-instructions.pdf
+  - https://www.tax.virginia.gov/sites/default/files/vatax-pdf/2025-760-instructions.pdf
+incomeTax:
+  source: https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-320/
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 3000, rate: 0.02 }, { upTo: 5000, rate: 0.03 }, { upTo: 17000, rate: 0.05 }, { upTo: null, rate: 0.0575 }]
+    marriedJoint: [{ upTo: 3000, rate: 0.02 }, { upTo: 5000, rate: 0.03 }, { upTo: 17000, rate: 0.05 }, { upTo: null, rate: 0.0575 }]
+    marriedSeparate: [{ upTo: 3000, rate: 0.02 }, { upTo: 5000, rate: 0.03 }, { upTo: 17000, rate: 0.05 }, { upTo: null, rate: 0.0575 }]
+    headOfHousehold: [{ upTo: 3000, rate: 0.02 }, { upTo: 5000, rate: 0.03 }, { upTo: 17000, rate: 0.05 }, { upTo: null, rate: 0.0575 }]
+  # 2025 and 2026 only (2025 session); 2027-2029 rise again under HB 30 (2026 Special Session I).
+  standardDeduction: { single: 8750, marriedJoint: 17500, marriedSeparate: 8750, headOfHousehold: 8750 }
+  exemption: { perFiler: 930, perDependent: 930, perAged: 800 }
+  # $12,000 per person 65 or over, less $1 for each $1 of AGI over $50,000 (single) or $75,000
+  # (married, combined). Anyone born on or before January 1, 1939 gets the full amount (not modelled).
+  ageDeduction:
+    perPerson: 12000
+    age: 65
+    phaseOutFrom: { single: 50000, marriedJoint: 75000, marriedSeparate: 75000, headOfHousehold: 50000 }
+    phaseOutRate: 1
+  # No return and no tax below these (Code of Virginia 58.1-321).
+  noTaxBelow: { single: 11950, marriedJoint: 23900, marriedSeparate: 11950, headOfHousehold: 11950 }
+  # $300 a person when family income is within the federal poverty guideline (2025 guidelines).
+  lowIncomeCredit:
+    perPerson: 300
+    incomeLimitByFamilySize: [15650, 21150, 26650, 32150, 37650, 43150, 48650, 54150]
+    perExtraPerson: 5500
+  spouseAdjustment: { cap: 259, minJointTaxable: 3000 }
+  notes:
+    - "Virginia's refundable earned income credit (20% of the federal one) isn't included."
+    - "Social Security benefits are fully subtracted in Virginia."

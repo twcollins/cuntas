@@ -1,0 +1,40 @@
+# New York State personal income tax, 2026 (Tax Law 601, 2026 rates; brackets with the statute's
+# bases). Above $107,650 of AGI the supplemental tax (601(d-5)) recaptures the lower brackets'
+# benefit. Standard deduction 2025's (no 2026 indexing found); $1,000 per dependent. New York City
+# and Yonkers taxes aren't included.
+kind: usState
+state: NY
+parent: US
+taxYear: "2026"
+version: "US-NY-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.nysenate.gov/legislation/laws/TAX/601
+  - https://www.tax.ny.gov/pit/file/standard_deductions.htm
+  - https://www.tax.ny.gov/pdf/current_forms/it/it201i.pdf
+incomeTax:
+  source: https://www.nysenate.gov/legislation/laws/TAX/601
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 8500, rate: 0.039, base: 0 }, { upTo: 11700, rate: 0.044, base: 332 }, { upTo: 13900, rate: 0.0515, base: 473 }, { upTo: 80650, rate: 0.054, base: 586 }, { upTo: 215400, rate: 0.059, base: 4191 }, { upTo: 1077550, rate: 0.0685, base: 12141 }, { upTo: 5000000, rate: 0.0965, base: 71198 }, { upTo: 25000000, rate: 0.103, base: 449714 }, { upTo: null, rate: 0.109, base: 2509714 }]
+    marriedJoint: [{ upTo: 17150, rate: 0.039, base: 0 }, { upTo: 23600, rate: 0.044, base: 669 }, { upTo: 27900, rate: 0.0515, base: 953 }, { upTo: 161550, rate: 0.054, base: 1174 }, { upTo: 323200, rate: 0.059, base: 8391 }, { upTo: 2155350, rate: 0.0685, base: 17928 }, { upTo: 5000000, rate: 0.0965, base: 143430 }, { upTo: 25000000, rate: 0.103, base: 417939 }, { upTo: null, rate: 0.109, base: 2477939 }]
+    marriedSeparate: [{ upTo: 8500, rate: 0.039, base: 0 }, { upTo: 11700, rate: 0.044, base: 332 }, { upTo: 13900, rate: 0.0515, base: 473 }, { upTo: 80650, rate: 0.054, base: 586 }, { upTo: 215400, rate: 0.059, base: 4191 }, { upTo: 1077550, rate: 0.0685, base: 12141 }, { upTo: 5000000, rate: 0.0965, base: 71198 }, { upTo: 25000000, rate: 0.103, base: 449714 }, { upTo: null, rate: 0.109, base: 2509714 }]
+    headOfHousehold: [{ upTo: 12800, rate: 0.039, base: 0 }, { upTo: 17650, rate: 0.044, base: 499 }, { upTo: 20900, rate: 0.0515, base: 712 }, { upTo: 107650, rate: 0.054, base: 879 }, { upTo: 269300, rate: 0.059, base: 5564 }, { upTo: 1616450, rate: 0.0685, base: 15101 }, { upTo: 5000000, rate: 0.0965, base: 107381 }, { upTo: 25000000, rate: 0.103, base: 433894 }, { upTo: null, rate: 0.109, base: 2493894 }]
+  standardDeduction: { single: 8000, marriedJoint: 16050, marriedSeparate: 8000, headOfHousehold: 11200 }
+  exemption: { perFiler: 0, perDependent: 1000 }
+  benefitRecapture:
+    agiAbove: 107650
+    width: 50000
+    fractionDecimals: 4
+    bands:
+      single: [{ upTo: 80650, agiFrom: 107650, flatRate: 0.059 }, { upTo: 215400, agiFrom: 107650, base: 0, benefit: 567 }, { upTo: 1077550, agiFrom: 215400, base: 567, benefit: 2047 }, { upTo: 5000000, agiFrom: 1077550, base: 2614, benefit: 30172 }, { upTo: null, agiFrom: 5000000, base: 32786, benefit: 32500 }]
+      marriedJoint: [{ upTo: 27900, agiFrom: 107650, flatRate: 0.054 }, { upTo: 161550, agiFrom: 107650, base: 0, benefit: 333 }, { upTo: 323200, agiFrom: 161550, base: 333, benefit: 807 }, { upTo: 2155350, agiFrom: 323200, base: 1140, benefit: 3071 }, { upTo: 5000000, agiFrom: 2155350, base: 4211, benefit: 60350 }, { upTo: null, agiFrom: 5000000, base: 64561, benefit: 32500 }]
+      marriedSeparate: [{ upTo: 80650, agiFrom: 107650, flatRate: 0.059 }, { upTo: 215400, agiFrom: 107650, base: 0, benefit: 567 }, { upTo: 1077550, agiFrom: 215400, base: 567, benefit: 2047 }, { upTo: 5000000, agiFrom: 1077550, base: 2614, benefit: 30172 }, { upTo: null, agiFrom: 5000000, base: 32786, benefit: 32500 }]
+      headOfHousehold: [{ upTo: 107650, agiFrom: 107650, flatRate: 0.059 }, { upTo: 269300, agiFrom: 107650, base: 0, benefit: 787 }, { upTo: 1616450, agiFrom: 269300, base: 787, benefit: 2559 }, { upTo: 5000000, agiFrom: 1616450, base: 3346, benefit: 45260 }, { upTo: null, agiFrom: 5000000, base: 48606, benefit: 32500 }]
+  notes:
+    - "New York's Empire State child credit, earned income credit and household credit aren't included."
+    - "Social Security isn't taxed in New York."
+localTax:
+  source: https://www.tax.ny.gov/pdf/current_forms/it/it201i.pdf
+  note: "New York City and Yonkers levy their own income tax on residents."

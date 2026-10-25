@@ -1,39 +1,27 @@
 import { useMemo, useState } from "react";
-import { FxTable } from "@cuntas/ledger";
-import {
-  ageOn,
-  applyRate,
-  classify,
-  deadlineFor,
-  getPack,
-  ieDeemedDisposals,
-  iePayroll,
-  listPacks,
-  packOn,
-  toMinor,
-  ukIsaCheck,
-  ukPayroll,
-  type CrossBorderItem,
-  type StudentLoanPlan,
-  type UkRegion,
-  type ExplainedLine,
-  type IeAssessment,
-  type PayFrequency,
-} from "@cuntas/rules";
+import { FxTable, residenceOn } from "@cuntas/ledger";
+import { ageOn, applyRate, classify, type CrossBorderItem, deadlineFor, type ExplainedLine, getPack, type IeAssessment, ieDeemedDisposals, iePayroll, type Jurisdiction, listPacks, packCheckState, packKey, packOn, type PayFrequency, type StudentLoanPlan, toMinor, ukIsaCheck, ukPayroll, type UkRegion, usPayroll, statePackFor, US_STATES, type UsFilingStatus, type UsState } from "@cuntas/rules";
 import { Badge, Button, Card, Disclaimer, Field, Input, MoneyInput, PageHeader, Select, Stat, Table, Why } from "../components/ui";
+import { RulesBanner } from "../components/RulesBanner";
 import { useAsOf } from "../lib/derived";
-import { formatDate, money, moneyExact, pct } from "../lib/format";
+import { formatDate, money, moneyExact, pct, taxCountryOptions, usFilingOptions, usStateOptions } from "../lib/format";
+import { useRulePacks } from "../lib/rulepacks";
 import { useDataset } from "../lib/store";
 import { PayslipCheckCard } from "./tax/PayslipCheck";
 import { SelfAssessmentCard } from "./tax/SelfAssessment";
 import { StudentLoanPicker } from "./tax/StudentLoanPicker";
+import { UsPlanningCard } from "./tax/UsPlanning";
 
 export function TaxPage() {
+  const ds = useDataset();
+  const asOf = useAsOf();
   return (
     <div>
-      <PageHeader title="Tax centre" subtitle="Calculators driven by versioned Irish and UK rule packs. Each figure links to the rule and source it came from." />
+      <PageHeader title="Tax centre" subtitle="Calculators driven by versioned Irish, UK and US (federal) rule packs. Each figure links to the rule and source it came from." />
+      <RulesBanner ds={ds} asOf={asOf} />
       <div className="space-y-4">
         <TakeHome />
+        <UsPlanningCard />
         <SelfAssessmentCard />
         <PayslipCheckCard />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -51,7 +39,7 @@ export function TaxPage() {
 function TakeHome() {
   const ds = useDataset();
   const asOf = useAsOf();
-  const [j, setJ] = useState<"IE" | "UK">("IE");
+  const [j, setJ] = useState<Jurisdiction>("IE");
   const packs = listPacks(j);
   const [year, setYear] = useState(packOn("IE", asOf).taxYear);
   const first = ds.members[0];
@@ -66,7 +54,13 @@ function TakeHome() {
   const [employment, setEmployment] = useState<"employee" | "selfEmployed">(first?.employmentType === "selfEmployed" ? "selfEmployed" : "employee");
   const [region, setRegion] = useState<UkRegion>(first?.ukRegion ?? "rUK");
   const [loans, setLoans] = useState<StudentLoanPlan[]>(first?.studentLoans ?? []);
+  const [filing, setFiling] = useState<UsFilingStatus>(first?.usFilingStatus ?? "single");
+  const [children, setChildren] = useState(ds.household.settings.children);
+  const [section125, setSection125] = useState(0);
+  const [usState, setUsState] = useState<UsState | "">(first?.usState ?? "");
+  const [locality, setLocality] = useState<string>(first?.usLocality ?? "");
   const yearValid = packs.some((p) => p.taxYear === year) ? year : packs.at(-1)!.taxYear;
+  const rules = useRulePacks();
 
   const result = useMemo(() => {
     if (j === "IE") {
@@ -74,24 +68,55 @@ function TakeHome() {
       const r = iePayroll(pack, { grossAnnualMinor: gross, frequency: freq, assessment, spouseGrossAnnualMinor: spouse, employment, age, pensionEmployeeMinor: applyRate(gross, pensionPct / 100), myFutureFund: mff, rentPaidMinor: rent });
       return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: r.periods, marginal: r.marginalRate, lines: r.lines, notes: r.notes, rows: [["Income tax", r.incomeTaxMinor], ["USC", r.uscMinor], ["PRSI", r.prsiMinor], ["Pension", r.pensionEmployeeMinor], ["MyFutureFund", r.myFutureFund.employeeMinor]] as [string, number][] };
     }
+    if (j === "US") {
+      const pack = getPack("US", yearValid);
+      const kids = filing === "marriedJoint" || filing === "headOfHousehold" ? children : 0;
+      const sp = usState ? statePackFor(usState, yearValid) : null;
+      const r = usPayroll(pack, {
+        grossAnnualMinor: gross,
+        employment,
+        age,
+        filingStatus: filing,
+        pretax401kMinor: applyRate(gross, pensionPct / 100),
+        pretaxSection125Minor: section125,
+        children: kids,
+        ...(sp ? { state: sp.pack, locality: locality || null, rentPaidMinor: rent } : {}),
+        ...(filing === "marriedJoint" ? { spouse: { grossAnnualMinor: spouse, employment: "employee", age } } : {}),
+      });
+      const rows: [string, number][] = [
+        ["Federal income tax", r.incomeTaxMinor],
+        ["Social Security", r.socialSecurityMinor],
+        ["Medicare", r.medicareMinor],
+        [usState ? `${US_STATES[usState]} income tax` : "State income tax", r.stateTaxMinor],
+        ["Local income tax", r.localTaxMinor],
+        ["Self-employment tax", r.selfEmploymentTaxMinor],
+        ["401(k)", applyRate(gross, pensionPct / 100)],
+        ["Pre-tax benefits (Section 125)", section125],
+        ["Refundable child tax credit", -r.refundableCreditMinor],
+      ];
+      const stateNotes = !usState ? [] : !sp ? [`No ${US_STATES[usState]} figures yet: state income tax isn't included.`] : !sp.exact ? [`${US_STATES[usState]} figures for ${yearValid} aren't loaded: using ${sp.pack.taxYear}.`] : [];
+      return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: 12, marginal: r.marginalRate, lines: r.lines, notes: [...stateNotes, ...r.notes], rows };
+    }
     const pack = getPack("UK", yearValid);
     const r = ukPayroll(pack, { grossAnnualMinor: gross, region, studentLoans: loans });
     return { pack, net: r.netAnnualMinor, perPeriod: r.netPerPeriodMinor, periods: 12, marginal: r.marginalRate, lines: r.lines, notes: r.notes, rows: [[region === "scotland" ? "Scottish income tax" : "Income tax", r.incomeTaxMinor], ["National Insurance", r.niMinor], ["Student loan", r.studentLoanMinor]] as [string, number][] };
-  }, [j, yearValid, gross, freq, assessment, spouse, age, pensionPct, mff, rent, employment, region, loans]);
-  const cur = j === "IE" ? "EUR" : "GBP";
+    // rules.revision: a loaded rule file can replace the pack for this year.
+  }, [j, yearValid, gross, freq, assessment, spouse, age, pensionPct, mff, rent, employment, region, loans, filing, children, section125, usState, locality, rules.revision]);
+  const cur = result.pack.currency;
+  const check = packCheckState(packKey(result.pack), rules.checks);
 
   return (
-    <Card title="Take-home pay" actions={<div className="flex gap-2"><Badge tone={result.pack.status === "verified" ? "good" : "warn"}>{result.pack.version} · {result.pack.status}</Badge></div>}>
+    <Card title="Take-home pay" actions={<div className="flex gap-2">{check.needsCheck && !check.checked && <Badge tone="bad">Figures not checked ({result.pack.taxYear})</Badge>}<Badge tone={result.pack.status === "verified" ? "good" : "warn"}>{result.pack.version} · {result.pack.status}</Badge></div>}>
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Rules">{(id) => <Select id={id} value={j} onChange={(e) => { setJ(e.target.value as "IE" | "UK"); setYear(e.target.value === "IE" ? packOn("IE", asOf).taxYear : packOn("UK", asOf).taxYear); }} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />}</Field>
+            <Field label="Rules">{(id) => <Select id={id} value={j} onChange={(e) => { const next = e.target.value as Jurisdiction; setJ(next); setYear(packOn(next, asOf).taxYear); }} options={taxCountryOptions()} />}</Field>
             <Field label="Tax year">{(id) => <Select id={id} value={yearValid} onChange={(e) => setYear(e.target.value)} options={packs.map((p) => ({ value: p.taxYear, label: p.taxYear }))} />}</Field>
           </div>
           {ds.members.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {ds.members.map((m) => (
-                <Button key={m.id} variant="ghost" className="text-xs" onClick={() => { setGross(m.grossAnnualMinor); setAge(ageOn(m.dateOfBirth, asOf)); setAssessment(m.assessment); setEmployment(m.employmentType === "selfEmployed" ? "selfEmployed" : "employee"); setRegion(m.ukRegion); setLoans(m.studentLoans); const plan = ds.pensionPlans.find((p) => p.memberId === m.id && p.isEmployerScheme); setPensionPct((plan?.employeeRate ?? 0) * 100); }}>Use {m.name}</Button>
+                <Button key={m.id} variant="ghost" className="text-xs" onClick={() => { setGross(m.grossAnnualMinor); setAge(ageOn(m.dateOfBirth, asOf)); setAssessment(m.assessment); setEmployment(m.employmentType === "selfEmployed" ? "selfEmployed" : "employee"); setRegion(m.ukRegion); setLoans(m.studentLoans); setFiling(m.usFilingStatus); setUsState(m.usState ?? ""); setLocality(m.usLocality ?? ""); const plan = ds.pensionPlans.find((p) => p.memberId === m.id && p.isEmployerScheme); setPensionPct((plan?.employeeRate ?? 0) * 100); }}>Use {m.name}</Button>
               ))}
             </div>
           )}
@@ -112,6 +137,27 @@ function TakeHome() {
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={mff} onChange={(e) => setMff(e.target.checked)} />Enrolled in MyFutureFund</label>
             </>
           )}
+          {j === "US" && (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Filing status">{(id) => <Select id={id} value={filing} onChange={(e) => setFiling(e.target.value as UsFilingStatus)} options={usFilingOptions()} />}</Field>
+                <Field label="Age">{(id) => <Input id={id} type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} />}</Field>
+              </div>
+              <Field label="State">{(id) => <Select id={id} value={usState} onChange={(e) => { setUsState(e.target.value as UsState | ""); setLocality(""); }} options={usStateOptions("None (federal only)")} />}</Field>
+              {(() => {
+                const loc = usState ? statePackFor(usState, yearValid)?.pack.localities : undefined;
+                return loc ? <Field label={loc.kind.charAt(0).toUpperCase() + loc.kind.slice(1)}>{(id) => <Select id={id} value={locality} onChange={(e) => setLocality(e.target.value)} options={[{ value: "", label: "Not chosen" }, ...loc.list.map((l) => ({ value: l.id, label: l.name }))]} />}</Field> : null;
+              })()}
+              {filing === "marriedJoint" && <Field label="Spouse's gross pay">{(id) => <MoneyInput id={id} value={spouse} onChange={setSpouse} />}</Field>}
+              {(filing === "marriedJoint" || filing === "headOfHousehold") && <Field label="Children under 17">{(id) => <Input id={id} type="number" min={0} value={children} onChange={(e) => setChildren(Math.max(0, Number(e.target.value)))} />}</Field>}
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="401(k) (% of pay)">{(id) => <Input id={id} type="number" step={0.5} min={0} value={pensionPct} onChange={(e) => setPensionPct(Number(e.target.value))} />}</Field>
+                <Field label="HSA and other pre-tax benefits a year">{(id) => <MoneyInput id={id} value={section125} onChange={setSection125} />}</Field>
+              </div>
+              {usState && statePackFor(usState, yearValid)?.pack.incomeTax.rentDeduction && <Field label="Rent paid a year">{(id) => <MoneyInput id={id} value={rent} onChange={setRent} />}</Field>}
+              <Field label="Work">{(id) => <Select id={id} value={employment} onChange={(e) => setEmployment(e.target.value as "employee" | "selfEmployed")} options={[{ value: "employee", label: "Employee (W-2)" }, { value: "selfEmployed", label: "Self-employed (net profit)" }]} />}</Field>
+            </>
+          )}
           {j === "UK" && (
             <>
               <Field label="Income tax">{(id) => <Select id={id} value={region} onChange={(e) => setRegion(e.target.value as UkRegion)} options={[{ value: "rUK", label: "England, Wales, Northern Ireland" }, { value: "scotland", label: "Scotland (Scottish taxpayer)" }]} />}</Field>
@@ -123,13 +169,13 @@ function TakeHome() {
           <div className="grid gap-3 sm:grid-cols-3">
             <Stat label="Take-home a year" value={moneyExact(result.net, cur)} tone="good" />
             <Stat label={`Per pay (${result.periods} a year)`} value={moneyExact(result.perPeriod, cur)} />
-            <Stat label="Marginal income tax rate" value={pct(result.marginal)} />
+            <Stat label={j === "US" ? "Marginal rate, with FICA" : "Marginal income tax rate"} value={pct(result.marginal)} />
           </div>
           <div className="mt-4">
             <Table head={["", "Amount"]}>
               <tr><td className="px-2 py-1.5">Gross pay</td><td className="px-2 py-1.5 text-right tabular-nums">{moneyExact(gross, cur)}</td></tr>
               {result.rows.filter(([, v]) => v !== 0).map(([k, v]) => (
-                <tr key={k}><td className="px-2 py-1.5">{k}</td><td className="px-2 py-1.5 text-right tabular-nums text-rose-600">−{moneyExact(v, cur).replace("−", "")}</td></tr>
+                <tr key={k}><td className="px-2 py-1.5">{k}</td><td className={`px-2 py-1.5 text-right tabular-nums ${v > 0 ? "text-rose-600" : "text-emerald-700 dark:text-emerald-400"}`}>{v > 0 ? "−" : "+"}{moneyExact(Math.abs(v), cur)}</td></tr>
               ))}
               <tr className="font-semibold"><td className="px-2 py-1.5">Net pay</td><td className="px-2 py-1.5 text-right tabular-nums">{moneyExact(result.net, cur)}</td></tr>
             </Table>
@@ -151,16 +197,26 @@ function TakeHome() {
 }
 
 function Deadlines() {
+  const ds = useDataset();
   const asOf = useAsOf();
   const year = Number(asOf.slice(0, 4));
   const ie = packOn("IE", asOf);
   const uk = packOn("UK", asOf);
+  const us = packOn("US", asOf);
+  const hasUs = ds.members.some((m) => residenceOn(ds, m.id, asOf) === "US");
   const items = [
     { label: `Form 11 / ROS for ${year - 1} (and pension relief for ${year - 1})`, date: deadlineFor(year - 1, ie.deadlines.form11), j: "IE" },
     ...ie.cgt.payment.map((p) => ({ label: `CGT on ${p.disposalsThroughMonth === 12 ? "December" : "January to November"} ${ie.taxYear} disposals`, date: deadlineFor(Number(ie.taxYear), { monthDay: p.dueMonthDay, yearOffset: p.yearOffset }), j: "IE" })),
     { label: `Form 11 for ${year}`, date: deadlineFor(year, ie.deadlines.form11), j: "IE" },
     ...(ie.selfAssessment ? [{ label: `Preliminary tax for ${year} (self-employed)`, date: deadlineFor(year, ie.selfAssessment.preliminaryDue), j: "IE" }] : []),
     { label: `UK self assessment ${uk.taxYear}`, date: deadlineFor(Number(uk.taxYear.slice(0, 4)), uk.deadlines.selfAssessmentOnline), j: "UK" },
+    ...(hasUs
+      ? [
+          { label: `US federal return for ${year - 1}`, date: deadlineFor(year - 1, us.deadlines.federalReturn), j: "US" },
+          { label: `US federal return for ${year}`, date: deadlineFor(year, us.deadlines.federalReturn), j: "US" },
+          ...us.estimatedTax.dueDates.map((d, i) => ({ label: `US estimated tax, installment ${i + 1} for ${us.taxYear}`, date: deadlineFor(Number(us.taxYear), d), j: "US" })),
+        ]
+      : []),
   ].sort((a, b) => a.date.localeCompare(b.date));
   return (
     <Card title="Tax deadlines">

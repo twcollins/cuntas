@@ -1,10 +1,10 @@
 import type { ParsedTransaction } from "@cuntas/importers";
-import type { Currency, IsoDate } from "@cuntas/rules";
+import type { Country, Currency, IsoDate } from "@cuntas/rules";
 
 export interface ProviderInstitution {
   id: string;
   name: string;
-  country: "IE" | "UK";
+  country: Country;
   bic?: string;
 }
 
@@ -27,7 +27,7 @@ export interface ConsentSession {
  */
 export interface BankDataProvider {
   readonly id: string;
-  listInstitutions(country: "IE" | "UK"): Promise<ProviderInstitution[]>;
+  listInstitutions(country: Country): Promise<ProviderInstitution[]>;
   startConsent(input: { institution: ProviderInstitution; redirectUrl: string; state: string; validDays: number }): Promise<{ url: string; reference: string }>;
   completeConsent(input: { code: string }): Promise<ConsentSession>;
   fetchAccounts(sessionId: string): Promise<ProviderAccount[]>;

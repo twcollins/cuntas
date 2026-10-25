@@ -1,0 +1,29 @@
+# Ireland-United States double taxation convention (1997) and what changes when a member moves from Ireland to the US.
+# Treaty references only: no tax figures are calculated from this pack. Shown by the residence what-if and the cross-border classifier.
+id: IE-US-DTA
+version: "XB-US-2026.1"
+status: provisional
+source: https://www.revenue.ie/en/tax-professionals/documents/double-taxation-treaties/u/usa-1997.pdf
+articles:
+  employment: { ref: "IE–US DTA Art. 15", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-15 }
+  privatePension: { ref: "IE–US DTA Art. 18(1)(a)", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18 }
+  socialSecurity: { ref: "IE–US DTA Art. 18(1)(b)", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18 }
+  governmentService: { ref: "IE–US DTA Art. 19", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-19 }
+  interest: { ref: "IE–US DTA Art. 11", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-11 }
+  eliminationOfDoubleTax: { ref: "IE–US DTA Art. 24", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-24 }
+  savingClause: { ref: "IE–US DTA Art. 1(4)", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-1 }
+pfic:
+  ref: "PFIC rules, IRS Form 8621"
+  source: https://www.irs.gov/forms-pubs/about-form-8621
+relocation:
+  source: https://www.irs.gov/businesses/international-businesses/ireland-tax-treaty-documents
+  toUS:
+    - { topic: residence, text: "US tax residence comes from a green card or the substantial presence test (183 days, counting part of the two years before). The US tax year is the calendar year, and the year you arrive you may file as dual-status.", source: https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test }
+    - { topic: states, text: "Most US states tax income as well as the federal government, and each sets its own rules. Where you settle matters as much as the move.", source: https://www.usa.gov/state-taxes }
+    - { topic: funds, text: "Irish-domiciled funds and ETFs are PFICs for US tax: without an election, gains are taxed at the top rate plus an interest charge, and each fund needs Form 8621 every year.", source: https://www.irs.gov/forms-pubs/about-form-8621 }
+    - { topic: pensions, text: "Irish occupational pensions and PRSAs paid to a US resident are taxed only in the US (IE–US DTA Art. 18(1)(a)), and so is the Irish State Pension (Art. 18(1)(b)).", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-18 }
+    - { topic: governmentPension, text: "Irish public service pensions stay taxable only in Ireland unless you are a US citizen living in the US (IE–US DTA Art. 19).", source: https://gocodebook.com/library/us/federal/us-tax-treaty-ireland/article-19 }
+    - { topic: investmentAccount, text: "The Irish Investment Account is for Irish residents; check what happens to it when you leave before moving.", source: https://www.rsm.global/ireland/node/768 }
+    - { topic: myFutureFund, text: "MyFutureFund contributions stop when you leave Irish employment; the pot stays invested.", source: https://brightsg.com/en-ie/blog/auto-enrolment-in-ireland-what-it-means-for-employees/ }
+    - { topic: foreignAccounts, text: "US residents report foreign bank and investment accounts each year: FinCEN Form 114 (FBAR) once their combined balance passes $10,000 at any point in the year, and Form 8938 above higher limits.", source: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar }
+    - { topic: statePension, text: "Under the US–Ireland social security agreement, PRSI and US Social Security credits can be combined to qualify for either country's pension.", source: https://www.ssa.gov/international/Agreement_Pamphlets/ireland.html }

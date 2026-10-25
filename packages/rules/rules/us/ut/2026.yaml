@@ -1,0 +1,27 @@
+# Utah individual income tax, 2026: a flat 4.45% (SB 60, back to January 1) on federal AGI, less the
+# taxpayer tax credit (Utah Code 59-10-1018): 6% of the federal standard deduction and the dependent
+# exemptions, reduced by 1.3% of income over a base. The dependent exemption and single and head of
+# household bases are from the draft 2026 TC-40; the joint base is twice the single one, as the
+# statute sets it. Check against the final form.
+kind: usState
+state: UT
+parent: US
+taxYear: "2026"
+version: "US-UT-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://le.utah.gov/Session/2026/bills/enrolled/SB0060.pdf
+  - https://le.utah.gov/xcode/Title59/Chapter10/C59-10-S1018_2026050620260506.html
+  - https://files.tax.utah.gov/tax/forms/drafts/tc-40.pdf
+incomeTax:
+  source: https://le.utah.gov/Session/2026/bills/enrolled/SB0060.pdf
+  base: federalAgi
+  rate: 0.0445
+  taxpayerCredit:
+    rate: 0.06
+    perDependent: 2167
+    phaseOutRate: 0.013
+    base: { single: 18696, marriedJoint: 37392, marriedSeparate: 18696, headOfHousehold: 28045 }
+  notes:
+    - "Utah's child tax credit for children 5 and under isn't included."

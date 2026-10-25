@@ -1,0 +1,29 @@
+# Minnesota individual income tax, 2026 (inflation-adjusted amounts, Dec 2025). Standard deduction
+# plus $2,000 / $1,600 for each 65+ filer; $5,300 per dependent. The refundable $1,800 child tax
+# credit falls by 12% of income over the threshold. High-income reductions of the standard
+# deduction and dependent exemption aren't modelled.
+kind: usState
+state: MN
+parent: US
+taxYear: "2026"
+version: "US-MN-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.revenue.state.mn.us/sites/default/files/2025-12/inflation-adjusted-amounts-2026.pdf
+  - https://www.revenue.state.mn.us/sites/default/files/2026-10/m1-inst-26.pdf
+  - https://www.revenue.state.mn.us/sites/default/files/2026-10/m1cwfc-26.pdf
+incomeTax:
+  source: https://www.revenue.state.mn.us/sites/default/files/2025-12/inflation-adjusted-amounts-2026.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 33310, rate: 0.0535 }, { upTo: 109430, rate: 0.068 }, { upTo: 203150, rate: 0.0785 }, { upTo: null, rate: 0.0985 }]
+    marriedJoint: [{ upTo: 48700, rate: 0.0535 }, { upTo: 193480, rate: 0.068 }, { upTo: 337930, rate: 0.0785 }, { upTo: null, rate: 0.0985 }]
+    marriedSeparate: [{ upTo: 24350, rate: 0.0535 }, { upTo: 96740, rate: 0.068 }, { upTo: 168965, rate: 0.0785 }, { upTo: null, rate: 0.0985 }]
+    headOfHousehold: [{ upTo: 41010, rate: 0.0535 }, { upTo: 164800, rate: 0.068 }, { upTo: 270060, rate: 0.0785 }, { upTo: null, rate: 0.0985 }]
+  standardDeduction: { single: 15300, marriedJoint: 30600, marriedSeparate: 15300, headOfHousehold: 23000 }
+  agedStandardDeduction: { married: 1600, unmarried: 2000 }
+  exemption: { perFiler: 0, perDependent: 5300 }
+  childCredit: { perChild: 1800, phaseOutFrom: { single: 32680, marriedJoint: 38770, marriedSeparate: 32680, headOfHousehold: 32680 }, phaseOutRate: 0.12 }
+  notes:
+    - "Minnesota's working family credit, renter's credit and marriage credit aren't included."

@@ -1,0 +1,13 @@
+# Texas: no personal income tax on wages in 2026.
+kind: usState
+state: TX
+parent: US
+taxYear: "2026"
+version: "US-TX-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://comptroller.texas.gov/economy/fiscal-notes/industry/2025/small-biz-info/
+incomeTax:
+  source: https://comptroller.texas.gov/economy/fiscal-notes/industry/2025/small-biz-info/
+  none: true

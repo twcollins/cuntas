@@ -1,0 +1,31 @@
+# Wisconsin individual income tax, 2026 (2026 Form 1-ES instructions): a sliding standard deduction
+# that falls as income rises, $700 exemptions plus $250 for 65+, and the married couple credit (3% of
+# the lower earner's income up to $16,000).
+kind: usState
+state: WI
+parent: US
+taxYear: "2026"
+version: "US-WI-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.revenue.wi.gov/TaxForms2026/2026-Form1-ES-Inst.pdf
+  - https://www.revenue.wi.gov/TaxForms2025/2025-Form1-inst.pdf
+incomeTax:
+  source: https://www.revenue.wi.gov/TaxForms2026/2026-Form1-ES-Inst.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 15110, rate: 0.035 }, { upTo: 51950, rate: 0.044 }, { upTo: 332720, rate: 0.053 }, { upTo: null, rate: 0.0765 }]
+    marriedJoint: [{ upTo: 20150, rate: 0.035 }, { upTo: 69260, rate: 0.044 }, { upTo: 443630, rate: 0.053 }, { upTo: null, rate: 0.0765 }]
+    marriedSeparate: [{ upTo: 10080, rate: 0.035 }, { upTo: 34630, rate: 0.044 }, { upTo: 221820, rate: 0.053 }, { upTo: null, rate: 0.0765 }]
+    headOfHousehold: [{ upTo: 15110, rate: 0.035 }, { upTo: 51950, rate: 0.044 }, { upTo: 332720, rate: 0.053 }, { upTo: null, rate: 0.0765 }]
+  slidingStandardDeduction:
+    single: [{ upTo: null, max: 13960, from: 20120, rate: 0.12 }]
+    marriedJoint: [{ upTo: null, max: 25840, from: 29040, rate: 0.19778 }]
+    marriedSeparate: [{ upTo: null, max: 12280, from: 13780, rate: 0.19778 }]
+    headOfHousehold: [{ upTo: 58827, max: 18030, from: 20120, rate: 0.22515 }, { upTo: null, max: 13960, from: 20120, rate: 0.12 }]
+  exemption: { perFiler: 700, perDependent: 700, perAged: 250 }
+  twoEarnerCredit: { rate: 0.03, maxIncome: 16000 }
+  notes:
+    - "Wisconsin's earned income credit, renter's school property tax credit and homestead credit aren't included."
+    - "Social Security isn't taxed in Wisconsin."

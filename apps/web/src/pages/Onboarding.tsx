@@ -3,10 +3,13 @@ import { ServerHouseholdList, ServerSignIn } from "../components/ServerAccess";
 import { Button, Card, Field, Input, Select } from "../components/ui";
 import type { ServerHousehold } from "../lib/server";
 import { startDemo, startEmpty, useStore } from "../lib/store";
+import { COUNTRY_INFO, type Currency, type Jurisdiction } from "@cuntas/rules";
+import { currencyOptions, taxCountryOptions } from "../lib/format";
 
 export function Onboarding() {
   const [name, setName] = useState("My household");
-  const [currency, setCurrency] = useState<"EUR" | "GBP">("EUR");
+  const [home, setHome] = useState<Jurisdiction>("IE");
+  const [currency, setCurrency] = useState<Currency>("EUR");
   const { account } = useStore();
   const [serverHouseholds, setServerHouseholds] = useState<ServerHousehold[] | null>(null);
   return (
@@ -15,7 +18,7 @@ export function Onboarding() {
         <img src="/icon.svg" alt="" className="h-12 w-12" />
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Cúntas</h1>
-          <p className="text-stone-600 dark:text-stone-400">What should your next euro do? Budgeting and planning built on Irish (and UK) tax rules.</p>
+          <p className="text-stone-600 dark:text-stone-400">What should your next euro (or dollar) do? Budgeting and planning built on Irish, UK and US tax rules.</p>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
@@ -28,9 +31,12 @@ export function Onboarding() {
         <Card title="Start your own">
           <div className="space-y-3">
             <Field label="Household name">{(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} />}</Field>
+            <Field label="Where do you live?" hint="Sets the currency, wording and tax rules to start with. Each person's residence can be changed later.">
+              {(id) => <Select id={id} value={home} onChange={(e) => { const j = e.target.value as Jurisdiction; setHome(j); setCurrency(COUNTRY_INFO[j].currency); }} options={taxCountryOptions()} />}
+            </Field>
             <Field label="Base currency" hint="Net worth and budgets are shown in this currency.">
               {(id) => (
-                <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as "EUR" | "GBP")} options={[{ value: "EUR", label: "Euro (EUR)" }, { value: "GBP", label: "Sterling (GBP)" }]} />
+                <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as Currency)} options={currencyOptions(true)} />
               )}
             </Field>
             <Button variant="primary" onClick={() => startEmpty(name.trim() || "My household", currency)}>Create household</Button>

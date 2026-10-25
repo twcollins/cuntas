@@ -1,0 +1,13 @@
+# Florida: no personal income tax on wages in 2026.
+kind: usState
+state: FL
+parent: US
+taxYear: "2026"
+version: "US-FL-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://floridarevenue.com/taxes/compliance/Pages/violations.aspx
+incomeTax:
+  source: https://floridarevenue.com/taxes/compliance/Pages/violations.aspx
+  none: true

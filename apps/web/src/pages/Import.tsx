@@ -3,8 +3,9 @@ import { detectFileKind, guessMapping, importFile, PRESETS, readCsvHeaders, type
 import { importStatement, newId } from "@cuntas/ledger";
 import { Badge, Button, Card, Field, Input, PageHeader, Select, Table } from "../components/ui";
 import { useAsOf } from "../lib/derived";
-import { formatDate, moneyExact } from "../lib/format";
+import { currencyOptions, formatDate, moneyExact } from "../lib/format";
 import { replaceDataset, useDataset } from "../lib/store";
+import type { Currency } from "@cuntas/rules";
 
 const DATE_FORMATS: DateFormat[] = ["DD/MM/YYYY", "YYYY-MM-DD", "DD-MM-YYYY", "DD.MM.YYYY", "DD MMM YYYY", "MM/DD/YYYY"];
 
@@ -87,7 +88,7 @@ export function ImportPage() {
                 <Field label="Description column">{(id) => <Select id={id} value={mapping.description[0] ?? ""} onChange={(e) => applyMapping({ ...mapping, description: [e.target.value] })} options={colOptions} />}</Field>
                 <Field label="Or: money out column">{(id) => <Select id={id} value={mapping.debit ?? ""} onChange={(e) => applyMapping({ ...mapping, debit: e.target.value || undefined, amount: e.target.value ? undefined : mapping.amount })} options={colOptions} />}</Field>
                 <Field label="Money in column">{(id) => <Select id={id} value={mapping.credit ?? ""} onChange={(e) => applyMapping({ ...mapping, credit: e.target.value || undefined })} options={colOptions} />}</Field>
-                <Field label="Currency">{(id) => <Select id={id} value={mapping.defaultCurrency} onChange={(e) => applyMapping({ ...mapping, defaultCurrency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+                <Field label="Currency">{(id) => <Select id={id} value={mapping.defaultCurrency} onChange={(e) => applyMapping({ ...mapping, defaultCurrency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
                 <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" checked={!!mapping.decimalComma} onChange={(e) => applyMapping({ ...mapping, decimalComma: e.target.checked })} />Decimal comma (1.234,56)</label>
               </div>
             </Card>

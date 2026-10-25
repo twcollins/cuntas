@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { importFile } from "@cuntas/importers";
 import { evaluate } from "@cuntas/engine";
-import { packOn, toMinor } from "@cuntas/rules";
+import { packOn, toMinor, type Currency } from "@cuntas/rules";
 import {
   budgetReport,
   buildSnapshot,
@@ -32,7 +32,7 @@ import {
 const AS_OF = "2026-10-22";
 const fixture = (name: string) => readFileSync(join(__dirname, "../../importers/fixtures", name), "utf8");
 
-function account(id: string, currency: "EUR" | "GBP", type: Account["type"] = "current"): Account {
+function account(id: string, currency: Currency, type: Account["type"] = "current"): Account {
   return { id, name: id, memberIds: [], type, currency, institutionId: null, wrapper: "none", jurisdiction: currency === "EUR" ? "IE" : "UK", openingBalanceMinor: 0, openingDate: "2026-01-01", valuations: [], isEmergencyFund: false, archived: false };
 }
 
@@ -95,9 +95,35 @@ describe("transfers and FX", () => {
     expect(fx.convert(8600, "GBP", "EUR", "2026-09-05")).toBe(10000);
   });
 
-  it("parses ECB reference-rate XML", () => {
-    const xml = `<Cube><Cube time='2026-10-21'><Cube currency='USD' rate='1.08'/><Cube currency='GBP' rate='0.8612'/></Cube></Cube>`;
-    expect(parseEcbXml(xml)).toEqual([{ date: "2026-10-21", base: "EUR", quote: "GBP", rate: 0.8612, source: "ECB" }]);
+  it("converts any pair through EUR, using each currency's latest rate", () => {
+    const fx = new FxTable([
+      { date: "2026-09-01", base: "EUR", quote: "GBP", rate: 0.85, source: "t" },
+      { date: "2026-09-01", base: "EUR", quote: "USD", rate: 1.1, source: "t" },
+      { date: "2026-09-04", base: "EUR", quote: "USD", rate: 1.2, source: "t" },
+    ]);
+    expect(fx.convert(10000, "EUR", "USD", "2026-09-02")).toBe(11000);
+    expect(fx.convert(12000, "USD", "EUR", "2026-09-05")).toBe(10000);
+    // USD -> GBP: 0.85 / 1.2 per dollar.
+    expect(fx.convert(12000, "USD", "GBP", "2026-09-05")).toBe(8500);
+    expect(fx.has("USD")).toBe(true);
+    expect(new FxTable([]).tryConvert(100, "USD", "EUR", "2026-09-05")).toBeNull();
+    expect(new FxTable(fx.rates("GBP")).tryConvert(100, "USD", "GBP", "2026-09-05")).toBeNull();
+  });
+
+  it("parses ECB reference-rate XML for every supported currency", () => {
+    const xml = `<Cube><Cube time='2026-10-21'><Cube currency='USD' rate='1.08'/><Cube currency='JPY' rate='160.1'/><Cube currency='GBP' rate='0.8612'/></Cube></Cube>`;
+    expect(parseEcbXml(xml)).toEqual([
+      { date: "2026-10-21", base: "EUR", quote: "GBP", rate: 0.8612, source: "ECB" },
+      { date: "2026-10-21", base: "EUR", quote: "USD", rate: 1.08, source: "ECB" },
+    ]);
+  });
+
+  it("accepts US dollar accounts and loads datasets from before USD", () => {
+    const ds = createEmptyDataset("Test", "USD");
+    expect(ds.household.baseCurrency).toBe("USD");
+    const old = createEmptyDataset("Old", "EUR");
+    const json = exportJson({ ...old, fxRates: [{ date: "2026-09-01", base: "EUR", quote: "GBP", rate: 0.85, source: "ECB" }] });
+    expect(importJson(json).fxRates[0]!.quote).toBe("GBP");
   });
 });
 

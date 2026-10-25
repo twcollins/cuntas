@@ -1,0 +1,22 @@
+# Colorado individual income tax, 2026: a flat 4.40% on federal taxable income (so the federal
+# standard deduction is already taken). Rate from the 2026 DR 1098 withholding worksheet; a
+# temporary TABOR cut can lower it for a year. Above $300,000 AGI some deductions are added back.
+kind: usState
+state: CO
+parent: US
+taxYear: "2026"
+version: "US-CO-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.colorado.gov/sites/tax/files/documents/DR_1098_Colorado_Withholding_Worksheet_for_Employees.pdf
+  - https://tax.colorado.gov/colorado-individual-income-tax-glossary
+incomeTax:
+  source: https://tax.colorado.gov/sites/tax/files/documents/DR_1098_Colorado_Withholding_Worksheet_for_Employees.pdf
+  base: federalTaxableIncome
+  rate: 0.044
+  notes:
+    - "Above $300,000 of federal AGI, Colorado adds back part of the deductions; that isn't included."
+localTax:
+  source: https://tax.colorado.gov/sites/default/files/documents/Book104_2025.pdf
+  note: "Denver, Aurora and some other Colorado cities charge a flat occupational privilege tax on wages."

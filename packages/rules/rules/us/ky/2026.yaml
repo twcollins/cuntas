@@ -1,0 +1,21 @@
+# Kentucky individual income tax, 2026: a flat rate on federal AGI less one standard deduction per
+# return. City and county occupational license taxes on wages aren't included.
+kind: usState
+state: KY
+parent: US
+taxYear: "2026"
+version: "US-KY-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://revenue.ky.gov/Business/Pages/Employer-Payroll-Withholding.aspx
+  - https://revenue.ky.gov/News/Pages/Kentucky-DOR-Announces-2026-Standard-Deduction.aspx
+  - https://revenue.ky.gov/Forms/2026%20Withholding%20Formula.pdf
+incomeTax:
+  source: https://revenue.ky.gov/News/Pages/Kentucky-DOR-Announces-2026-Standard-Deduction.aspx
+  base: federalAgi
+  rate: 0.035
+  standardDeduction: { single: 3360, marriedJoint: 3360, marriedSeparate: 3360, headOfHousehold: 3360 }
+localTax:
+  source: https://revenue.ky.gov/Business/Pages/Employer-Payroll-Withholding.aspx
+  note: "Many Kentucky cities and counties levy occupational license taxes on wages."

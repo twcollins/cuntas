@@ -5,16 +5,18 @@ import { budgetReport, netWorthSeries, periodOf, periodRange, totalsByCategory }
 import { classify } from "@cuntas/rules";
 import { starterFundTarget } from "@cuntas/engine";
 import { NextStep } from "../components/NextStep";
+import { RulesBanner } from "../components/RulesBanner";
 import { Badge, Card, Disclaimer, PageHeader, Stat } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
 import { money, monthLabel } from "../lib/format";
 import { useChartColors } from "../lib/theme";
 import { useDataset } from "../lib/store";
+import { currencyWord } from "../lib/region";
 
 export function OverviewPage() {
   const colors = useChartColors();
   const ds = useDataset();
-  const { result, snapshot, asOf } = usePlan(ds);
+  const { result, snapshot, asOf, figures } = usePlan(ds);
   const base = ds.household.baseCurrency;
   const catName = useCategoryName(ds);
   const series = useMemo(() => netWorthSeries(ds, asOf, 12), [ds, asOf]);
@@ -45,14 +47,15 @@ export function OverviewPage() {
 
   return (
     <div>
-      <PageHeader title={`Hello, ${ds.members.map((m) => m.name).join(" & ") || ds.household.name}`} subtitle={`Pay period ${monthLabel(period)} · rule pack ${result.rulePack}`} />
+      <PageHeader title={`Hello, ${ds.members.map((m) => m.name).join(" & ") || ds.household.name}`} subtitle={<>Pay period {monthLabel(period)} · rule pack {result.rulePack}{figures && <> · <Badge tone="bad">{figures}</Badge></>}</>} />
+      <RulesBanner ds={ds} asOf={asOf} />
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           {result.current ? (
             <NextStep card={result.current} />
           ) : (
             <Card title="Every step on the ladder is met">
-              <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">Choose what your next euro does. Figures use your marginal rate and the current rule pack.</p>
+              <p className="mb-3 text-sm text-stone-600 dark:text-stone-400">Choose what your next {currencyWord(ds)} does. Figures use your marginal rate and the current rule pack.</p>
               <ul className="space-y-2 text-sm">
                 {result.options.map((o) => (
                   <li key={o.id} className="rounded-lg bg-stone-50 p-3 dark:bg-stone-800/60"><div className="font-medium">{o.title}</div><div className="text-stone-600 dark:text-stone-400">{o.detail}</div></li>
@@ -91,7 +94,7 @@ export function OverviewPage() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-2 text-xs text-stone-500">GBP balances converted at ECB reference rates; the tooltip shows the part of each month's change caused by exchange rates.</p>
+          <p className="mt-2 text-xs text-stone-500">Balances in other currencies are converted at ECB reference rates; the tooltip shows the part of each month's change caused by exchange rates.</p>
         </Card>
         <Card title={`Spending this period`} actions={<Link to="/transactions" className="text-sm text-brand-700 underline dark:text-brand-500">All transactions</Link>}>
           <div className="h-56">

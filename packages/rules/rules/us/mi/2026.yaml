@@ -1,0 +1,21 @@
+# Michigan individual income tax, 2026: a flat rate on federal AGI less exemptions for each filer
+# and dependent. Rate and exemption from the 2026 withholding guide (Form 446); a revenue trigger
+# can lower the rate for the annual return. Some cities (Detroit among them) levy their own tax.
+kind: usState
+state: MI
+parent: US
+taxYear: "2026"
+version: "US-MI-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.michigan.gov/taxes/-/media/Project/Websites/taxes/Forms/SUW/TY2026/446_Withholding-Guide_2026.pdf
+  - https://www.michigan.gov/taxes/business-taxes/withholding/calendar-year-tax-information
+incomeTax:
+  source: https://www.michigan.gov/taxes/-/media/Project/Websites/taxes/Forms/SUW/TY2026/446_Withholding-Guide_2026.pdf
+  base: federalAgi
+  rate: 0.0425
+  exemption: { perFiler: 5900, perDependent: 5900 }
+localTax:
+  source: https://www.michigan.gov/citytax
+  note: "Detroit and some other Michigan cities levy a city income tax."

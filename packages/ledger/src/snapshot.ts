@@ -8,14 +8,19 @@ import {
   ieSelfAssessment,
   MONTHS_PER_YEAR,
   myFutureFundStatus,
+  COUNTRY_INFO,
   packOn,
+  statePackFor,
   ukPayroll,
+  usPayroll,
+  type UsEarner,
   type ChartDefaults,
   type IePack,
+  type Currency,
   type IsoDate,
   type Jurisdiction,
 } from "@cuntas/rules";
-import { defaultThresholds, type HouseholdSnapshot, type MemberState, type Thresholds } from "@cuntas/engine";
+import { defaultThresholds, type HouseholdSnapshot, type MemberState, type Thresholds, type UsMemberState } from "@cuntas/engine";
 import { balancesByAccount } from "./balances";
 import { periodOf, periodRange } from "./budgets";
 import { FxTable } from "./fx";
@@ -32,7 +37,7 @@ export function residenceOn(ds: Dataset, memberId: string, date: IsoDate): Juris
 export interface MemberPay {
   netAnnualMinor: number;
   marginalRate: number;
-  currency: "EUR" | "GBP";
+  currency: Currency;
   pack: string;
 }
 
@@ -41,8 +46,9 @@ export function memberPay(ds: Dataset, m: Member, asOf: IsoDate): MemberPay {
   const residence = residenceOn(ds, m.id, asOf);
   const age = ageOn(m.dateOfBirth, asOf);
   if (m.grossAnnualMinor <= 0 || m.employmentType === "notWorking") {
-    return { netAnnualMinor: 0, marginalRate: 0, currency: residence === "UK" ? "GBP" : "EUR", pack: "" };
+    return { netAnnualMinor: 0, marginalRate: 0, currency: COUNTRY_INFO[residence].currency, pack: "" };
   }
+  if (residence === "US") return usMemberPay(ds, m, asOf);
   if (residence === "UK") {
     const pack = packOn("UK", asOf);
     const r = ukPayroll(pack, { grossAnnualMinor: m.grossAnnualMinor, region: m.ukRegion, studentLoans: m.studentLoans });
@@ -64,6 +70,80 @@ export function memberPay(ds: Dataset, m: Member, asOf: IsoDate): MemberPay {
     myFutureFund: mff === "auto-enrolled",
   });
   return { netAnnualMinor: r.netAnnualMinor, marginalRate: r.marginalRate, currency: "EUR", pack: pack.version };
+}
+
+/** US federal take-home and the return's figures. A joint return includes a spouse who also lives in the US; children are claimed on joint and head-of-household returns. */
+function usPayDetail(ds: Dataset, m: Member, asOf: IsoDate) {
+  const pack = packOn("US", asOf);
+  const plansOf = (x: Member) => ds.pensionPlans.filter((p) => p.memberId === x.id && p.isEmployerScheme && p.jurisdiction === "US");
+  const earner = (x: Member): UsEarner => ({
+    grossAnnualMinor: x.employmentType === "notWorking" || x.employmentType === "retired" ? 0 : x.grossAnnualMinor,
+    employment: x.employmentType === "selfEmployed" ? "selfEmployed" : "employee",
+    age: ageOn(x.dateOfBirth, asOf),
+    pretax401kMinor: applyRate(x.grossAnnualMinor, plansOf(x).reduce((a, p) => a + p.employeeRate, 0)),
+  });
+  const status = m.usFilingStatus;
+  const spouse = status === "marriedJoint" ? ds.members.find((x) => x.id !== m.id && residenceOn(ds, x.id, asOf) === "US") : undefined;
+  const self = earner(m);
+  const state = m.usState ? statePackFor(m.usState, pack.taxYear)?.pack : undefined;
+  const r = usPayroll(pack, {
+    ...self,
+    ...(state ? { state, locality: m.usLocality, rentPaidMinor: rentOnReturn(ds, m, asOf) } : {}),
+    filingStatus: status,
+    ...(spouse ? { spouse: earner(spouse) } : {}),
+    children: status === "marriedJoint" || status === "headOfHousehold" ? ds.household.settings.children : 0,
+  });
+  return {
+    pack,
+    pay: { netAnnualMinor: r.netAnnualMinor, marginalRate: r.marginalRate, currency: "USD", pack: pack.version } satisfies MemberPay,
+    agiMinor: r.agiMinor,
+    deferralMinor: self.pretax401kMinor ?? 0,
+    covered: plansOf(m).length > 0,
+    spouseCovered: !!spouse && plansOf(spouse).length > 0,
+    /** Federal income tax and self-employment tax for the year, less refundable credits. */
+    expectedTaxMinor: r.incomeTaxMinor + r.selfEmploymentTaxMinor - r.refundableCreditMinor,
+  };
+}
+
+/**
+ * Rent counts once: on a joint return, or on the first US member's return otherwise. Rent is the
+ * household's monthly rent setting, when it's held in dollars.
+ */
+function rentOnReturn(ds: Dataset, m: Member, asOf: IsoDate): number {
+  const s = ds.household.settings;
+  if (s.ownsHome || ds.household.baseCurrency !== "USD") return 0;
+  const firstUs = ds.members.find((x) => residenceOn(ds, x.id, asOf) === "US");
+  return m.usFilingStatus === "marriedJoint" || firstUs?.id === m.id ? s.monthlyRentMinor * MONTHS_PER_YEAR : 0;
+}
+
+function usMemberPay(ds: Dataset, m: Member, asOf: IsoDate): MemberPay {
+  return usPayDetail(ds, m, asOf).pay;
+}
+
+/** The figures the US ladder needs, in dollars. */
+function usMemberState(ds: Dataset, m: Member, asOf: IsoDate): UsMemberState {
+  const d = usPayDetail(ds, m, asOf);
+  const yearStart = `${asOf.slice(0, 4)}-01-01`;
+  const ytd = (kinds: readonly string[]) =>
+    ds.contributions
+      .filter((c) => c.date >= yearStart && c.date <= asOf && ds.pensionPlans.some((p) => p.id === c.pensionPlanId && p.memberId === m.id && kinds.includes(p.kind)))
+      .reduce((a, c) => a + c.employeeMinor, 0);
+  return {
+    filingStatus: m.usFilingStatus,
+    grossAnnualMinor: m.employmentType === "notWorking" || m.employmentType === "retired" ? 0 : m.grossAnnualMinor,
+    magiMinor: d.agiMinor,
+    coveredByWorkplacePlan: d.covered,
+    spouseCoveredByWorkplacePlan: d.spouseCovered,
+    employeeDeferralMinor: d.deferralMinor,
+    iraContribYtdMinor: ytd(["usIRA", "usRothIRA"]),
+    hsaCoverage: m.usHsaCoverage === "none" ? null : m.usHsaCoverage,
+    hsaContribYtdMinor: ytd(["usHSA"]),
+  };
+}
+
+/** The US ladder applies when everyone in the household lives in the US. */
+export function planFor(ds: Dataset, asOf: IsoDate): "IE" | "US" {
+  return ds.members.length > 0 && ds.members.every((m) => residenceOn(ds, m.id, asOf) === "US") ? "US" : "IE";
 }
 
 function memberState(ds: Dataset, m: Member, asOf: IsoDate, pack: IePack, fx: FxTable): MemberState {
@@ -101,6 +181,7 @@ function memberState(ds: Dataset, m: Member, asOf: IsoDate, pack: IePack, fx: Fx
       myFutureFund: mff,
     },
     ...(m.stockMatch ? { stockMatch: m.stockMatch } : {}),
+    ...(residence === "US" ? { us: usMemberState(ds, m, asOf) } : {}),
   };
 }
 
@@ -113,7 +194,9 @@ export function thresholdsFor(ds: Dataset, chart: ChartDefaults): Thresholds {
 }
 
 /** Builds the engine's household snapshot from the dataset. */
-export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart: ChartDefaults = chartDefaults()): HouseholdSnapshot {
+export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart?: ChartDefaults): HouseholdSnapshot {
+  const plan = planFor(ds, asOf);
+  chart ??= chartDefaults(plan);
   const fx = new FxTable(ds.fxRates);
   const pack = packOn("IE", asOf);
   const base = ds.household.baseCurrency;
@@ -176,6 +259,7 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart: ChartDefaults =
 
   return {
     asOf,
+    plan,
     currency: base,
     members,
     netMonthlyPayMinor: netMonthlyPay,
@@ -210,8 +294,24 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart: ChartDefaults =
       .filter((x) => x.status === "dismissed")
       .map((x) => ({ stepId: x.stepId, reason: x.dismissedReason ?? "", ...(x.memberId ? { memberId: x.memberId } : {}) })),
     thresholds: thresholdsFor(ds, chart),
-    ...selfEmployedTax(ds, asOf, pack, fx),
+    ...(plan === "US" ? usEstimatedTaxSetAside(ds, asOf, fx) : selfEmployedTax(ds, asOf, pack, fx)),
   };
+}
+
+/** Monthly set-aside for US self-employed members: this year's federal and self-employment tax over twelve months, against tax set-aside goals. */
+function usEstimatedTaxSetAside(ds: Dataset, asOf: IsoDate, fx: FxTable): Pick<HouseholdSnapshot, "selfEmployedTax"> {
+  const selfEmployed = ds.members.filter((m) => m.employmentType === "selfEmployed" && m.grossAnnualMinor > 0 && residenceOn(ds, m.id, asOf) === "US");
+  if (selfEmployed.length === 0) return {};
+  const base = ds.household.baseCurrency;
+  const details = selfEmployed.map((m) => usPayDetail(ds, m, asOf));
+  const yearly = details.reduce((a, d) => a + Math.max(0, d.expectedTaxMinor), 0);
+  const monthly = Math.ceil(yearly / MONTHS_PER_YEAR);
+  const pack = details[0]!.pack;
+  const year = Number(asOf.slice(0, 4));
+  const dates = [...pack.estimatedTax.dueDates.map((d) => deadlineFor(year, d)), ...pack.estimatedTax.dueDates.map((d) => deadlineFor(year + 1, d))].sort();
+  const nextDeadline = dates.find((d) => d >= asOf)!;
+  const planned = ds.goals.filter((g) => g.type === "taxSetAside").reduce((a, g) => a + (fx.tryConvert(g.monthlyContributionMinor, g.currency, base, asOf) ?? 0), 0);
+  return { selfEmployedTax: { monthlySetAsideMinor: fx.tryConvert(monthly, "USD", base, asOf) ?? monthly, plannedMonthlyMinor: planned, nextDeadline } };
 }
 
 /** Monthly set-aside for Irish self-employed members, against what tax set-aside goals put by. */

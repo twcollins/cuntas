@@ -1,0 +1,13 @@
+# South Dakota: no personal income tax on wages in 2026.
+kind: usState
+state: SD
+parent: US
+taxYear: "2026"
+version: "US-SD-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://dor.sd.gov/individuals/taxes/
+incomeTax:
+  source: https://dor.sd.gov/individuals/taxes/
+  none: true

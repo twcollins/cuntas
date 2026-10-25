@@ -3,6 +3,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { loadRulePacks, useRulePacks } from "./lib/rulepacks";
 import { loadStore, useStore } from "./lib/store";
 import { initNative } from "./lib/native";
 import { initTheme } from "./lib/theme";
@@ -16,10 +17,12 @@ void initNative();
 
 function App() {
   const { status } = useStore();
+  const rules = useRulePacks();
   useEffect(() => {
-    void loadStore();
+    // Rule files load first so every calculation uses them from the first render.
+    void loadRulePacks().then(loadStore);
   }, []);
-  if (status === "loading") return <div className="p-8 text-sm text-stone-500">Loading…</div>;
+  if (status === "loading" || rules.status === "loading") return <div className="p-8 text-sm text-stone-500">Loading…</div>;
   if (status === "empty") return window.location.pathname === "/join" ? <JoinPage standalone /> : <Onboarding />;
   return <RouterProvider router={router} />;
 }

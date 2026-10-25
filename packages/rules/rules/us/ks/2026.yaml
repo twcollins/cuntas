@@ -1,0 +1,28 @@
+# Kansas individual income tax, 2026 (K.S.A. 79-32,110; no 2026 rate cut). Standard deduction and
+# the 65+ extra (79-32,119), exemptions (79-32,121). The married-filing-separately standard deduction
+# is taken as half the joint one: check. Kansas Department of Revenue pages couldn't be read.
+kind: usState
+state: KS
+parent: US
+taxYear: "2026"
+version: "US-KS-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://ksrevisor.gov/statutes/chapters/ch79/079_032_0110.html
+  - https://ksrevisor.gov/statutes/chapters/ch79/079_032_0119.html
+  - https://ksrevisor.gov/statutes/chapters/ch79/079_032_0121.html
+incomeTax:
+  source: https://ksrevisor.gov/statutes/chapters/ch79/079_032_0110.html
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 23000, rate: 0.052 }, { upTo: null, rate: 0.0558 }]
+    marriedJoint: [{ upTo: 46000, rate: 0.052 }, { upTo: null, rate: 0.0558 }]
+    marriedSeparate: [{ upTo: 23000, rate: 0.052 }, { upTo: null, rate: 0.0558 }]
+    headOfHousehold: [{ upTo: 23000, rate: 0.052 }, { upTo: null, rate: 0.0558 }]
+  standardDeduction: { single: 3605, marriedJoint: 8240, marriedSeparate: 4120, headOfHousehold: 6180 }
+  agedStandardDeduction: { married: 700, unmarried: 850 }
+  exemption: { perFiler: 0, perDependent: 2320, byStatus: { single: 9160, marriedJoint: 18320, marriedSeparate: 9160, headOfHousehold: 9160 } }
+  notes:
+    - "Kansas's earned income credit (17% of the federal one) isn't included."
+    - "Social Security isn't taxed in Kansas."

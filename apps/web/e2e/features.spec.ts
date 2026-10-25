@@ -42,6 +42,23 @@ test("tax centre: payslip check flags missing credits; Form 11 and Scottish tax"
   await expect(takeHome.getByRole("row", { name: /Scottish income tax/ })).toContainText("£8,982.05");
 });
 
+test("tax centre: US take-home under the 2026 federal pack, marked as figures you haven't checked", async ({ page }) => {
+  await go(page, "Tax centre");
+  const takeHome = page.locator("section", { has: page.getByRole("heading", { name: "Take-home pay" }) });
+  await takeHome.getByLabel("Rules").selectOption("US");
+  await takeHome.getByLabel("Gross annual pay").fill("60000");
+  await takeHome.getByLabel("Filing status").selectOption("single");
+  await takeHome.getByLabel("Age").fill("35");
+  await takeHome.getByLabel("401(k) (% of pay)").fill("0");
+  await expect(takeHome.getByText("$50,390.00").first()).toBeVisible();
+  await expect(takeHome.getByRole("row", { name: /Federal income tax/ })).toContainText("$5,020.00");
+  await expect(takeHome.getByText("Figures not checked (2026)")).toBeVisible();
+
+  await go(page, "Tax rules");
+  const us = page.locator("section", { has: page.getByRole("heading", { name: "United States (federal)" }) });
+  await expect(us.getByRole("row", { name: /US-2026\.1/ })).toContainText("Not checked yet");
+});
+
 test("retirement, wrapper comparison and the move what-if render from the demo", async ({ page }) => {
   await go(page, "Retirement");
   await expect(page.getByText("Central", { exact: false }).first()).toBeVisible();
@@ -55,6 +72,12 @@ test("retirement, wrapper comparison and the move what-if render from the demo",
   await page.getByLabel("Aoife").uncheck();
   await expect(page.getByText(/Stocks and shares ISA \(Seán\)/)).toBeVisible();
   await expect(page.getByText("Tax-free").first()).toBeVisible();
+
+  await page.getByLabel("Move to").selectOption("US");
+  await expect(page.getByRole("note")).toContainText("federal only");
+  await expect(page.getByText(/€[\d,]+ → \$[\d,]+/)).toBeVisible();
+  await expect(page.getByText("Taxed in US").first()).toBeVisible();
+  await expect(page.getByText(/FinCEN Form 114/)).toBeVisible();
 });
 
 test("light and dark mode", async ({ page }) => {

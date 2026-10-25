@@ -1,0 +1,3 @@
+Account Number,Transaction Date,Transaction Amount,Transaction Type,Transaction Description,Balance
+3601,09/02/26,1500.00,Credit,Deposit from ACME CORP,6500.00
+3601,09/03/26,200.00,Debit,Withdrawal to SAVINGS,6300.00

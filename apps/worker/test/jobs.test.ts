@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fxRates, notifications } from "@cuntas/db";
 import { testApp } from "../../api/test/helpers";
+import { getRates } from "@cuntas/api/services";
 import { fxRefresh, nightlySync, queueReminders } from "../src/jobs";
 
 describe("worker jobs", () => {
@@ -24,9 +25,12 @@ describe("worker jobs", () => {
 
   it("stores ECB rates", async () => {
     const t = await testApp();
-    const xml = `<gesmes:Envelope><Cube><Cube time="2026-10-21"><Cube currency="GBP" rate="0.8612"/></Cube><Cube time="2026-10-20"><Cube currency="GBP" rate="0.8601"/></Cube></Cube></gesmes:Envelope>`;
+    const xml = `<gesmes:Envelope><Cube><Cube time="2026-10-21"><Cube currency="USD" rate="1.0811"/><Cube currency="GBP" rate="0.8612"/></Cube><Cube time="2026-10-20"><Cube currency="GBP" rate="0.8601"/></Cube></Cube></gesmes:Envelope>`;
     const n = await fxRefresh(t.db, (async () => new Response(xml)) as unknown as typeof fetch);
-    expect(n).toBe(2);
-    expect((await t.db.select().from(fxRates)).map((r) => Number(r.rate))).toEqual([0.8612, 0.8601]);
+    expect(n).toBe(3);
+    const rows = await t.db.select().from(fxRates);
+    expect(rows.map((r) => [r.quote, Number(r.rate)])).toEqual([["GBP", 0.8612], ["USD", 1.0811], ["GBP", 0.8601]]);
+    const served = await getRates(t.db, "2026-10-21", "2026-10-21");
+    expect(served.map((r) => r.quote).sort()).toEqual(["GBP", "USD"]);
   });
 });

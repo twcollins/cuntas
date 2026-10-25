@@ -1,0 +1,26 @@
+# Nebraska individual income tax, 2026 (Form 1040N-ES, LB 754 rates). Standard deduction plus the
+# extra for 65+; a $176 personal exemption credit per person (draft 2026 Form 1040N).
+kind: usState
+state: NE
+parent: US
+taxYear: "2026"
+version: "US-NE-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/2025/f_1040N-ES.pdf
+  - https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/drafts/f_1040n.pdf
+incomeTax:
+  source: https://revenue.nebraska.gov/sites/default/files/doc/tax-forms/2025/f_1040N-ES.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 4130, rate: 0.0246 }, { upTo: 24760, rate: 0.0351 }, { upTo: null, rate: 0.0455 }]
+    marriedJoint: [{ upTo: 8250, rate: 0.0246 }, { upTo: 49530, rate: 0.0351 }, { upTo: null, rate: 0.0455 }]
+    marriedSeparate: [{ upTo: 4130, rate: 0.0246 }, { upTo: 24760, rate: 0.0351 }, { upTo: null, rate: 0.0455 }]
+    headOfHousehold: [{ upTo: 7700, rate: 0.0246 }, { upTo: 39620, rate: 0.0351 }, { upTo: null, rate: 0.0455 }]
+  standardDeduction: { single: 8850, marriedJoint: 17700, marriedSeparate: 8850, headOfHousehold: 12950 }
+  agedStandardDeduction: { married: 1700, unmarried: 2050 }
+  exemptionCredit: { perFiler: 176, perDependent: 176 }
+  notes:
+    - "Nebraska's earned income credit isn't included."
+    - "Social Security isn't taxed in Nebraska."

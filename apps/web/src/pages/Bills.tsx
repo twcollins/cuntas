@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { BILL_TEMPLATES, billCadences, detectRecurring, newId, nextDueOf, perYear, upcomingBills, type Bill, type RecurringSeries } from "@cuntas/ledger";
-import { addDays } from "@cuntas/rules";
+import { addDays, type Currency } from "@cuntas/rules";
 import { Badge, Button, Card, Disclaimer, Empty, Field, Input, Modal, MoneyInput, PageHeader, Select, Stat, Table } from "../components/ui";
 import { useAsOf, useCategoryName } from "../lib/derived";
-import { formatDate, money } from "../lib/format";
+import { currencyOptions, formatDate, money } from "../lib/format";
 import { update, useDataset } from "../lib/store";
 
 const CADENCE_LABEL: Record<Bill["cadence"], string> = { weekly: "Weekly", fortnightly: "Fortnightly", monthly: "Monthly", quarterly: "Quarterly", annual: "Yearly", biennial: "Every 2 years" };
@@ -139,7 +139,7 @@ function BillForm({ bill, onDone }: { bill: Bill; onDone: () => void }) {
         <Field label="Name">{(id) => <Input id={id} value={b.name} onChange={(e) => setB({ ...b, name: e.target.value })} />}</Field>
         <Field label="How often">{(id) => <Select id={id} value={b.cadence} onChange={(e) => setB({ ...b, cadence: e.target.value as Bill["cadence"] })} options={billCadences.map((c) => ({ value: c, label: CADENCE_LABEL[c] }))} />}</Field>
         <Field label="Amount">{(id) => <MoneyInput id={id} value={b.amountMinor} onChange={(v) => setB({ ...b, amountMinor: v })} />}</Field>
-        <Field label="Currency">{(id) => <Select id={id} value={b.currency} onChange={(e) => setB({ ...b, currency: e.target.value as "EUR" | "GBP" })} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+        <Field label="Currency">{(id) => <Select id={id} value={b.currency} onChange={(e) => setB({ ...b, currency: e.target.value as Currency })} options={currencyOptions()} />}</Field>
         <Field label="Next due">{(id) => <Input id={id} type="date" value={b.nextDue} onChange={(e) => setB({ ...b, nextDue: e.target.value })} />}</Field>
         <Field label="Category">{(id) => <Select id={id} value={b.categoryId ?? ""} onChange={(e) => setB({ ...b, categoryId: e.target.value || null })} options={[{ value: "", label: "None" }, ...ds.categories.filter((c) => c.kind === "expense").map((c) => ({ value: c.id, label: c.name }))]} />}</Field>
       </div>

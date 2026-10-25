@@ -1,0 +1,33 @@
+# West Virginia personal income tax, 2026: rates cut 5% by SB 392 (back to January 1, 2026), one
+# schedule for single, joint and head of household and a half-width one for married filing
+# separately. No standard deduction; $2,000 per exemption. Social Security is fully subtracted
+# from 2026. Earned income is excluded when AGI is $10,000 or less ($5,000 separately).
+kind: usState
+state: WV
+parent: US
+taxYear: "2026"
+version: "US-WV-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.wv.gov/Individuals/Pages/PersonalIncomeTaxReductionBill.aspx
+  - https://www.wvlegislature.gov/Bill_Text_HTML/2026_SESSIONS/RS/bills/sb392%20sub1%20enr.pdf
+  - https://tax.wv.gov/Documents/Withholding/it100.2a.pdf
+incomeTax:
+  source: https://tax.wv.gov/Documents/Withholding/it100.2a.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 10000, rate: 0.0211 }, { upTo: 25000, rate: 0.0281 }, { upTo: 40000, rate: 0.0316 }, { upTo: 60000, rate: 0.0422 }, { upTo: null, rate: 0.0458 }]
+    marriedJoint: [{ upTo: 10000, rate: 0.0211 }, { upTo: 25000, rate: 0.0281 }, { upTo: 40000, rate: 0.0316 }, { upTo: 60000, rate: 0.0422 }, { upTo: null, rate: 0.0458 }]
+    marriedSeparate: [{ upTo: 5000, rate: 0.0211 }, { upTo: 12500, rate: 0.0281 }, { upTo: 20000, rate: 0.0316 }, { upTo: 30000, rate: 0.0422 }, { upTo: null, rate: 0.0458 }]
+    headOfHousehold: [{ upTo: 10000, rate: 0.0211 }, { upTo: 25000, rate: 0.0281 }, { upTo: 40000, rate: 0.0316 }, { upTo: 60000, rate: 0.0422 }, { upTo: null, rate: 0.0458 }]
+  exemption: { perFiler: 2000, perDependent: 2000 }
+  # Up to $8,000 per person 65 or over (reduced by other retirement subtractions: not modelled).
+  ageDeduction:
+    perPerson: 8000
+    age: 65
+    phaseOutFrom: { single: 0, marriedJoint: 0, marriedSeparate: 0, headOfHousehold: 0 }
+    phaseOutRate: 0
+  noTaxBelow: { single: 10000, marriedJoint: 10000, marriedSeparate: 5000, headOfHousehold: 10000 }
+  notes:
+    - "West Virginia's family tax credit for incomes near the poverty line isn't included."

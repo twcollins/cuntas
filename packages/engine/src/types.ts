@@ -1,4 +1,4 @@
-import type { ChartDefaults, Currency, IePack, IsoDate, Jurisdiction, RuleRef } from "@cuntas/rules";
+import type { ChartDefaults, Currency, IePack, IsoDate, Jurisdiction, RulePack, RuleRef, UsFilingStatus } from "@cuntas/rules";
 
 export type Employment = "employee" | "selfEmployed" | "notWorking" | "retired";
 
@@ -24,6 +24,22 @@ export interface MemberState {
     myFutureFund: "not-eligible-age" | "not-eligible-earnings" | "in-qualifying-scheme" | "auto-enrolled" | "opted-out";
   };
   stockMatch?: { contributedRate: number; fullMatchRate: number };
+  /** US members only. Amounts are in US dollars (minor units), since US limits are. */
+  us?: UsMemberState;
+}
+
+export interface UsMemberState {
+  filingStatus: UsFilingStatus;
+  grossAnnualMinor: number;
+  /** Modified AGI for IRA purposes: the return's, so both spouses' on a joint return. */
+  magiMinor: number;
+  coveredByWorkplacePlan: boolean;
+  spouseCoveredByWorkplacePlan: boolean;
+  /** 401(k) deferrals a year at the current rate. */
+  employeeDeferralMinor: number;
+  iraContribYtdMinor: number;
+  hsaCoverage: "selfOnly" | "family" | null;
+  hsaContribYtdMinor: number;
 }
 
 export interface DebtState {
@@ -68,6 +84,8 @@ export interface Dismissal {
 
 export interface HouseholdSnapshot {
   asOf: IsoDate;
+  /** Which ladder applies: the US one when everyone in the household lives in the US. */
+  plan: "IE" | "US";
   currency: Currency;
   members: MemberState[];
   netMonthlyPayMinor: number;
@@ -103,39 +121,39 @@ export interface ActionRef {
   to: string;
 }
 
-export interface EvalContext {
+export interface EvalContext<P extends RulePack = IePack> {
   snapshot: HouseholdSnapshot;
   member?: MemberState;
-  pack: IePack;
+  pack: P;
   chart: ChartDefaults;
 }
 
-type Fn<T> = (ctx: EvalContext) => T;
+type Fn<T, P extends RulePack> = (ctx: EvalContext<P>) => T;
 
-export interface CheckDefinition {
+export interface CheckDefinition<P extends RulePack = IePack> {
   id: string;
   title: string;
-  appliesWhen?: Fn<boolean>;
-  isMet: Fn<boolean>;
-  progress: Fn<Progress>;
+  appliesWhen?: Fn<boolean, P>;
+  isMet: Fn<boolean, P>;
+  progress: Fn<Progress, P>;
   headline: string;
   explain: string;
-  vars: Fn<Record<string, string | number>>;
-  sources: Fn<RuleRef[]>;
+  vars: Fn<Record<string, string | number>, P>;
+  sources: Fn<RuleRef[], P>;
   actions: ActionRef[];
-  deadline?: Fn<IsoDate | undefined>;
+  deadline?: Fn<IsoDate | undefined, P>;
 }
 
-export interface StepDefinition {
+export interface StepDefinition<P extends RulePack = IePack> {
   id: string;
   order: number;
   title: string;
   chartRule: string;
   jurisdictions: Jurisdiction[];
   scope: "household" | "member";
-  appliesWhen?: Fn<boolean>;
+  appliesWhen?: Fn<boolean, P>;
   alwaysOn?: boolean;
-  checks: CheckDefinition[];
+  checks: CheckDefinition<P>[];
 }
 
 export interface NextStepCard {

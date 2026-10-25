@@ -1,0 +1,38 @@
+# Connecticut income tax, 2026 (rates and tables unchanged from 2025, TPG-211): Table A exemption,
+# reduced $1 per $1 of AGI over the threshold; Table B tax; Table C (2% rate phase-out) and Table D
+# (benefit recapture) added; then Table E's personal tax credit takes a share off.
+kind: usState
+state: CT
+parent: US
+taxYear: "2026"
+version: "US-CT-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://portal.ct.gov/-/media/drs/forms/2025/income/2025-ct-1040-instructions_1225.pdf
+  - https://portal.ct.gov/-/media/drs/forms/2025/wth/tpg-211_1225.pdf
+incomeTax:
+  source: https://portal.ct.gov/-/media/drs/forms/2025/income/2025-ct-1040-instructions_1225.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 10000, rate: 0.02 }, { upTo: 50000, rate: 0.045 }, { upTo: 100000, rate: 0.055 }, { upTo: 200000, rate: 0.06 }, { upTo: 250000, rate: 0.065 }, { upTo: 500000, rate: 0.069 }, { upTo: null, rate: 0.0699 }]
+    marriedJoint: [{ upTo: 20000, rate: 0.02 }, { upTo: 100000, rate: 0.045 }, { upTo: 200000, rate: 0.055 }, { upTo: 400000, rate: 0.06 }, { upTo: 500000, rate: 0.065 }, { upTo: 1000000, rate: 0.069 }, { upTo: null, rate: 0.0699 }]
+    marriedSeparate: [{ upTo: 10000, rate: 0.02 }, { upTo: 50000, rate: 0.045 }, { upTo: 100000, rate: 0.055 }, { upTo: 200000, rate: 0.06 }, { upTo: 250000, rate: 0.065 }, { upTo: 500000, rate: 0.069 }, { upTo: null, rate: 0.0699 }]
+    headOfHousehold: [{ upTo: 16000, rate: 0.02 }, { upTo: 80000, rate: 0.045 }, { upTo: 160000, rate: 0.055 }, { upTo: 320000, rate: 0.06 }, { upTo: 400000, rate: 0.065 }, { upTo: 800000, rate: 0.069 }, { upTo: null, rate: 0.0699 }]
+  exemption:
+    perFiler: 0
+    perDependent: 0
+    byStatus: { single: 15000, marriedJoint: 24000, marriedSeparate: 12000, headOfHousehold: 19000 }
+    reduction: { from: { single: 30000, marriedJoint: 48000, marriedSeparate: 24000, headOfHousehold: 38000 }, rate: 1 }
+  addBacks:
+    single: [{ from: 56500, step: 5000, amount: 25, cap: 250 }, { from: 105000, step: 5000, amount: 25, cap: 250 }, { from: 200000, step: 5000, amount: 90, cap: 2700 }, { from: 500000, step: 5000, amount: 50, cap: 450 }]
+    marriedJoint: [{ from: 100500, step: 5000, amount: 50, cap: 500 }, { from: 210000, step: 10000, amount: 50, cap: 500 }, { from: 400000, step: 10000, amount: 180, cap: 5400 }, { from: 1000000, step: 10000, amount: 100, cap: 900 }]
+    marriedSeparate: [{ from: 50250, step: 2500, amount: 25, cap: 250 }, { from: 105000, step: 5000, amount: 25, cap: 250 }, { from: 200000, step: 5000, amount: 90, cap: 2700 }, { from: 500000, step: 5000, amount: 50, cap: 450 }]
+    headOfHousehold: [{ from: 78500, step: 4000, amount: 40, cap: 400 }, { from: 168000, step: 8000, amount: 40, cap: 400 }, { from: 320000, step: 8000, amount: 140, cap: 4200 }, { from: 800000, step: 8000, amount: 80, cap: 720 }]
+  personalCreditRateByAgi:
+    single: [{ upTo: 15000, rate: 0.75 }, { upTo: 18800, rate: 0.75 }, { upTo: 19300, rate: 0.7 }, { upTo: 19800, rate: 0.65 }, { upTo: 20300, rate: 0.6 }, { upTo: 20800, rate: 0.55 }, { upTo: 21300, rate: 0.5 }, { upTo: 21800, rate: 0.45 }, { upTo: 22300, rate: 0.4 }, { upTo: 25000, rate: 0.35 }, { upTo: 25500, rate: 0.3 }, { upTo: 26000, rate: 0.25 }, { upTo: 26500, rate: 0.2 }, { upTo: 31300, rate: 0.15 }, { upTo: 31800, rate: 0.14 }, { upTo: 32300, rate: 0.13 }, { upTo: 32800, rate: 0.12 }, { upTo: 33300, rate: 0.11 }, { upTo: 60000, rate: 0.1 }, { upTo: 60500, rate: 0.09 }, { upTo: 61000, rate: 0.08 }, { upTo: 61500, rate: 0.07 }, { upTo: 62000, rate: 0.06 }, { upTo: 62500, rate: 0.05 }, { upTo: 63000, rate: 0.04 }, { upTo: 63500, rate: 0.03 }, { upTo: 64000, rate: 0.02 }, { upTo: 64500, rate: 0.01 }, { upTo: null, rate: 0 }]
+    marriedJoint: [{ upTo: 24000, rate: 0.75 }, { upTo: 30000, rate: 0.75 }, { upTo: 30500, rate: 0.7 }, { upTo: 31000, rate: 0.65 }, { upTo: 31500, rate: 0.6 }, { upTo: 32000, rate: 0.55 }, { upTo: 32500, rate: 0.5 }, { upTo: 33000, rate: 0.45 }, { upTo: 33500, rate: 0.4 }, { upTo: 40000, rate: 0.35 }, { upTo: 40500, rate: 0.3 }, { upTo: 41000, rate: 0.25 }, { upTo: 41500, rate: 0.2 }, { upTo: 50000, rate: 0.15 }, { upTo: 50500, rate: 0.14 }, { upTo: 51000, rate: 0.13 }, { upTo: 51500, rate: 0.12 }, { upTo: 52000, rate: 0.11 }, { upTo: 96000, rate: 0.1 }, { upTo: 96500, rate: 0.09 }, { upTo: 97000, rate: 0.08 }, { upTo: 97500, rate: 0.07 }, { upTo: 98000, rate: 0.06 }, { upTo: 98500, rate: 0.05 }, { upTo: 99000, rate: 0.04 }, { upTo: 99500, rate: 0.03 }, { upTo: 100000, rate: 0.02 }, { upTo: 100500, rate: 0.01 }, { upTo: null, rate: 0 }]
+    marriedSeparate: [{ upTo: 12000, rate: 0.75 }, { upTo: 15000, rate: 0.75 }, { upTo: 15500, rate: 0.7 }, { upTo: 16000, rate: 0.65 }, { upTo: 16500, rate: 0.6 }, { upTo: 17000, rate: 0.55 }, { upTo: 17500, rate: 0.5 }, { upTo: 18000, rate: 0.45 }, { upTo: 18500, rate: 0.4 }, { upTo: 20000, rate: 0.35 }, { upTo: 20500, rate: 0.3 }, { upTo: 21000, rate: 0.25 }, { upTo: 21500, rate: 0.2 }, { upTo: 25000, rate: 0.15 }, { upTo: 25500, rate: 0.14 }, { upTo: 26000, rate: 0.13 }, { upTo: 26500, rate: 0.12 }, { upTo: 27000, rate: 0.11 }, { upTo: 48000, rate: 0.1 }, { upTo: 48500, rate: 0.09 }, { upTo: 49000, rate: 0.08 }, { upTo: 49500, rate: 0.07 }, { upTo: 50000, rate: 0.06 }, { upTo: 50500, rate: 0.05 }, { upTo: 51000, rate: 0.04 }, { upTo: 51500, rate: 0.03 }, { upTo: 52000, rate: 0.02 }, { upTo: 52500, rate: 0.01 }, { upTo: null, rate: 0 }]
+    headOfHousehold: [{ upTo: 19000, rate: 0.75 }, { upTo: 24000, rate: 0.75 }, { upTo: 24500, rate: 0.7 }, { upTo: 25000, rate: 0.65 }, { upTo: 25500, rate: 0.6 }, { upTo: 26000, rate: 0.55 }, { upTo: 26500, rate: 0.5 }, { upTo: 27000, rate: 0.45 }, { upTo: 27500, rate: 0.4 }, { upTo: 34000, rate: 0.35 }, { upTo: 34500, rate: 0.3 }, { upTo: 35000, rate: 0.25 }, { upTo: 35500, rate: 0.2 }, { upTo: 44000, rate: 0.15 }, { upTo: 44500, rate: 0.14 }, { upTo: 45000, rate: 0.13 }, { upTo: 45500, rate: 0.12 }, { upTo: 46000, rate: 0.11 }, { upTo: 74000, rate: 0.1 }, { upTo: 74500, rate: 0.09 }, { upTo: 75000, rate: 0.08 }, { upTo: 75500, rate: 0.07 }, { upTo: 76000, rate: 0.06 }, { upTo: 76500, rate: 0.05 }, { upTo: 77000, rate: 0.04 }, { upTo: 77500, rate: 0.03 }, { upTo: 78000, rate: 0.02 }, { upTo: 78500, rate: 0.01 }, { upTo: null, rate: 0 }]
+  notes:
+    - "Connecticut's property tax credit (up to $300) and earned income credit aren't included."

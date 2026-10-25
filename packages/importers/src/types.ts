@@ -1,4 +1,4 @@
-import type { Currency, IsoDate } from "@cuntas/rules";
+import type { Country, Currency, IsoDate } from "@cuntas/rules";
 
 export interface ParsedTransaction {
   bookedAt: IsoDate;
@@ -44,12 +44,18 @@ export interface ColumnMapping {
    * location, card time and references on follow-on rows). Their text and balance are folded in.
    */
   detailRows?: boolean;
+  /** Charges are exported as positive amounts (some US card issuers): flip every sign. */
+  invertAmount?: boolean;
+  /** The amount is unsigned and this column says which way it went (e.g. Transaction Type = Debit). */
+  signFrom?: { column: string; negativeWhen: string };
+  /** Skip rows whose column starts with this text (e.g. a "Beginning balance" line). */
+  skip?: { column: string; startsWith: string };
 }
 
 export interface CsvPreset extends ColumnMapping {
   id: string;
   name: string;
-  country: "IE" | "UK";
+  country: Country;
   /** Headers that must all be present (normalised) for auto-detection. */
   signature: string[];
   /**

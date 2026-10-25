@@ -1,4 +1,6 @@
 export * from "./money";
+export * from "./countries";
+export * from "./usStates";
 export * from "./dates";
 export * from "./packs";
 export * from "./calculators/shared";
@@ -17,6 +19,9 @@ export * from "./calculators/uk/annualAllowance";
 export * from "./calculators/uk/payslip";
 export * from "./calculators/xb/retirement";
 export * from "./calculators/xb/wrappers";
+export * from "./calculators/us/payroll";
+export * from "./calculators/us/limits";
+export * from "./calculators/us/state";
 
 import * as iePayrollMod from "./calculators/ie/payroll";
 import * as iePension from "./calculators/ie/pensionRelief";
@@ -32,6 +37,8 @@ import * as ukAa from "./calculators/uk/annualAllowance";
 import * as ukPayslip from "./calculators/uk/payslip";
 import * as xbRetire from "./calculators/xb/retirement";
 import * as xbWrap from "./calculators/xb/wrappers";
+import * as usPayrollMod from "./calculators/us/payroll";
+import * as usLimits from "./calculators/us/limits";
 
 /** Namespaced calculators, as named in the spec: ie.payroll, uk.isaAllowance, xb.classify, ... */
 export const ie = {
@@ -57,4 +64,5 @@ export const uk = {
   payslipCheck: ukPayslip.ukPayslipCheck,
   statePension: xbRetire.ukStatePensionEstimate,
 };
+export const us = { payroll: usPayrollMod.usPayroll, retirementLimits: usLimits.usRetirementLimits, estimatedTax: usLimits.usEstimatedTax };
 export const xb = { classify: xbMod.classify, projectRetirement: xbRetire.projectRetirement, compareWrappers: xbWrap.compareWrappers };

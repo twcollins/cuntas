@@ -1,0 +1,30 @@
+# Delaware personal income tax, 2026: the same brackets for every filing status (30 Del. C. 1102,
+# unchanged since 2014), the standard deduction plus $2,500 for 65+ (1108), and a $110 personal
+# credit per person, $110 more at 60 or over (modelled at 65). Wilmington's city wage tax isn't included.
+kind: usState
+state: DE
+parent: US
+taxYear: "2026"
+version: "US-DE-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://delcode.delaware.gov/title30/c011/sc01/index.html
+  - https://delcode.delaware.gov/title30/c011/sc02/index.html
+  - https://revenue.delaware.gov/employers-guide-withholding-regulations-employers-duties/
+incomeTax:
+  source: https://delcode.delaware.gov/title30/c011/sc01/index.html
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 2000, rate: 0 }, { upTo: 5000, rate: 0.022 }, { upTo: 10000, rate: 0.039 }, { upTo: 20000, rate: 0.048 }, { upTo: 25000, rate: 0.052 }, { upTo: 60000, rate: 0.0555 }, { upTo: null, rate: 0.066 }]
+    marriedJoint: [{ upTo: 2000, rate: 0 }, { upTo: 5000, rate: 0.022 }, { upTo: 10000, rate: 0.039 }, { upTo: 20000, rate: 0.048 }, { upTo: 25000, rate: 0.052 }, { upTo: 60000, rate: 0.0555 }, { upTo: null, rate: 0.066 }]
+    marriedSeparate: [{ upTo: 2000, rate: 0 }, { upTo: 5000, rate: 0.022 }, { upTo: 10000, rate: 0.039 }, { upTo: 20000, rate: 0.048 }, { upTo: 25000, rate: 0.052 }, { upTo: 60000, rate: 0.0555 }, { upTo: null, rate: 0.066 }]
+    headOfHousehold: [{ upTo: 2000, rate: 0 }, { upTo: 5000, rate: 0.022 }, { upTo: 10000, rate: 0.039 }, { upTo: 20000, rate: 0.048 }, { upTo: 25000, rate: 0.052 }, { upTo: 60000, rate: 0.0555 }, { upTo: null, rate: 0.066 }]
+  standardDeduction: { single: 3250, marriedJoint: 6500, marriedSeparate: 3250, headOfHousehold: 3250 }
+  exemption: { perFiler: 0, perDependent: 0, perAged: 2500 }
+  exemptionCredit: { perFiler: 110, perDependent: 110, perAged: 110 }
+  notes:
+    - "Delaware's earned income credit and pension exclusions aren't included."
+localTax:
+  source: https://revenue.delaware.gov/employers-guide-withholding-regulations-employers-duties/
+  note: "Wilmington levies a city wage tax."

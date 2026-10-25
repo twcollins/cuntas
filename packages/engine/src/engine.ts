@@ -1,4 +1,5 @@
-import { applyRate, chartDefaults, formatRate, onDate, pensionReliefHeadroom, type ChartDefaults, type IePack } from "@cuntas/rules";
+import { applyRate, chartDefaults, formatRate, onDate, pensionReliefHeadroom, type ChartDefaults, type IePack, type RulePack, type UsPack } from "@cuntas/rules";
+import { US_STEPS, usOptions } from "./steps/us";
 import { IE_STEPS } from "./steps/ie";
 import { money, render } from "./helpers";
 import type {
@@ -20,7 +21,7 @@ function isDismissed(s: HouseholdSnapshot, checkId: string, member?: MemberState
   return s.dismissed.some((d) => (d.stepId === checkId || checkId.startsWith(`${d.stepId}.`)) && (!d.memberId || d.memberId === member?.id));
 }
 
-function toCard(step: StepDefinition, check: CheckDefinition, ctx: EvalContext): NextStepCard {
+function toCard<P extends RulePack>(step: StepDefinition<P>, check: CheckDefinition<P>, ctx: EvalContext<P>): NextStepCard {
   const vars = check.vars(ctx);
   const deadline = check.deadline?.(ctx);
   return {
@@ -83,12 +84,32 @@ function options(ctx: EvalContext): OptionCard[] {
   return out;
 }
 
-/** Evaluates the ladder. Output is a pure function of the snapshot, rule pack and chart defaults. */
+/** Evaluates the Irish ladder (also used for UK and mixed households). Output is a pure function of the snapshot, rule pack and chart defaults. */
 export function evaluate(
   snapshot: HouseholdSnapshot,
   pack: IePack,
   chart: ChartDefaults = chartDefaults(),
   steps: readonly StepDefinition[] = IE_STEPS,
+): EngineResult {
+  return runLadder(snapshot, pack, chart, steps, options);
+}
+
+/** Evaluates the US ladder, for a household where everyone lives in the US. */
+export function evaluateUs(
+  snapshot: HouseholdSnapshot,
+  pack: UsPack,
+  chart: ChartDefaults = chartDefaults("US"),
+  steps: readonly StepDefinition<UsPack>[] = US_STEPS,
+): EngineResult {
+  return runLadder(snapshot, pack, chart, steps, usOptions);
+}
+
+function runLadder<P extends RulePack>(
+  snapshot: HouseholdSnapshot,
+  pack: P,
+  chart: ChartDefaults,
+  steps: readonly StepDefinition<P>[],
+  optionsFor: (ctx: EvalContext<P>) => OptionCard[],
 ): EngineResult {
   const ladder: LadderRow[] = [];
   let current: NextStepCard | null = null;
@@ -100,7 +121,7 @@ export function evaluate(
     let stepUnmetCard: NextStepCard | null = null;
 
     for (const member of targets) {
-      const ctx: EvalContext = { snapshot, member, pack, chart };
+      const ctx: EvalContext<P> = { snapshot, member, pack, chart };
       if (step.appliesWhen && !step.appliesWhen(ctx)) continue;
       let blocked = false; // sub-checks are ordered: later ones wait for earlier ones
       for (const check of step.checks) {
@@ -131,12 +152,12 @@ export function evaluate(
   }
 
   // An always-on card that is also the first unmet step shows once, as the current step.
-  const ctx: EvalContext = { snapshot, pack, chart };
+  const ctx: EvalContext<P> = { snapshot, pack, chart };
   return {
     current,
     alwaysOn,
     ladder,
-    options: current ? [] : options(ctx),
+    options: current ? [] : optionsFor(ctx),
     rulePack: pack.version,
     chart: chart.version,
     disclaimer: DISCLAIMER,

@@ -3,8 +3,10 @@ import { memberPay, newId, newMember, type Member, type ResidencePeriod } from "
 import { StudentLoanPicker } from "./tax/StudentLoanPicker";
 import { Badge, Button, Card, Field, Input, Modal, MoneyInput, PageHeader, Select } from "../components/ui";
 import { useAsOf } from "../lib/derived";
-import { formatDate, money } from "../lib/format";
+import { currencyOptions, formatDate, money, taxCountryOptions, usFilingOptions, usStateOptions } from "../lib/format";
+import { homeOf } from "../lib/region";
 import { update, useDataset } from "../lib/store";
+import { COUNTRIES, COUNTRY_INFO, packOn, statePackFor, today, US_STATES, type Currency, type Jurisdiction } from "@cuntas/rules";
 
 export function HouseholdPage() {
   const ds = useDataset();
@@ -14,7 +16,7 @@ export function HouseholdPage() {
   const setSettings = (patch: Partial<typeof s>) => update((d) => ({ ...d, household: { ...d.household, settings: { ...d.household.settings, ...patch } } }));
   return (
     <div>
-      <PageHeader title="Household" subtitle="The people in this plan, their residence, and the settings the planner uses. To add another household or share this one, go to Households." actions={<Button variant="primary" onClick={() => setEditing(newMember({ id: newId("m"), name: "", dateOfBirth: "1990-01-01" }))}>Add person</Button>} />
+      <PageHeader title="Household" subtitle="The people in this plan, their residence, and the settings the planner uses. To add another household or share this one, go to Households." actions={<Button variant="primary" onClick={() => setEditing(newMember({ id: newId("m"), name: "", dateOfBirth: "1990-01-01", nationality: [homeOf(ds)] }))}>Add person</Button>} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="People in this plan">
           {ds.members.length === 0 && <p className="text-sm text-stone-500">Add yourself to get take-home pay, pension and next-step figures.</p>}
@@ -27,11 +29,11 @@ export function HouseholdPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{m.name}</div>
-                      <div className="text-xs text-stone-500">Born {formatDate(m.dateOfBirth)} · {m.nationality.join(", ")} national · {m.employmentType}</div>
+                      <div className="text-xs text-stone-500">Born {formatDate(m.dateOfBirth)} · {m.nationality.map((n) => COUNTRY_INFO[n].adjective).join(", ")} national · {m.employmentType}</div>
                     </div>
                     <Button variant="ghost" onClick={() => setEditing(m)}>Edit</Button>
                   </div>
-                  {m.grossAnnualMinor > 0 && <div className="mt-1 text-sm">Gross {money(m.grossAnnualMinor, pay.currency)} → net {money(pay.netAnnualMinor, pay.currency)} a year <Badge>{pay.pack}</Badge></div>}
+                  {m.grossAnnualMinor > 0 && <div className="mt-1 text-sm">Gross {money(m.grossAnnualMinor, pay.currency)} → net {money(pay.netAnnualMinor, pay.currency)} a year <Badge>{pay.pack}</Badge>{pay.currency === "USD" && <StateNote state={m.usState} />}</div>}
                   <div className="mt-1 flex flex-wrap gap-1 text-xs">
                     {periods.map((r) => <Badge key={r.id} tone="info">{r.jurisdiction} resident {formatDate(r.from)} – {r.to ? formatDate(r.to) : "now"}</Badge>)}
                   </div>
@@ -43,7 +45,7 @@ export function HouseholdPage() {
         <Card title="Household settings">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Name">{(id) => <Input id={id} value={ds.household.name} onChange={(e) => update((d) => ({ ...d, household: { ...d.household, name: e.target.value } }))} />}</Field>
-            <Field label="Base currency">{(id) => <Select id={id} value={ds.household.baseCurrency} onChange={(e) => update((d) => ({ ...d, household: { ...d.household, baseCurrency: e.target.value as "EUR" | "GBP" } }))} options={[{ value: "EUR", label: "EUR" }, { value: "GBP", label: "GBP" }]} />}</Field>
+            <Field label="Base currency">{(id) => <Select id={id} value={ds.household.baseCurrency} onChange={(e) => update((d) => ({ ...d, household: { ...d.household, baseCurrency: e.target.value as Currency } }))} options={currencyOptions()} />}</Field>
             <Field label="Payday (day of month)" hint="Budget periods run from payday.">{(id) => <Input id={id} type="number" min={1} max={28} value={s.paydayDayOfMonth} onChange={(e) => setSettings({ paydayDayOfMonth: Math.min(28, Math.max(1, Number(e.target.value))) })} />}</Field>
             <Field label="Children">{(id) => <Input id={id} type="number" min={0} value={s.children} onChange={(e) => setSettings({ children: Math.max(0, Number(e.target.value)) })} />}</Field>
           </div>
@@ -75,7 +77,7 @@ function MemberForm({ member, onDone }: { member: Member; onDone: () => void }) 
   const [m, setM] = useState(member);
   const exists = ds.members.some((x) => x.id === m.id);
   const [periods, setPeriods] = useState<ResidencePeriod[]>(ds.residencePeriods.filter((r) => r.memberId === m.id));
-  if (!exists && periods.length === 0) periods.push({ id: newId("rp"), memberId: m.id, jurisdiction: "IE", from: m.dateOfBirth, to: null, declaredBy: "user" });
+  if (!exists && periods.length === 0) periods.push({ id: newId("rp"), memberId: m.id, jurisdiction: homeOf(ds), from: m.dateOfBirth, to: null, declaredBy: "user" });
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
@@ -98,17 +100,26 @@ function MemberForm({ member, onDone }: { member: Member; onDone: () => void }) 
           <StudentLoanPicker value={m.studentLoans} onChange={(studentLoans) => setM({ ...m, studentLoans })} />
         </div>
       </details>
+      <details className="rounded-lg border border-stone-200 p-3 text-sm dark:border-stone-800">
+        <summary className="cursor-pointer text-xs font-medium text-stone-600 dark:text-stone-400">US tax details (used while US resident)</summary>
+        <div className="mt-3 space-y-3">
+          <Field label="State" hint="Where you live for state income tax. Local (city or county) income taxes aren't included.">{(id) => <Select id={id} value={m.usState ?? ""} onChange={(e) => setM({ ...m, usState: (e.target.value || null) as Member["usState"], usLocality: null })} options={usStateOptions("Not chosen (federal only)")} />}</Field>
+          <LocalityField state={m.usState} value={m.usLocality} onChange={(usLocality) => setM({ ...m, usLocality })} />
+          <Field label="Filing status" hint="A joint return includes a spouse who also lives in the US. Children count on joint and head-of-household returns. Federal tax only.">{(id) => <Select id={id} value={m.usFilingStatus} onChange={(e) => setM({ ...m, usFilingStatus: e.target.value as Member["usFilingStatus"] })} options={usFilingOptions()} />}</Field>
+          <Field label="HSA-eligible health plan" hint="A high-deductible plan that allows HSA contributions.">{(id) => <Select id={id} value={m.usHsaCoverage} onChange={(e) => setM({ ...m, usHsaCoverage: e.target.value as Member["usHsaCoverage"] })} options={[{ value: "none", label: "None" }, { value: "selfOnly", label: "Yes, self-only coverage" }, { value: "family", label: "Yes, family coverage" }]} />}</Field>
+        </div>
+      </details>
       <fieldset className="text-sm">
-        <legend className="mb-1 text-xs font-medium text-stone-600 dark:text-stone-400">Nationality (matters for UK government pensions, DTA Art. 18)</legend>
-        {(["IE", "UK"] as const).map((n) => (
-          <label key={n} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" checked={m.nationality.includes(n)} onChange={(e) => setM({ ...m, nationality: e.target.checked ? [...m.nationality, n] : m.nationality.filter((x) => x !== n) })} />{n === "IE" ? "Irish" : "British"}</label>
+        <legend className="mb-1 text-xs font-medium text-stone-600 dark:text-stone-400">Nationality (matters for government pensions, and the US taxes its citizens wherever they live)</legend>
+        {COUNTRIES.map((n) => (
+          <label key={n} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" checked={m.nationality.includes(n)} onChange={(e) => setM({ ...m, nationality: e.target.checked ? [...m.nationality, n] : m.nationality.filter((x) => x !== n) })} />{COUNTRY_INFO[n].adjective}</label>
         ))}
       </fieldset>
       <div>
         <div className="mb-1 text-xs font-medium text-stone-600">Tax residence, as you declare it</div>
         {periods.map((r, i) => (
           <div key={r.id} className="mb-2 grid grid-cols-[1fr_1fr_1fr_auto] gap-2">
-            <Select aria-label="Country" value={r.jurisdiction} onChange={(e) => setPeriods(periods.map((x, j) => (j === i ? { ...x, jurisdiction: e.target.value as "IE" | "UK" } : x)))} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />
+            <Select aria-label="Country" value={r.jurisdiction} onChange={(e) => setPeriods(periods.map((x, j) => (j === i ? { ...x, jurisdiction: e.target.value as Jurisdiction } : x)))} options={taxCountryOptions()} />
             <Input aria-label="From" type="date" value={r.from} onChange={(e) => setPeriods(periods.map((x, j) => (j === i ? { ...x, from: e.target.value } : x)))} />
             <Input aria-label="To" type="date" value={r.to ?? ""} onChange={(e) => setPeriods(periods.map((x, j) => (j === i ? { ...x, to: e.target.value || null } : x)))} />
             <Button variant="ghost" aria-label="Remove period" onClick={() => setPeriods(periods.filter((_, j) => j !== i))}>✕</Button>
@@ -127,3 +138,25 @@ function MemberForm({ member, onDone }: { member: Member; onDone: () => void }) 
     </div>
   );
 }
+
+/** For a US member: which state's tax is in take-home, or why none is. */
+function StateNote({ state }: { state: Member["usState"] }) {
+  const year = packOn("US", today()).taxYear;
+  if (!state) return <span className="ml-1 text-xs text-stone-500">Federal only: choose a state</span>;
+  const sp = statePackFor(state, year);
+  if (!sp) return <span className="ml-1 text-xs text-amber-700 dark:text-amber-300">Federal only: no {US_STATES[state]} figures yet</span>;
+  return <Badge>{sp.pack.version}</Badge>;
+}
+
+/** County (or city) picker, shown only when the state's pack carries local rates. */
+function LocalityField({ state, value, onChange }: { state: Member["usState"]; value: string | null; onChange: (v: string | null) => void }) {
+  const loc = state ? statePackFor(state, packOn("US", today()).taxYear)?.pack.localities : undefined;
+  if (!loc) return null;
+  const label = loc.kind.charAt(0).toUpperCase() + loc.kind.slice(1);
+  return (
+    <Field label={label} hint={`For ${loc.kind} income tax, set by where you live on January 1.`}>
+      {(id) => <Select id={id} value={value ?? ""} onChange={(e) => onChange(e.target.value || null)} options={[{ value: "", label: "Not chosen" }, ...loc.list.map((l) => ({ value: l.id, label: `${l.name} (${(l.rate * 100).toFixed(2).replace(/0$/, "")}%)` }))]} />}
+    </Field>
+  );
+}
+

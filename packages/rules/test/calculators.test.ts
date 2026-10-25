@@ -22,6 +22,8 @@ import {
   ukNiGapCheck,
   ukPayroll,
   ukSavingsTax,
+  treaty,
+  treatyFor,
 } from "../src";
 
 const ie26 = getPack("IE", "2026");
@@ -209,5 +211,79 @@ describe("xb.classify", () => {
     const c = classify({ kind: "employment", workCountry: "UK", homeWorkdays: 12 }, ieResident, "2026");
     expect(c.flags).toEqual(["trans-border-relief-check", "home-workdays-may-lose-relief"]);
     expect(c.reference.ref).toBe("TCA 1997 s.825A");
+  });
+
+  describe("moving to the US", () => {
+    const usResident = { residence: "US", nationality: ["IE"], counterpart: "IE" } as const;
+    it("Irish and UK private pensions are taxable only in the US", () => {
+      const ie = classify({ kind: "privatePension", sourceCountry: "IE" }, usResident, "2026");
+      expect(ie.taxedBy).toEqual(["US"]);
+      expect(ie.method).toBe("residence-only");
+      expect(ie.reference.ref).toBe("IE–US DTA Art. 18(1)(a)");
+      const uk = classify({ kind: "privatePension", sourceCountry: "UK" }, { ...usResident, counterpart: "UK" }, "2026");
+      expect(uk.taxedBy).toEqual(["US"]);
+      expect(uk.flags).toContain("claim-hmrc-relief-at-source");
+      expect(uk.notes.join(" ")).toContain("Art. 17(2)");
+    });
+    it("state pensions follow the social security article", () => {
+      expect(classify({ kind: "statePension", sourceCountry: "IE" }, usResident, "2026").reference.ref).toBe("IE–US DTA Art. 18(1)(b)");
+      expect(classify({ kind: "statePension", sourceCountry: "UK" }, usResident, "2026").reference.ref).toBe("UK–US DTC Art. 17(3)");
+    });
+    it("an ISA is taxable in the US and its funds are flagged as PFICs", () => {
+      const c = classify({ kind: "isa" }, usResident, "2026");
+      expect(c.taxedBy).toEqual(["US"]);
+      expect(c.method).toBe("taxable-no-wrapper-exemption");
+      expect(c.flags).toEqual(["isa-not-exempt", "check-pfic-funds"]);
+    });
+    it("keeping an Irish job is taxed in Ireland with a US credit", () => {
+      const c = classify({ kind: "employment", workCountry: "IE" }, usResident, "2026");
+      expect(c.taxedBy).toEqual(["IE", "US"]);
+      expect(c.method).toBe("source-with-credit");
+      expect(c.reference.ref).toBe("IE–US DTA Art. 24");
+    });
+    it("a job in the US is domestic, under the treaty with the country left", () => {
+      const c = classify({ kind: "employment", workCountry: "US" }, usResident, "2026");
+      expect(c).toMatchObject({ taxedBy: ["US"], method: "domestic" });
+      expect(c.reference.ref).toBe("IE–US DTA Art. 15");
+    });
+    it("interest on an Irish account is taxable in the US and the account is reportable", () => {
+      const c = classify({ kind: "deposit", accountCountry: "IE" }, usResident, "2026");
+      expect(c.taxedBy).toEqual(["US"]);
+      expect(c.notes).toContain("Interest on an Irish account is taxable in US; declare it on your return.");
+      expect(c.flags).toEqual(["foreign-deposit-declare", "us-foreign-account-reporting"]);
+    });
+  });
+
+  describe("US citizens living in Ireland or the UK", () => {
+    const american = { residence: "IE", nationality: ["US", "IE"] } as const;
+    it("the US taxes their income too (saving clause)", () => {
+      const c = classify({ kind: "deposit", accountCountry: "IE" }, american, "2026");
+      expect(c.taxedBy).toEqual(["IE", "US"]);
+      expect(c.flags).toContain("us-citizen-worldwide");
+      expect(c.notes.join(" ")).toContain("IE–US DTA Art. 1(4)");
+      expect(classify({ kind: "isa" }, { residence: "UK", nationality: ["US"] }, "2026").taxedBy).toEqual(["US"]);
+    });
+    it("but not state pensions, which the saving clause leaves out", () => {
+      expect(classify({ kind: "statePension", sourceCountry: "UK" }, american, "2026").taxedBy).toEqual(["IE"]);
+    });
+    it("other nationalities are unchanged", () => {
+      expect(classify({ kind: "deposit", accountCountry: "IE" }, ieResident, "2026").taxedBy).toEqual(["IE"]);
+    });
+  });
+});
+
+describe("treaty packs", () => {
+  it("has a pack for each pair of countries, every reference sourced", () => {
+    for (const [a, b] of [["IE", "UK"], ["IE", "US"], ["UK", "US"]] as const) {
+      const t = treatyFor(a, b);
+      expect(treatyFor(b, a)).toBe(t);
+      for (const r of Object.values(t.articles)) expect(r.source).toMatch(/^https:\/\//);
+    }
+    for (const a of ["IE", "UK"] as const) {
+      const notes = treatyFor(a, "US").relocation?.toUS ?? [];
+      expect(notes.length).toBeGreaterThan(0);
+      for (const n of notes) expect(n.source).toMatch(/^https:\/\//);
+    }
+    expect(treaty()).toBe(treatyFor("IE", "UK"));
   });
 });

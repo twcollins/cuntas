@@ -1,0 +1,25 @@
+# Arkansas individual income tax, 2026 (top rate 3.7% back to January 1, 2026, HB 1001; 2026
+# withholding formula). The small per-$100 adjustments near $95,000-97,600 and the low-income tax
+# tables aren't modelled. $29 exemption credits per person and per filer 65+.
+kind: usState
+state: AR
+parent: US
+taxYear: "2026"
+version: "US-AR-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.dfa.arkansas.gov/wp-content/uploads/Withholding-Tax-Formula.pdf
+  - https://www.dfa.arkansas.gov/wp-content/uploads/2025_AR1000F_and_AR1000NR_Instructions.pdf
+incomeTax:
+  source: https://www.dfa.arkansas.gov/wp-content/uploads/Withholding-Tax-Formula.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 5599, rate: 0 }, { upTo: 11199, rate: 0.02 }, { upTo: 15999, rate: 0.03 }, { upTo: 26399, rate: 0.034 }, { upTo: null, rate: 0.037 }]
+    marriedJoint: [{ upTo: 5599, rate: 0 }, { upTo: 11199, rate: 0.02 }, { upTo: 15999, rate: 0.03 }, { upTo: 26399, rate: 0.034 }, { upTo: null, rate: 0.037 }]
+    marriedSeparate: [{ upTo: 5599, rate: 0 }, { upTo: 11199, rate: 0.02 }, { upTo: 15999, rate: 0.03 }, { upTo: 26399, rate: 0.034 }, { upTo: null, rate: 0.037 }]
+    headOfHousehold: [{ upTo: 5599, rate: 0 }, { upTo: 11199, rate: 0.02 }, { upTo: 15999, rate: 0.03 }, { upTo: 26399, rate: 0.034 }, { upTo: null, rate: 0.037 }]
+  standardDeduction: { single: 2470, marriedJoint: 4940, marriedSeparate: 2470, headOfHousehold: 2470 }
+  exemptionCredit: { perFiler: 29, perDependent: 29, perAged: 29 }
+  notes:
+    - "Arkansas's low-income tax tables and additional tax credit for qualified individuals aren't included."

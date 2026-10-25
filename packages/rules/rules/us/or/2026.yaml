@@ -1,0 +1,40 @@
+# Oregon personal income tax, 2026: the department's estimated 2026 figures (OR-ESTIMATE). Federal
+# income tax is deductible up to $8,750, stepping down at higher incomes (2026 withholding steps; the
+# married-filing-separately cap is taken as half: check). Exemption credits of $260 stop above
+# $100,000 / $200,000 AGI. The 65+ extra standard deduction is 2025's. The statewide transit tax is
+# 0.1% of wages.
+kind: usState
+state: OR
+parent: US
+taxYear: "2026"
+version: "US-OR-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.oregon.gov/dor/forms/FormsPubs/publication-or-estimate_101-026_2026.pdf
+  - https://www.oregon.gov/dor/forms/FormsPubs/withholding-tax-formulas_206-436_2026.pdf
+  - https://www.oregon.gov/dor/programs/businesses/Pages/statewide-transit-tax.aspx
+incomeTax:
+  source: https://www.oregon.gov/dor/forms/FormsPubs/publication-or-estimate_101-026_2026.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 4550, rate: 0.0475 }, { upTo: 11400, rate: 0.0675 }, { upTo: 125000, rate: 0.0875 }, { upTo: null, rate: 0.099 }]
+    marriedJoint: [{ upTo: 9100, rate: 0.0475 }, { upTo: 22800, rate: 0.0675 }, { upTo: 250000, rate: 0.0875 }, { upTo: null, rate: 0.099 }]
+    marriedSeparate: [{ upTo: 4550, rate: 0.0475 }, { upTo: 11400, rate: 0.0675 }, { upTo: 125000, rate: 0.0875 }, { upTo: null, rate: 0.099 }]
+    headOfHousehold: [{ upTo: 9100, rate: 0.0475 }, { upTo: 22800, rate: 0.0675 }, { upTo: 250000, rate: 0.0875 }, { upTo: null, rate: 0.099 }]
+  standardDeduction: { single: 2900, marriedJoint: 5800, marriedSeparate: 2900, headOfHousehold: 4650 }
+  agedStandardDeduction: { married: 1000, unmarried: 1200 }
+  exemptionCredit: { perFiler: 260, perDependent: 260, incomeLimit: { single: 100000, marriedJoint: 200000, marriedSeparate: 100000, headOfHousehold: 200000 } }
+  federalTaxDeduction:
+    capByAgi:
+      single: [{ upTo: 125000, amount: 8750 }, { upTo: 130000, amount: 7000 }, { upTo: 135000, amount: 5250 }, { upTo: 140000, amount: 3500 }, { upTo: 145000, amount: 1750 }, { upTo: null, amount: 0 }]
+      marriedJoint: [{ upTo: 250000, amount: 8750 }, { upTo: 260000, amount: 7000 }, { upTo: 270000, amount: 5250 }, { upTo: 280000, amount: 3500 }, { upTo: 290000, amount: 1750 }, { upTo: null, amount: 0 }]
+      marriedSeparate: [{ upTo: 125000, amount: 4375 }, { upTo: 130000, amount: 3500 }, { upTo: 135000, amount: 2625 }, { upTo: 140000, amount: 1750 }, { upTo: 145000, amount: 875 }, { upTo: null, amount: 0 }]
+      headOfHousehold: [{ upTo: 250000, amount: 8750 }, { upTo: 260000, amount: 7000 }, { upTo: 270000, amount: 5250 }, { upTo: 280000, amount: 3500 }, { upTo: 290000, amount: 1750 }, { upTo: null, amount: 0 }]
+  wageLevy: { name: "statewide transit tax", rate: 0.001 }
+  notes:
+    - "Oregon's earned income credit and Oregon Kids Credit aren't included."
+    - "Social Security isn't taxed in Oregon."
+localTax:
+  source: https://www.oregon.gov/dor/programs/businesses/Pages/statewide-transit-tax.aspx
+  note: "Portland Metro and Multnomah County tax high incomes, and some transit districts tax self-employment income."

@@ -1,0 +1,33 @@
+# California personal income tax. 2026 inflation-adjusted figures come out in late December, so
+# these are 2025's (2025 Form 540 booklet and rate schedules). The top band includes the 1%
+# Behavioral Health Services Tax on taxable income over $1 million (not doubled for joint returns).
+# Exemptions are credits: $153 per filer and per filer 65+, $475 per dependent, each cut by $6 per
+# $2,500 of AGI over the threshold.
+kind: usState
+state: CA
+parent: US
+taxYear: "2026"
+version: "US-CA-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.ftb.ca.gov/forms/2025/2025-540-tax-rate-schedules.pdf
+  - https://www.ftb.ca.gov/forms/2025/2025-540-booklet.pdf
+incomeTax:
+  source: https://www.ftb.ca.gov/forms/2025/2025-540-tax-rate-schedules.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 11079, rate: 0.01 }, { upTo: 26264, rate: 0.02 }, { upTo: 41452, rate: 0.04 }, { upTo: 57542, rate: 0.06 }, { upTo: 72724, rate: 0.08 }, { upTo: 371479, rate: 0.093 }, { upTo: 445771, rate: 0.103 }, { upTo: 742953, rate: 0.113 }, { upTo: 1000000, rate: 0.123 }, { upTo: null, rate: 0.133 }]
+    marriedJoint: [{ upTo: 22158, rate: 0.01 }, { upTo: 52528, rate: 0.02 }, { upTo: 82904, rate: 0.04 }, { upTo: 115084, rate: 0.06 }, { upTo: 145448, rate: 0.08 }, { upTo: 742958, rate: 0.093 }, { upTo: 891542, rate: 0.103 }, { upTo: 1000000, rate: 0.113 }, { upTo: 1485906, rate: 0.123 }, { upTo: null, rate: 0.133 }]
+    marriedSeparate: [{ upTo: 11079, rate: 0.01 }, { upTo: 26264, rate: 0.02 }, { upTo: 41452, rate: 0.04 }, { upTo: 57542, rate: 0.06 }, { upTo: 72724, rate: 0.08 }, { upTo: 371479, rate: 0.093 }, { upTo: 445771, rate: 0.103 }, { upTo: 742953, rate: 0.113 }, { upTo: 1000000, rate: 0.123 }, { upTo: null, rate: 0.133 }]
+    headOfHousehold: [{ upTo: 22173, rate: 0.01 }, { upTo: 52530, rate: 0.02 }, { upTo: 67716, rate: 0.04 }, { upTo: 83805, rate: 0.06 }, { upTo: 98990, rate: 0.08 }, { upTo: 505208, rate: 0.093 }, { upTo: 606251, rate: 0.103 }, { upTo: 1000000, rate: 0.113 }, { upTo: 1010417, rate: 0.123 }, { upTo: null, rate: 0.133 }]
+  standardDeduction: { single: 5706, marriedJoint: 11412, marriedSeparate: 5706, headOfHousehold: 11412 }
+  exemptionCredit:
+    perFiler: 153
+    perDependent: 475
+    perAged: 153
+    phaseOut: { from: { single: 252203, marriedJoint: 504411, marriedSeparate: 252203, headOfHousehold: 378310 }, step: { single: 2500, marriedJoint: 2500, marriedSeparate: 1250, headOfHousehold: 2500 }, reductionPerStep: 6 }
+  renterCredit: { amount: { single: 60, marriedJoint: 120, marriedSeparate: 60, headOfHousehold: 120 }, incomeLimit: { single: 53994, marriedJoint: 107988, marriedSeparate: 53994, headOfHousehold: 107988 } }
+  notes:
+    - "California's earned income tax credit and young child tax credit aren't included."
+    - "Social Security isn't taxed in California."

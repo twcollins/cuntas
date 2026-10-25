@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { newId, residenceOn, type Payslip } from "@cuntas/ledger";
-import { ageOn, iePayslipCheck, packOn, ukPayslipCheck, type PayslipFinding } from "@cuntas/rules";
+import { ageOn, iePayslipCheck, type Jurisdiction, packOn, type PayslipFinding, ukPayslipCheck } from "@cuntas/rules";
 import { Badge, Button, Card, Field, Input, Modal, MoneyInput, Select, Why } from "../../components/ui";
 import { useAsOf } from "../../lib/derived";
-import { formatDate, moneyExact } from "../../lib/format";
+import { formatDate, moneyExact, taxCountryOptions } from "../../lib/format";
 import { update, useDataset } from "../../lib/store";
 
 /** Differences below this are rounding, not errors. */
@@ -13,6 +13,7 @@ const TONE: Record<PayslipFinding["severity"], "good" | "info" | "warn" | "bad">
 
 function check(p: Payslip, ds: ReturnType<typeof useDataset>) {
   const m = ds.members.find((x) => x.id === p.memberId);
+  if (p.jurisdiction === "US") return { pack: "", findings: [], notes: ["US payslips can't be checked yet."], rows: [] as [string, number, number][] };
   if (p.jurisdiction === "IE") {
     const r = iePayslipCheck(packOn("IE", p.payDate), {
       frequency: p.frequency, payDate: p.payDate, grossPeriodMinor: p.grossMinor, incomeTaxMinor: p.incomeTaxMinor, uscMinor: p.uscMinor, prsiMinor: p.prsiMinor,
@@ -33,7 +34,8 @@ export function PayslipCheckCard() {
   const [editing, setEditing] = useState<Payslip | null>(null);
   const blank = (): Payslip => {
     const m = ds.members[0];
-    const j = m ? residenceOn(ds, m.id, asOf) : "IE";
+    // Payslip checks cover Ireland and the UK.
+    const j = m && residenceOn(ds, m.id, asOf) === "UK" ? "UK" : "IE";
     return { id: newId("ps"), memberId: m?.id ?? "", jurisdiction: j, payDate: asOf, frequency: m?.payFrequency ?? "monthly", currency: j === "UK" ? "GBP" : "EUR", grossMinor: m ? Math.round(m.grossAnnualMinor / 12) : 0, incomeTaxMinor: 0, uscMinor: 0, prsiMinor: 0, niMinor: 0, studentLoanMinor: 0, taxCode: "", pensionMinor: 0 };
   };
   return (
@@ -92,7 +94,7 @@ function PayslipForm({ slip, onDone }: { slip: Payslip; onDone: () => void }) {
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <Field label="Member">{(id) => <Select id={id} value={p.memberId} onChange={(e) => setP({ ...p, memberId: e.target.value })} options={ds.members.map((m) => ({ value: m.id, label: m.name }))} />}</Field>
-        <Field label="Country">{(id) => <Select id={id} value={p.jurisdiction} onChange={(e) => setP({ ...p, jurisdiction: e.target.value as "IE" | "UK", currency: e.target.value === "UK" ? "GBP" : "EUR" })} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />}</Field>
+        <Field label="Country">{(id) => <Select id={id} value={p.jurisdiction} onChange={(e) => setP({ ...p, jurisdiction: e.target.value as Jurisdiction, currency: e.target.value === "UK" ? "GBP" : "EUR" })} options={taxCountryOptions().filter((o) => o.value !== "US")} />}</Field>
         <Field label="Pay date">{(id) => <Input id={id} type="date" value={p.payDate} onChange={(e) => setP({ ...p, payDate: e.target.value })} />}</Field>
         <Field label="Paid">{(id) => <Select id={id} value={p.frequency} onChange={(e) => setP({ ...p, frequency: e.target.value as Payslip["frequency"] })} options={[{ value: "monthly", label: "Monthly" }, { value: "fortnightly", label: "Fortnightly" }, { value: "weekly", label: "Weekly" }]} />}</Field>
         {money("grossMinor", "Gross pay this period")}

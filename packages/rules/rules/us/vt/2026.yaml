@@ -1,0 +1,25 @@
+# Vermont personal income tax, 2026: preliminary 2026 brackets (IN-114 instructions). The 2026
+# standard deduction and exemption aren't published, so 2025's are used: check.
+kind: usState
+state: VT
+parent: US
+taxYear: "2026"
+version: "US-VT-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://tax.vermont.gov/sites/tax/files/documents/IN-114-Instr-2026.pdf
+  - https://tax.vermont.gov/sites/tax/files/documents/IN-111-Instr-2025.pdf
+incomeTax:
+  source: https://tax.vermont.gov/sites/tax/files/documents/IN-114-Instr-2026.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 50750, rate: 0.0335, base: 0 }, { upTo: 122850, rate: 0.066, base: 1700 }, { upTo: 256300, rate: 0.076, base: 6459 }, { upTo: null, rate: 0.0875, base: 16601 }]
+    marriedJoint: [{ upTo: 84700, rate: 0.0335, base: 0 }, { upTo: 204750, rate: 0.066, base: 2837 }, { upTo: 312050, rate: 0.076, base: 10761 }, { upTo: null, rate: 0.0875, base: 18916 }]
+    marriedSeparate: [{ upTo: 42350, rate: 0.0335, base: 0 }, { upTo: 102375, rate: 0.066, base: 1419 }, { upTo: 156025, rate: 0.076, base: 5380 }, { upTo: null, rate: 0.0875, base: 9458 }]
+    headOfHousehold: [{ upTo: 68000, rate: 0.0335, base: 0 }, { upTo: 175500, rate: 0.066, base: 2278 }, { upTo: 284150, rate: 0.076, base: 9373 }, { upTo: null, rate: 0.0875, base: 17630 }]
+  standardDeduction: { single: 7650, marriedJoint: 15300, marriedSeparate: 7650, headOfHousehold: 11450 }
+  agedStandardDeduction: { married: 1250, unmarried: 1250 }
+  exemption: { perFiler: 5300, perDependent: 5300 }
+  notes:
+    - "Vermont's child tax credit, earned income credit and renter credit aren't included, nor its minimum tax above $150,000 AGI."

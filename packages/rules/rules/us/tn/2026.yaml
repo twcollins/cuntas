@@ -1,0 +1,13 @@
+# Tennessee: no personal income tax on wages in 2026.
+kind: usState
+state: TN
+parent: US
+taxYear: "2026"
+version: "US-TN-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.tn.gov/revenue/taxes/hall-income-tax.html
+incomeTax:
+  source: https://www.tn.gov/revenue/taxes/hall-income-tax.html
+  none: true

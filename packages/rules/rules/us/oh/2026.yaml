@@ -1,0 +1,44 @@
+# Ohio individual income tax, 2026 (H.B. 96; R.C. 5747.02(A)(3)(c)): no tax on taxable nonbusiness
+# income up to $26,050, then $332 plus 2.75% of the excess. Exemptions per person by income (2025
+# amounts; indexing suspended for 2026), none at $500,000 or more. Joint filing credit for couples
+# who both earn. Municipal and school district income taxes aren't included.
+kind: usState
+state: OH
+parent: US
+taxYear: "2026"
+version: "US-OH-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://codes.ohio.gov/assets/laws/revised-code/authenticated/57/5747/5747.02/9-30-2025/5747.02-9-30-2025.pdf
+  - https://codes.ohio.gov/ohio-revised-code/section-5747.025
+  - https://codes.ohio.gov/ohio-revised-code/section-5747.05
+incomeTax:
+  source: https://codes.ohio.gov/assets/laws/revised-code/authenticated/57/5747/5747.02/9-30-2025/5747.02-9-30-2025.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 26050, rate: 0, base: 0 }, { upTo: null, rate: 0.0275, base: 332 }]
+    marriedJoint: [{ upTo: 26050, rate: 0, base: 0 }, { upTo: null, rate: 0.0275, base: 332 }]
+    marriedSeparate: [{ upTo: 26050, rate: 0, base: 0 }, { upTo: null, rate: 0.0275, base: 332 }]
+    headOfHousehold: [{ upTo: 26050, rate: 0, base: 0 }, { upTo: null, rate: 0.0275, base: 332 }]
+  noTaxIfTaxableAtMost: 26050
+  exemption:
+    perFiler: 2400
+    perDependent: 2400
+    amountByAgi:
+      single: [{ upTo: 40000, amount: 2400 }, { upTo: 80000, amount: 2150 }, { upTo: 499999, amount: 1900 }, { upTo: null, amount: 0 }]
+      marriedJoint: [{ upTo: 40000, amount: 2400 }, { upTo: 80000, amount: 2150 }, { upTo: 499999, amount: 1900 }, { upTo: null, amount: 0 }]
+      marriedSeparate: [{ upTo: 40000, amount: 2400 }, { upTo: 80000, amount: 2150 }, { upTo: 499999, amount: 1900 }, { upTo: null, amount: 0 }]
+      headOfHousehold: [{ upTo: 40000, amount: 2400 }, { upTo: 80000, amount: 2150 }, { upTo: 499999, amount: 1900 }, { upTo: null, amount: 0 }]
+  # $20 per exemption when income less exemptions is under $30,000 (tested here on AGI).
+  exemptionCredit: { perFiler: 20, perDependent: 20, incomeLimit: { single: 30000, marriedJoint: 30000, marriedSeparate: 30000, headOfHousehold: 30000 } }
+  jointFilingCredit:
+    minEachIncome: 500
+    max: 650
+    rateByIncome: [{ upTo: 25000, rate: 0.2 }, { upTo: 50000, rate: 0.15 }, { upTo: 75000, rate: 0.1 }, { upTo: null, rate: 0.05 }]
+  notes:
+    - "Ohio's senior, retirement income and earned income credits aren't included."
+    - "Social Security isn't taxed in Ohio."
+localTax:
+  source: https://codes.ohio.gov/ohio-revised-code/section-5747.05
+  note: "Most Ohio cities and many school districts levy their own income tax."

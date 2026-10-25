@@ -1,0 +1,42 @@
+# Alabama individual income tax, 2026 (rates unchanged; 2026 withholding booklet). The standard
+# deduction steps down with AGI; dependent exemptions by AGI band; federal income tax is deductible
+# in full. City and county occupational taxes aren't included.
+kind: usState
+state: AL
+parent: US
+taxYear: "2026"
+version: "US-AL-2026.1"
+status: provisional
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.revenue.alabama.gov/wp-content/uploads/2026/01/whbooklet_0126.pdf
+  - https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40bk.pdf
+incomeTax:
+  source: https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40bk.pdf
+  base: federalAgi
+  brackets:
+    single: [{ upTo: 500, rate: 0.02 }, { upTo: 3000, rate: 0.04 }, { upTo: null, rate: 0.05 }]
+    marriedJoint: [{ upTo: 1000, rate: 0.02 }, { upTo: 6000, rate: 0.04 }, { upTo: null, rate: 0.05 }]
+    marriedSeparate: [{ upTo: 500, rate: 0.02 }, { upTo: 3000, rate: 0.04 }, { upTo: null, rate: 0.05 }]
+    headOfHousehold: [{ upTo: 500, rate: 0.02 }, { upTo: 3000, rate: 0.04 }, { upTo: null, rate: 0.05 }]
+  standardDeduction: { single: 3000, marriedJoint: 8500, marriedSeparate: 4250, headOfHousehold: 5200 }
+  standardDeductionSteps:
+    single: { from: 25999, step: 500, reduction: 25, min: 2500 }
+    marriedJoint: { from: 25999, step: 500, reduction: 175, min: 5000 }
+    marriedSeparate: { from: 12999, step: 250, reduction: 88, min: 2500 }
+    headOfHousehold: { from: 25999, step: 500, reduction: 135, min: 2500 }
+  exemption:
+    perFiler: 0
+    perDependent: 1000
+    byStatus: { single: 1500, marriedJoint: 3000, marriedSeparate: 1500, headOfHousehold: 3000 }
+    amountByAgi:
+      single: [{ upTo: 50000, amount: 1000 }, { upTo: 100000, amount: 500 }, { upTo: null, amount: 300 }]
+      marriedJoint: [{ upTo: 50000, amount: 1000 }, { upTo: 100000, amount: 500 }, { upTo: null, amount: 300 }]
+      marriedSeparate: [{ upTo: 50000, amount: 1000 }, { upTo: 100000, amount: 500 }, { upTo: null, amount: 300 }]
+      headOfHousehold: [{ upTo: 50000, amount: 1000 }, { upTo: 100000, amount: 500 }, { upTo: null, amount: 300 }]
+  federalTaxDeduction: {}
+  notes:
+    - "Social Security isn't taxed in Alabama."
+localTax:
+  source: https://www.revenue.alabama.gov/wp-content/uploads/2026/01/whbooklet_0126.pdf
+  note: "Some Alabama cities and counties (Birmingham among them) levy occupational taxes on wages."

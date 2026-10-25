@@ -1,0 +1,153 @@
+# United States federal tax, 2026 (calendar year). State and local income tax are not included.
+# You check these figures yourself each year: open each section's source and compare.
+jurisdiction: US
+taxYear: "2026"
+version: "US-2026.1"
+status: provisional
+currency: USD
+effective: { from: "2026-01-01", to: "2026-12-31" }
+sources:
+  - https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+  - https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill
+
+# Rev. Proc. 2025-32 section 4.01, Tables 1-4. Bands are on taxable income, after deductions.
+incomeTax:
+  source: https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+  brackets:
+    single:
+      - { upTo: 12400, rate: 0.10 }
+      - { upTo: 50400, rate: 0.12 }
+      - { upTo: 105700, rate: 0.22 }
+      - { upTo: 201775, rate: 0.24 }
+      - { upTo: 256225, rate: 0.32 }
+      - { upTo: 640600, rate: 0.35 }
+      - { upTo: null, rate: 0.37 }
+    marriedJoint:
+      - { upTo: 24800, rate: 0.10 }
+      - { upTo: 100800, rate: 0.12 }
+      - { upTo: 211400, rate: 0.22 }
+      - { upTo: 403550, rate: 0.24 }
+      - { upTo: 512450, rate: 0.32 }
+      - { upTo: 768700, rate: 0.35 }
+      - { upTo: null, rate: 0.37 }
+    marriedSeparate:
+      - { upTo: 12400, rate: 0.10 }
+      - { upTo: 50400, rate: 0.12 }
+      - { upTo: 105700, rate: 0.22 }
+      - { upTo: 201775, rate: 0.24 }
+      - { upTo: 256225, rate: 0.32 }
+      - { upTo: 384350, rate: 0.35 }
+      - { upTo: null, rate: 0.37 }
+    headOfHousehold:
+      - { upTo: 17700, rate: 0.10 }
+      - { upTo: 67450, rate: 0.12 }
+      - { upTo: 105700, rate: 0.22 }
+      - { upTo: 201750, rate: 0.24 }
+      - { upTo: 256200, rate: 0.32 }
+      - { upTo: 640600, rate: 0.35 }
+      - { upTo: null, rate: 0.37 }
+
+# Rev. Proc. 2025-32 section 4.14. The additional amount is per person aged 65 or over (or blind);
+# the higher figure applies to someone unmarried.
+standardDeduction:
+  source: https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+  single: 16100
+  marriedJoint: 32200
+  marriedSeparate: 16100
+  headOfHousehold: 24150
+  additionalAged: { age: 65, married: 1650, unmarried: 2050 }
+
+# One Big Beautiful Bill Act, 2025 to 2028: per person aged 65 or over, reduced by 6% of
+# modified AGI over the threshold.
+seniorDeduction:
+  source: https://www.irs.gov/newsroom/one-big-beautiful-bill-act-tax-deductions-for-working-americans-and-seniors
+  status: provisional
+  perPerson: 6000
+  age: 65
+  phaseOut: { single: 75000, marriedJoint: 150000, rate: 0.06 }
+
+# Rev. Proc. 2025-32 section 4.05; phase-out under IRC 24(b): the credit falls by 50 for each
+# 1,000 (or part) of modified AGI over the threshold. The refundable part is limited to 15% of
+# earned income over 2,500.
+childTaxCredit:
+  source: https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+  perChild: 2200
+  underAge: 17
+  phaseOut: { marriedJoint: 400000, other: 200000, step: 1000, reductionPerStep: 50 }
+  refundable: { perChild: 1700, earnedIncomeFloor: 2500, rate: 0.15 }
+
+# Social Security and Medicare (FICA). The wage base rises each year with average wages.
+# Additional Medicare tax thresholds are fixed in law (IRC 3101(b)(2)).
+fica:
+  source: https://www.ssa.gov/oact/cola/cbb.html
+  socialSecurityRate: 0.062
+  socialSecurityWageBase: 184500
+  medicareRate: 0.0145
+  additionalMedicare:
+    source: https://www.irs.gov/taxtopics/tc560
+    rate: 0.009
+    thresholds: { single: 200000, marriedJoint: 250000, marriedSeparate: 125000, headOfHousehold: 200000 }
+
+# Self-employment tax (Schedule SE): both halves of FICA on 92.35% of net profit; half is deductible.
+selfEmployment:
+  source: https://www.irs.gov/businesses/small-businesses-self-employed/self-employment-tax-social-security-and-medicare-taxes
+  earningsFactor: 0.9235
+  socialSecurityRate: 0.124
+  medicareRate: 0.029
+  deductibleShare: 0.5
+
+# Rev. Proc. 2025-32 section 4.26. Below the threshold the deduction is 20% of qualified business
+# income, limited to 20% of taxable income; above it, wage and property limits apply.
+qualifiedBusinessIncome:
+  source: https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+  rate: 0.20
+  minimumIncome: 1000
+  threshold: { single: 201750, marriedJoint: 403500, marriedSeparate: 201775, headOfHousehold: 201750 }
+
+# IRS Notice 2025-67 (401(k), IRA). Phase-out ranges are modified AGI from-to; married filing
+# separately (having lived together) is 0-10,000 in law. Reduced limits round up to the next 10,
+# with a minimum of 200 (Pub. 590-A worksheets 1-2 and 2-2; the Roth ratio rounds to 3 places).
+retirement:
+  source: https://www.irs.gov/newsroom/401k-limit-increases-to-24500-for-2026-ira-limit-increases-to-7500
+  employeeDeferral: 24500
+  catchUpAge: 50
+  catchUp50: 8000
+  superCatchUpAges: [60, 63]
+  catchUp60to63: 11250
+  ira: 7500
+  iraCatchUp50: 1100
+  rothIraPhaseOut: { single: [153000, 168000], marriedJoint: [242000, 252000], marriedSeparate: [0, 10000] }
+  iraDeductionPhaseOut:
+    coveredSingle: [81000, 91000]
+    coveredMarriedJoint: [129000, 149000]
+    spouseCoveredMarriedJoint: [242000, 252000]
+    marriedSeparate: [0, 10000]
+  phaseOutRounding: { step: 10, minimum: 200, rothRatioDecimals: 3 }
+
+# Rev. Proc. 2025-19.
+hsa:
+  source: https://www.irs.gov/pub/irs-drop/rp-25-19.pdf
+  selfOnly: 4400
+  family: 8750
+  catchUpAge: 55
+  catchUp55: 1000
+
+# Pub. 505 (2026), chapter 2: pay the smaller of 90% of this year's tax or 100% of last year's
+# (110% if last year's AGI was over the limit) through withholding and four installments. No
+# estimated tax is needed if you'll owe less than 1,000 after withholding.
+estimatedTax:
+  source: https://www.irs.gov/publications/p505
+  currentYearShare: 0.90
+  priorYearShare: 1.00
+  priorYearShareHighIncome: 1.10
+  highIncomeAgi: { other: 150000, marriedSeparate: 75000 }
+  minimumOwed: 1000
+  dueDates:
+    - { monthDay: "04-15", yearOffset: 0 }
+    - { monthDay: "06-15", yearOffset: 0 }
+    - { monthDay: "09-15", yearOffset: 0 }
+    - { monthDay: "01-15", yearOffset: 1 }
+
+deadlines:
+  source: https://www.irs.gov/filing/individuals/when-to-file
+  federalReturn: { monthDay: "04-15", yearOffset: 1 }
