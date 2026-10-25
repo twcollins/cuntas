@@ -1,6 +1,6 @@
 # Cúntas: where we are
 
-As of 2026-10-25. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents.
+As of 2026-10-25. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents. For how the code fits together, read [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Design documents
 
@@ -9,6 +9,7 @@ As of 2026-10-25. This file records the state of the build and the design. `docs
 | [design/original-spec.md](design/original-spec.md) | The original IE/UK app spec (22 Oct 2026) | https://claude.ai/artifact/245bx7WUF7rpZY7dtPJiK8 |
 | [design/design-and-working-doc.md](design/design-and-working-doc.md) | Design decisions, phases, backlog and decision log | https://claude.ai/artifact/SJ8AdQhQtPuiWSx67MDeQU |
 | [design/website-brief.md](design/website-brief.md) | Brief for the marketing website | https://claude.ai/artifact/Rm7JtbC2Fzzt7JfibHG1nc |
+| [design/ux-review.md](design/ux-review.md) | UX review of getting money in (manual entry, spending estimate, import, categorising) with a phased design (2026-10-25) | Repo only |
 | [design/mobile-apps.md](design/mobile-apps.md) | iOS and Android apps: architecture, storage, files, app lock, notifications, sign-in, store submission, phases (2026-10-25) | Repo only |
 
 The snapshots were exported on 2026-10-25. Date and mention chips became plain text, and the household-switcher diagram in the working doc is a placeholder. The website brief predates US support: its "USA planned" lines are out of date.
@@ -43,7 +44,8 @@ Checks on 2026-10-25: 399 Vitest tests and 26 Playwright tests pass (2 skipped);
 
 ## Next
 
-1. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
-2. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
-3. Verify provisional packs (P0 in the backlog).
-4. Update the website brief for US support.
+1. UX phases 1-6 in [design/ux-review.md](design/ux-review.md): quick add, spending estimate, import that finishes the job, review queue, setup checklist.
+2. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
+3. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
+4. Verify provisional packs (P0 in the backlog).
+5. Update the website brief for US support.

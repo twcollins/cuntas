@@ -25,7 +25,7 @@ The iOS and Android apps are the same React app inside a Capacitor shell, with a
 | Export | `<a download>` with a blob URL; does nothing useful in a web view | `src/lib/format.ts` |
 | Import | `<input type="file">` on Import, Tax rules, Settings restore; works in both web views | pages |
 | Backup | AES-GCM, PBKDF2-SHA256 (310,000 rounds), `.cuntas` file | `src/lib/backup.ts` |
-| Server sign-in | Browser WebAuthn (`@simplewebauthn/browser`) plus TOTP; session cookie; CORS `EXTRA_ORIGINS`, `CROSS_SITE_COOKIES` already exist for the apps | `src/lib/api.ts`, `apps/api/src/config.ts` |
+| Server sign-in | Browser WebAuthn (`@simplewebauthn/browser`); the API also supports TOTP but the web app has no TOTP screen; session cookie; CORS `EXTRA_ORIGINS`, `CROSS_SITE_COOKIES` already exist for the apps | `src/lib/api.ts`, `apps/api/src/config.ts` |
 | Layout | Sidebar plus hamburger; `viewport` without `viewport-fit=cover`; no safe-area insets | `src/components/Layout.tsx`, `index.html` |
 | Build | `pnpm --filter @cuntas/web build:native` builds and runs `cap sync` | `package.json` |
 
@@ -119,7 +119,7 @@ The apps make two kinds of request, both optional:
 Cookies and WebAuthn don't suit a web view talking to an arbitrary server: WKWebView blocks third-party cookies, and passkeys in an app need an associated domain fixed at build time, which a self-hosted server can't provide. So the apps sign in through the system browser and use a bearer token.
 
 1. The app opens `https://<server>/app-sign-in?state=<random>` in `ASWebAuthenticationSession` (iOS) or a Custom Tab (Android), via `@capacitor/browser`.
-2. The web app on the server signs in as today (passkey or TOTP), on the server's own domain, so passkeys work unchanged.
+2. The web app on the server signs in as today (passkey; TOTP once it has a screen), on the server's own domain, so passkeys work unchanged.
 3. The server redirects to `cuntas://auth?code=<one-time code>&state=<random>`.
 4. The app checks `state` and posts the code to `POST /auth/app/exchange`, getting a token valid for 90 days, stored in the Keychain / Keystore.
 5. `api.ts` sends `Authorization: Bearer <token>` when native, and the cookie otherwise.
