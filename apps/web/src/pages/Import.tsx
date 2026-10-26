@@ -4,6 +4,7 @@ import { importStatement, newId } from "@cuntas/ledger";
 import { Badge, Button, Card, Field, Input, PageHeader, Select, Table } from "../components/ui";
 import { useAsOf } from "../lib/derived";
 import { currencyOptions, formatDate, moneyExact } from "../lib/format";
+import { countryForCurrency } from "../lib/region";
 import { replaceDataset, useDataset } from "../lib/store";
 import type { Currency } from "@cuntas/rules";
 
@@ -50,7 +51,7 @@ export function ImportPage() {
     if (target === "__new") {
       const currency = parsed.account?.currency ?? parsed.transactions[0]?.currency ?? ds.household.baseCurrency;
       const first = parsed.transactions.map((t) => t.bookedAt).sort()[0] ?? asOf;
-      const acc = { id: newId("acc"), name: newName || "Imported account", memberIds: ds.members.map((m) => m.id), type: "current" as const, currency, institutionId: null, wrapper: "none" as const, jurisdiction: currency === "GBP" ? ("UK" as const) : ("IE" as const), openingBalanceMinor: 0, openingDate: first, valuations: [], isEmergencyFund: false, archived: false };
+      const acc = { id: newId("acc"), name: newName || "Imported account", memberIds: ds.members.map((m) => m.id), type: "current" as const, currency, institutionId: null, wrapper: "none" as const, jurisdiction: countryForCurrency(ds, currency), openingBalanceMinor: 0, openingDate: first, valuations: [], isEmergencyFund: false, archived: false };
       d = { ...d, accounts: [...d.accounts, acc] };
       target = acc.id;
     }

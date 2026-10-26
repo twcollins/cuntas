@@ -147,6 +147,15 @@ describe("OFX and CAMT.053", () => {
       { bookedAt: "2026-09-25", amountMinor: 320000, payee: "ACME LTD", externalId: "camt:R2" },
     ]);
   });
+  it("keeps a USD statement in dollars and warns only for unsupported currencies", () => {
+    const usd = importFile("chase.qfx", fixture("sample.ofx").replace(/<CURDEF>\w+/, "<CURDEF>USD"));
+    expect(usd.transactions.every((t) => t.currency === "USD")).toBe(true);
+    expect(usd.warnings).toEqual([]);
+    const chf = importFile("s.ofx", fixture("sample.ofx").replace(/<CURDEF>\w+/, "<CURDEF>CHF"));
+    expect(chf.warnings.join(" ")).toMatch(/CHF is not supported/);
+    const camt = importFile("s.xml", fixture("sample.camt053.xml").replaceAll('Ccy="EUR"', 'Ccy="USD"').replace(/<Ccy>EUR<\/Ccy>/, "<Ccy>USD</Ccy>"));
+    expect(camt.transactions.every((t) => t.currency === "USD")).toBe(true);
+  });
 });
 
 describe("US bank presets", () => {

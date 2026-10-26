@@ -6,9 +6,9 @@ type Topic = { to: string; label: string; body: string };
 const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
   {
     title: "Get started",
-    intro: "Three steps give the planner enough to work with. Everything stays on this device unless you connect a server.",
+    intro: "Three steps give the planner enough to work with. Everything stays on this device unless you connect a server. The sidebar keeps the everyday pages at the top; the rest are under More.",
     topics: [
-      { to: "/household", label: "Household", body: "Add each person with their pay, date of birth and tax residence. Pay drives take-home, pension relief and the next-step checks. For someone in the US, also set their state, filing status and HSA coverage, and their county in Indiana." },
+      { to: "/household", label: "Household", body: "You're added when you create the household, resident where you said you live; add your pay and date of birth, and anyone else in the household, with their tax residence. Pay drives take-home, pension relief and the next-step checks. For someone in the US, also set their state, filing status and HSA coverage, and their county in Indiana." },
       { to: "/accounts", label: "Accounts", body: "Add current and savings accounts, cards, loans, pensions and property, in EUR, GBP or USD. Tick the ones that hold your emergency fund." },
       { to: "/import", label: "Import", body: "Load a CSV, OFX, QFX or CAMT.053 file from your bank. Irish, UK and major US banks and card issuers are recognised; any other layout is mapped once; re-importing the same file never adds duplicates." },
     ],

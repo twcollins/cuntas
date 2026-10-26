@@ -1,5 +1,5 @@
 import { planFor, residenceOn, type Dataset } from "@cuntas/ledger";
-import { CURRENCY_NAMES, today, type Jurisdiction } from "@cuntas/rules";
+import { COUNTRIES, COUNTRY_INFO, CURRENCY_NAMES, today, type Currency, type Jurisdiction } from "@cuntas/rules";
 
 // Wording and date style follow where the household lives: US terms ("checking", "401(k)") for a
 // US household, Irish/UK terms otherwise.
@@ -23,6 +23,19 @@ export function homeOf(ds: Dataset, asOf = today()): Jurisdiction {
   if (planFor(ds, asOf) === "US") return "US";
   const first = residenceOn(ds, ds.members[0]!.id, asOf);
   return ds.members.every((m) => residenceOn(ds, m.id, asOf) === first) ? first : "IE";
+}
+
+/** The country an account in this currency is most likely in: the household's own, if it uses that currency. */
+export function countryForCurrency(ds: Dataset, currency: Currency): Jurisdiction {
+  const home = homeOf(ds);
+  if (COUNTRY_INFO[home].currency === currency) return home;
+  return COUNTRIES.find((c) => COUNTRY_INFO[c].currency === currency) ?? home;
+}
+
+/** Whether anyone in the household is resident in a country (or, with nobody added, the household lives there). */
+export function involves(ds: Dataset, country: Jurisdiction, asOf = today()): boolean {
+  if (ds.members.length === 0) return homeOf(ds, asOf) === country;
+  return ds.members.some((m) => residenceOn(ds, m.id, asOf) === country);
 }
 
 export function termsFor(ds: Dataset): Terms {

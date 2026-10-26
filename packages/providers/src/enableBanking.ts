@@ -1,6 +1,6 @@
 import { createSign } from "node:crypto";
 import { assignContentIds, cleanPayee, parseAmount } from "@cuntas/importers";
-import type { Country, Currency } from "@cuntas/rules";
+import { isCurrency, type Country } from "@cuntas/rules";
 import { ProviderError, type BankDataProvider, type ConsentSession, type ProviderAccount, type ProviderInstitution } from "./types";
 
 export interface EnableBankingConfig {
@@ -47,7 +47,7 @@ export function mapEnableBankingTransactions(rows: EbTransaction[]) {
       return {
         bookedAt: (t.booking_date ?? t.value_date ?? "").slice(0, 10),
         amountMinor: credit ? value : -value,
-        currency: (t.transaction_amount.currency === "GBP" ? "GBP" : "EUR") as Currency,
+        currency: isCurrency(t.transaction_amount.currency) ? t.transaction_amount.currency : "EUR",
         payee: party ?? cleanPayee(rawDescription),
         rawDescription,
         ...(id ? { externalId: `eb:${id}` } : {}),
@@ -130,7 +130,7 @@ function toAccount(a: { uid: string; name?: string; currency?: string; account_i
   return {
     ref: a.uid,
     name: a.name ?? a.account_id?.iban ?? a.uid,
-    currency: a.currency === "GBP" ? "GBP" : "EUR",
+    currency: a.currency && isCurrency(a.currency) ? a.currency : "EUR",
     ...(a.account_id?.iban ? { iban: a.account_id.iban } : {}),
   };
 }

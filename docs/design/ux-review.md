@@ -183,6 +183,24 @@ Each phase ships on its own and is tested before the next.
 
 Phases 1 and 6 overlap with the phone layout in mobile-apps.md phase 2; do them together.
 
+### Progress
+
+**Phase 1, done 2026-10-26.** A new US household's first Overview shows the US pack and ladder, greets the person by name, and has no Irish options (checked in `e2e/us.spec.ts`).
+
+- Onboarding asks for a first name and creates that person resident where the household lives (`createEmptyDataset(..., first)`).
+- New accounts, from Accounts, import or bank sync, take their country from their currency and the household's home, not IE. OFX, QFX, CAMT.053 and bank sync keep USD instead of turning it into EUR.
+- Accounts' subtitle no longer says "EUR and GBP". The Investment Account option shows only when someone lives in Ireland; Compare wrappers is hidden when nobody lives in Ireland or the UK.
+- The empty net-worth and spending charts say what to do instead of drawing empty axes.
+- For members not resident in Ireland, the ladder leaves out DIRT, Irish pension relief limits and the Irish relief deadline.
+- Sidebar: the main list is Overview, Transactions, Import, Accounts, Budgets, Next steps (Bills, Debts, Goals), Tax centre; everything else is under More, collapsed until opened.
+
+Changed from the design above:
+
+- Import and Accounts stay in the main list until quick add (phase 2) and drop-anywhere import (phase 4) give another way in.
+- Households and Account & sync sit under More rather than inside Settings, which keeps one place for them and needs no new links.
+- A UK-only household still runs the Irish step order and thresholds; only the Irish-only text is removed. A UK ladder is separate work.
+- The first person's date of birth is a placeholder (1 January 1990) until edited. The "You" line of the setup checklist (phase 6) should ask for it with pay and state.
+
 ## Testing
 
 - Unit tests for merchant cleaning (a table of real-looking bank strings and expected names), the account matcher, manual/import merging, and the estimate fallback in the snapshot.

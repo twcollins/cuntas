@@ -1,7 +1,7 @@
 import { del, get, set } from "idb-keyval";
 import { useSyncExternalStore } from "react";
 import { createDemoDataset, createEmptyDataset, datasetSchema, newId, withAudit, type Dataset } from "@cuntas/ledger";
-import { today, type Currency } from "@cuntas/rules";
+import { today, type Currency, type Jurisdiction } from "@cuntas/rules";
 
 // Local-first: every household lives in IndexedDB on this device, one key each, with an index
 // of households and the active one. Server sync is optional and set per household.
@@ -195,8 +195,8 @@ export function startDemo() {
   return addHousehold(createDemoDataset(today()));
 }
 
-export function startEmpty(name: string, baseCurrency: Currency) {
-  return addHousehold(createEmptyDataset(name, baseCurrency));
+export function startEmpty(name: string, baseCurrency: Currency, first?: { name: string; home: Jurisdiction }) {
+  return addHousehold(createEmptyDataset(name, baseCurrency, undefined, first));
 }
 
 /** Delete every household and the sign-in from this device. */

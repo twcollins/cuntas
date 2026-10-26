@@ -164,7 +164,7 @@ Helpers: `createEmptyDataset` and `importStatement` in [dataset.ts](../packages/
 
 ### Residence decides the rules
 
-`residenceOn(ds, memberId, date)` in [snapshot.ts](../packages/ledger/src/snapshot.ts) picks a member's jurisdiction from `residencePeriods`, defaulting to `IE`. It decides which payroll calculator runs for that member. `planFor` returns `"US"` only when every member lives in the US; otherwise the Irish ladder runs (also for UK-only and mixed households).
+`residenceOn(ds, memberId, date)` in [snapshot.ts](../packages/ledger/src/snapshot.ts) picks a member's jurisdiction from `residencePeriods`, defaulting to `IE`. It decides which payroll calculator runs for that member. `planFor` returns `"US"` only when every member lives in the US; otherwise the Irish ladder runs (also for UK-only and mixed households; steps leave out Irish-only text, such as DIRT and Irish pension relief limits, for members not resident in Ireland).
 
 ### Server tables
 
@@ -397,7 +397,7 @@ Reminders are queued only; nothing delivers them yet (no email or push).
 
 ### Routing
 
-[src/router.tsx](../apps/web/src/router.tsx) is a flat list of code-based routes under one root route. To add a page, add a `[path, Component]` pair. The sidebar groups in `NAV` in [Layout.tsx](../apps/web/src/components/Layout.tsx) match the Guide's sections closely:
+[src/router.tsx](../apps/web/src/router.tsx) is a flat list of code-based routes under one root route. To add a page, add a `[path, Component]` pair. The sidebar in [Layout.tsx](../apps/web/src/components/Layout.tsx) has two lists: `MAIN` (Overview, Transactions, Import, Accounts, Budgets, Next steps with Bills, Debts and Goals under it, Tax centre) and `MORE`, collapsed until opened or until one of its pages is open. An item can carry `when(ds)` to hide it from households it doesn't apply to (Compare wrappers needs someone in Ireland or the UK). The table groups pages by area, as the Guide does:
 
 | Group | Path | Page | Main logic used |
 | --- | --- | --- | --- |
@@ -533,7 +533,7 @@ If the new year adds a new kind of figure, extend the TypeScript type in [types.
 
 1. Create `apps/web/src/pages/<Name>.tsx` exporting a component. Read the dataset with `useDataset()`, write with `update(ds => ...)`, and use `PageHeader` and `Card` from [ui.tsx](../apps/web/src/components/ui.tsx).
 2. Put calculations in a package (usually `ledger` or `rules`), with Vitest tests, not in the page.
-3. Add the route to `pages` in [router.tsx](../apps/web/src/router.tsx), the nav item to `NAV` in [Layout.tsx](../apps/web/src/components/Layout.tsx), and a topic in [Guide.tsx](../apps/web/src/pages/Guide.tsx).
+3. Add the route to `pages` in [router.tsx](../apps/web/src/router.tsx), the nav item to `MAIN` or `MORE` in [Layout.tsx](../apps/web/src/components/Layout.tsx), and a topic in [Guide.tsx](../apps/web/src/pages/Guide.tsx).
 4. Use `termsFor(ds)` for wording that differs between US and IE/UK households.
 5. Add or extend a Playwright spec in [apps/web/e2e/](../apps/web/e2e); it runs on desktop and mobile.
 
@@ -575,16 +575,16 @@ Add it to the zod schema in [schema.ts](../packages/ledger/src/schema.ts) with a
 
 ## 9. Known gaps and inconsistencies
 
-Found while writing this document. None of these were changed.
+Found while writing this document. UX phase 1 (2026-10-26) fixed the USD bank-sync currency and the Irish-only ladder text; the rest are open.
 
-- **Bank sync is IE/UK only.** The API's institution and connection routes accept `country: "IE" | "UK"`, and the Accounts page offers only those. When pulling synced accounts, [Accounts.tsx](../apps/web/src/pages/Accounts.tsx) sets a new account's currency to GBP or else EUR, so a USD account would be created as EUR.
+- **Bank sync is IE/UK only.** The API's institution and connection routes accept `country: "IE" | "UK"`, and the Accounts page offers only those. (Synced accounts and transactions now keep any supported currency, USD included.)
 - **Reminders.** `queueReminders` only queues for households that have an active bank connection, and only IE and UK deadlines. Nothing delivers them.
 - **TOTP has no UI.** The API has `/auth/totp/*`, but the web client only uses passkeys.
 - **FX source.** The web app fetches rates from `api.frankfurter.app` even when a server is connected; the API's `/fx` is unused by the client.
 - **Signed manifest is unused.** `/rule-packs/manifest` is served but nothing in the web app reads it.
 - **Flowchart files can't be loaded.** `chartDefaults` and treaty packs read `RAW_PACKS` directly, so a loaded rule file can't replace them, and `parseRuleFile` rejects them.
 - **The compiler doesn't validate.** `compile-packs.mjs` only parses YAML; schema validation of built-in packs happens in `rulefiles.test.ts`.
-- **UK households use the Irish ladder and pack.** `usePlan` and `evaluate` pass the IE pack for any non-US household, so ladder text (for example DIRT in the starter-fund explanation) is Irish for a UK-only household.
+- **UK households use the Irish ladder and pack.** `usePlan` and `evaluate` pass the IE pack for any non-US household. Irish-only text (DIRT, Irish pension relief limits and deadline) is left out for members not resident in Ireland, but the step order and thresholds are still the Irish flowchart's; a UK ladder is not built.
 - **Stale comments and docs:**
   - `TAX_JURISDICTIONS` in [packs/types.ts](../packages/rules/src/packs/types.ts) says "US packs are federal only; states come later".
   - The `usPayroll` doc comment says state tax is not included; it is when a state pack is passed.

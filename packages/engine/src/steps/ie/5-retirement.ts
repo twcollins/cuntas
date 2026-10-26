@@ -3,6 +3,8 @@ import type { EvalContext, StepDefinition } from "../../types";
 import { chartRef, money, packRef, pct } from "../../helpers";
 
 const target = (ctx: EvalContext) => (ctx.member!.age * ctx.snapshot.thresholds.retirementShareOfAge) / 100;
+// Irish relief limits apply to Irish residents; UK members get the gauge without them.
+const irish = (ctx: EvalContext) => ctx.member!.residence === "IE";
 const current = (ctx: EvalContext) => ctx.member!.pension.employeeRate + ctx.member!.pension.employerRate;
 
 export const retirement: StepDefinition = {
@@ -21,8 +23,7 @@ export const retirement: StepDefinition = {
       progress: (ctx) => ({ current: Math.round(current(ctx) * 1000) / 10, target: Math.round(target(ctx) * 1000) / 10, unit: "%" }),
       headline: "{name}: raise pension saving from {current} to {target} of pay",
       explain:
-        "Half your age ({age}) is {target} of pre-tax pay; you and your employer put in {current}, about {gap} a year short. " +
-        "{vehicle} Your age-band relief limit is {limitRate} of earnings up to {cap}; {headroom} of unused relief this year is worth {taxBack} back at {marginal}.",
+        "Half your age ({age}) is {target} of pre-tax pay; you and your employer put in {current}, about {gap} a year short. {vehicle}{relief}",
       vars: (ctx) => {
         const m = ctx.member!;
         const h = pensionReliefHeadroom(ctx.pack, {
@@ -31,6 +32,17 @@ export const retirement: StepDefinition = {
           contributedMinor: applyRate(m.grossAnnualMinor, m.pension.employeeRate),
           marginalRate: m.marginalRate,
         });
+        if (!irish(ctx)) {
+          return {
+            name: m.name,
+            age: m.age,
+            target: pct(target(ctx)),
+            current: pct(current(ctx)),
+            gap: money(ctx, applyRate(m.grossAnnualMinor, Math.max(0, target(ctx) - current(ctx)))),
+            vehicle: m.pension.hasEmployerScheme ? "Raise contributions in your workplace pension." : "With no workplace pension, a personal pension is the usual route.",
+            relief: "",
+          };
+        }
         return {
           name: m.name,
           age: m.age,
@@ -40,18 +52,13 @@ export const retirement: StepDefinition = {
           vehicle: m.pension.hasEmployerScheme
             ? "Raise contributions in your employer scheme (AVCs)."
             : "With no employer scheme, a PRSA (or an Executive Pension if self-employed through a company) is the usual route.",
-          limitRate: pct(h.limitRate),
-          cap: money(ctx, toMinor(ctx.pack.pension.earningsCap)),
-          headroom: money(ctx, h.headroomMinor),
-          taxBack: money(ctx, h.taxBackMinor),
-          marginal: pct(m.marginalRate),
+          relief: ` Your age-band relief limit is ${pct(h.limitRate)} of earnings up to ${money(ctx, toMinor(ctx.pack.pension.earningsCap))}; ${money(ctx, h.headroomMinor)} of unused relief this year is worth ${money(ctx, h.taxBackMinor)} back at ${pct(m.marginalRate)}.`,
         };
       },
-      deadline: (ctx) => `${Number(ctx.pack.taxYear) + ctx.pack.pension.reliefClaimDeadline.yearOffset}-${ctx.pack.pension.reliefClaimDeadline.monthDay}`,
+      deadline: (ctx) => (irish(ctx) ? `${Number(ctx.pack.taxYear) + ctx.pack.pension.reliefClaimDeadline.yearOffset}-${ctx.pack.pension.reliefClaimDeadline.monthDay}` : undefined),
       sources: (ctx) => [
         chartRef(ctx, "retirement.shareOfAge"),
-        packRef(ctx, "pension.ageBands", ctx.pack.pension.source),
-        packRef(ctx, "pension.earningsCap", ctx.pack.pension.source),
+        ...(irish(ctx) ? [packRef(ctx, "pension.ageBands", ctx.pack.pension.source), packRef(ctx, "pension.earningsCap", ctx.pack.pension.source)] : []),
       ],
       actions: [{ id: "pensions", label: "Open pensions", to: "/pensions" }],
     },

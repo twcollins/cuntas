@@ -96,6 +96,20 @@ describe("next-step engine", () => {
     expect(r.current?.deadline).toBe("2027-10-31");
   });
 
+  it("a UK-resident household gets no Irish-only explanations", () => {
+    const uk = member({ residence: "UK", age: 40, pension: { ...member().pension, employeeRate: 0.05, employerRate: 0.05, fullMatchEmployeeRate: 0.05 } });
+    const fund = evaluate(snapshot({ members: [uk], liquidSavingsMinor: toMinor(2000) }), pack);
+    expect(fund.current?.step).toBe("ie.starter-fund");
+    expect(fund.current?.why).not.toMatch(/DIRT/);
+    expect(fund.current?.sources.map((s) => s.key)).not.toContain("dirt.rate");
+    const ret = evaluate(snapshot({ members: [uk] }), pack);
+    expect(ret.current?.check).toBe("ie.retirement.half-age");
+    expect(ret.current?.why).not.toMatch(/age-band|PRSA|AVC/);
+    expect(ret.current?.deadline).toBeUndefined();
+    // An Irish resident still gets them.
+    expect(evaluate(snapshot({ liquidSavingsMinor: toMinor(2000) }), pack).current?.why).toMatch(/DIRT/);
+  });
+
   it("step 6: mortgage readiness for renters", () => {
     const r = evaluate(
       snapshot({ housing: { ownsHome: false, monthlyRentMinor: toMinor(1200), monthlyDepositSavingMinor: toMinor(300), expectedMortgagePaymentMinor: toMinor(1800), mortgageMonthlyPaymentMinor: null } }),

@@ -8,6 +8,7 @@ import { currencyOptions, taxCountryOptions } from "../lib/format";
 
 export function Onboarding() {
   const [name, setName] = useState("My household");
+  const [firstName, setFirstName] = useState("");
   const [home, setHome] = useState<Jurisdiction>("IE");
   const [currency, setCurrency] = useState<Currency>("EUR");
   const { account } = useStore();
@@ -30,8 +31,9 @@ export function Onboarding() {
         </Card>
         <Card title="Start your own">
           <div className="space-y-3">
+            <Field label="Your first name">{(id) => <Input id={id} value={firstName} autoComplete="given-name" onChange={(e) => setFirstName(e.target.value)} />}</Field>
             <Field label="Household name">{(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} />}</Field>
-            <Field label="Where do you live?" hint="Sets the currency, wording and tax rules to start with. Each person's residence can be changed later.">
+            <Field label="Where do you live?" hint="Sets the currency, wording and tax rules to start with. You can add people and change residence later.">
               {(id) => <Select id={id} value={home} onChange={(e) => { const j = e.target.value as Jurisdiction; setHome(j); setCurrency(COUNTRY_INFO[j].currency); }} options={taxCountryOptions()} />}
             </Field>
             <Field label="Base currency" hint="Net worth and budgets are shown in this currency.">
@@ -39,7 +41,7 @@ export function Onboarding() {
                 <Select id={id} value={currency} onChange={(e) => setCurrency(e.target.value as Currency)} options={currencyOptions(true)} />
               )}
             </Field>
-            <Button variant="primary" onClick={() => startEmpty(name.trim() || "My household", currency)}>Create household</Button>
+            <Button variant="primary" onClick={() => startEmpty(name.trim() || "My household", currency, { name: firstName.trim() || "Me", home })}>Create household</Button>
           </div>
         </Card>
         <Card title="I already use Cúntas">

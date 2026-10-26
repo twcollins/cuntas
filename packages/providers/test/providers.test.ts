@@ -48,6 +48,11 @@ describe("Enable Banking", () => {
     expect(rows[0]!.externalId).toMatch(/^h:/);
     expect(rows[0]!.currency).toBe("GBP");
   });
+
+  it("keeps US dollar transactions in dollars", () => {
+    const rows = mapEnableBankingTransactions([{ transaction_amount: { amount: "5", currency: "USD" }, credit_debit_indicator: "DBIT", booking_date: "2026-09-01" }]);
+    expect(rows[0]!.currency).toBe("USD");
+  });
 });
 
 describe("mock provider", () => {

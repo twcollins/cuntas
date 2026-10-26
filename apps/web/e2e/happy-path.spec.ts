@@ -7,7 +7,11 @@ const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../../../package
 async function go(page: Page, label: string) {
   const menu = page.getByRole("button", { name: "Open menu" });
   if (await menu.isVisible()) await menu.click();
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label }).click();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  const link = nav.getByRole("link", { name: label });
+  // Less-used pages sit under "More", collapsed at first.
+  if (!(await link.isVisible())) await nav.getByRole("button", { name: /^More/ }).click();
+  await link.click();
 }
 
 test("demo household: next step, import without duplicates, recategorise, export", async ({ page }) => {

@@ -7,8 +7,8 @@ import { useAsOf, useBalances } from "../lib/derived";
 import { currencyOptions, formatDate, money, moneyExact, taxCountryOptions } from "../lib/format";
 import { apiClient } from "../lib/api";
 import { replaceDataset, update, useDataset, useStore } from "../lib/store";
-import type { Currency, Jurisdiction } from "@cuntas/rules";
-import { termsFor, type Terms } from "../lib/region";
+import { isCurrency, type Currency, type Jurisdiction } from "@cuntas/rules";
+import { countryForCurrency, homeOf, termsFor, type Terms } from "../lib/region";
 
 const TYPE_LABELS: Record<Account["type"], string> = {
   // "current" reads "Checking account" for a US household: see typeLabel.
@@ -19,7 +19,7 @@ const TYPE_LABELS: Record<Account["type"], string> = {
 const typeLabel = (t: Account["type"], terms: Terms) => (t === "current" ? terms.currentAccount : TYPE_LABELS[t]);
 
 function blankAccount(ds: ReturnType<typeof useDataset>, asOf: string): Account {
-  return { id: newId("acc"), name: "", memberIds: ds.members.map((m) => m.id), type: "current", currency: ds.household.baseCurrency, institutionId: null, wrapper: "none", jurisdiction: "IE", openingBalanceMinor: 0, openingDate: asOf, valuations: [], isEmergencyFund: false, archived: false };
+  return { id: newId("acc"), name: "", memberIds: ds.members.map((m) => m.id), type: "current", currency: ds.household.baseCurrency, institutionId: null, wrapper: "none", jurisdiction: homeOf(ds), openingBalanceMinor: 0, openingDate: asOf, valuations: [], isEmergencyFund: false, archived: false };
 }
 
 export function AccountsPage() {
@@ -39,7 +39,7 @@ export function AccountsPage() {
 
   return (
     <div>
-      <PageHeader title="Accounts" subtitle="Bank accounts, credit union shares and loans, pensions, property and other assets, in EUR and GBP." actions={<Button variant="primary" onClick={() => setEditing(blankAccount(ds, asOf))}>Add account</Button>} />
+      <PageHeader title="Accounts" subtitle="Bank accounts, credit union shares and loans, pensions, property and other assets, in any of the app's currencies." actions={<Button variant="primary" onClick={() => setEditing(blankAccount(ds, asOf))}>Add account</Button>} />
       <BankConnections />
       <div className="mt-4 space-y-4">
         {groups.map((g) => {
@@ -171,7 +171,8 @@ function BankConnections() {
     for (const acc of accounts) {
       let local = d.accounts.find((a) => a.institutionId === `conn:${connId}:${acc.ref}`);
       if (!local) {
-        local = { ...blankAccount(d, asOf), name: acc.name, currency: acc.currency === "GBP" ? "GBP" : "EUR", institutionId: `conn:${connId}:${acc.ref}`, openingDate: "2000-01-01" };
+        const currency = isCurrency(acc.currency) ? acc.currency : d.household.baseCurrency;
+        local = { ...blankAccount(d, asOf), name: acc.name, currency, jurisdiction: countryForCurrency(d, currency), institutionId: `conn:${connId}:${acc.ref}`, openingDate: "2000-01-01" };
         d = { ...d, accounts: [...d.accounts, local] };
       }
       const r = importStatement(d, local.id, { format: "csv", warnings: [], transactions: rows.filter((x) => x.accountRef === acc.ref).map((x) => x.transaction) });

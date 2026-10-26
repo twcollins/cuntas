@@ -108,3 +108,17 @@ describe("state income tax in the household", () => {
     expect(datasetSchema.parse(raw).members[0]!.usState).toBeNull();
   });
 });
+
+describe("a new household with its first person", () => {
+  it("starts with that person resident where the household lives", () => {
+    const ds = createEmptyDataset("The Lees", "USD", `${asOf}T00:00:00Z`, { name: "Alex", home: "US" });
+    expect(datasetSchema.parse(ds)).toBeTruthy();
+    expect(ds.members.map((m) => m.name)).toEqual(["Alex"]);
+    expect(ds.members[0]!.nationality).toEqual(["US"]);
+    expect(ds.residencePeriods).toMatchObject([{ memberId: ds.members[0]!.id, jurisdiction: "US", to: null }]);
+    expect(planFor(ds, asOf)).toBe("US");
+  });
+  it("starts empty when no first person is given", () => {
+    expect(createEmptyDataset("Test", "EUR").members).toEqual([]);
+  });
+});

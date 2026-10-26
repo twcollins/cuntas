@@ -1,5 +1,8 @@
-import type { StepDefinition } from "../../types";
+import type { EvalContext, StepDefinition } from "../../types";
 import { chartRef, money, starterFundTarget } from "../../helpers";
+
+// DIRT is Irish; a household with nobody resident in Ireland doesn't pay it.
+const paysDirt = (ctx: EvalContext) => ctx.snapshot.members.length === 0 || ctx.snapshot.members.some((m) => m.residence === "IE");
 
 export const starterFund: StepDefinition = {
   id: "ie.starter-fund",
@@ -16,8 +19,7 @@ export const starterFund: StepDefinition = {
       progress: ({ snapshot }) => ({ current: snapshot.liquidSavingsMinor, target: starterFundTarget(snapshot), unit: snapshot.currency }),
       headline: "Save {gap} more for your starter emergency fund",
       explain:
-        "The chart's starter fund is the greater of {floor} or {months} month's net pay ({target}). You have {saved} in cash savings. " +
-        "Interest on deposits is subject to DIRT at {dirt}.",
+        "The chart's starter fund is the greater of {floor} or {months} month's net pay ({target}). You have {saved} in cash savings.{dirtNote}",
       vars: (ctx) => {
         const s = ctx.snapshot;
         const target = starterFundTarget(s);
@@ -27,10 +29,10 @@ export const starterFund: StepDefinition = {
           months: s.thresholds.starterFundMonths,
           target: money(ctx, target),
           saved: money(ctx, s.liquidSavingsMinor),
-          dirt: `${ctx.pack.dirt.rate * 100}%`,
+          dirtNote: paysDirt(ctx) ? ` Interest on deposits is subject to DIRT at ${ctx.pack.dirt.rate * 100}%.` : "",
         };
       },
-      sources: (ctx) => [chartRef(ctx, "starterFund"), { pack: ctx.pack.version, key: "dirt.rate", source: ctx.pack.dirt.source }],
+      sources: (ctx) => [chartRef(ctx, "starterFund"), ...(paysDirt(ctx) ? [{ pack: ctx.pack.version, key: "dirt.rate", source: ctx.pack.dirt.source }] : [])],
       actions: [{ id: "goal", label: "Set up emergency fund goal", to: "/goals" }],
     },
   ],

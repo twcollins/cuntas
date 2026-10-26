@@ -7,7 +7,11 @@ async function openSidebar(page: Page) {
 
 async function go(page: Page, label: string) {
   await openSidebar(page);
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label, exact: true }).click();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  const link = nav.getByRole("link", { name: label, exact: true });
+  // Less-used pages sit under "More", collapsed at first.
+  if (!(await link.isVisible())) await nav.getByRole("button", { name: /^More/ }).click();
+  await link.click();
 }
 
 test("onboarding offers sign-in for people who already use Cúntas", async ({ page }) => {

@@ -1,58 +1,46 @@
-import { Link, Outlet } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import type { Dataset } from "@cuntas/ledger";
 import { useEffect, useRef, useState } from "react";
 import { today } from "@cuntas/rules";
 import { useRulePrompts } from "../lib/rulepacks";
 import { switchHousehold, useDataset, useStore } from "../lib/store";
 import { setTheme, useTheme, type ThemePreference } from "../lib/theme";
 import { setDisplayLocale } from "../lib/format";
-import { termsFor } from "../lib/region";
+import { involves, termsFor, type Terms } from "../lib/region";
 import { cx } from "./ui";
 
-type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules" };
+type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules"; sub?: boolean; when?: (ds: Dataset) => boolean };
 
-const NAV: { group: string; items: NavItem[] }[] = [
-  {
-    group: "Money",
-    items: [
-      { to: "/", label: "Overview", icon: "◎" },
-      { to: "/plan", label: "Next steps", icon: "↗" },
-      { to: "/transactions", label: "Transactions", icon: "≡" },
-      { to: "/budgets", label: "Budgets", icon: "▤" },
-      { to: "/bills", label: "Bills", icon: "↻" },
-      { to: "/accounts", label: "Accounts", icon: "▣" },
-      { to: "/import", label: "Import", icon: "⇪" },
-    ],
-  },
-  {
-    group: "Plan",
-    items: [
-      { to: "/debts", label: "Debts", icon: "↘" },
-      { to: "/goals", label: "Goals", icon: "◆" },
-      { to: "/pensions", label: "Pensions", icon: "☂" },
-      { to: "/retirement", label: "Retirement", icon: "◔" },
-      { to: "/investing", label: "Compare wrappers", icon: "⚖" },
-    ],
-  },
-  {
-    group: "Tax",
-    items: [
-      { to: "/tax", label: "Tax centre", icon: "§" },
-      { to: "/what-if", label: "What if we moved", icon: "⇄" },
-      { to: "/tax-rules", label: "Tax rules", icon: "¶", badge: "rules" },
-    ],
-  },
-  {
-    group: "Household",
-    items: [
-      { to: "/household", label: "Household", icon: "⌂" },
-      { to: "/households", label: "Households", icon: "⌘" },
-      { to: "/account", label: "Account & sync", icon: "⇅" },
-      { to: "/settings", label: "Settings", icon: "⚙" },
-      { to: "/guide", label: "Guide", icon: "?" },
-      { to: "/admin", label: "Server admin", icon: "⛭", adminOnly: true },
-    ],
-  },
+// The everyday pages first; the rest sits under "More", collapsed until opened or until one of its pages is open.
+const MAIN: NavItem[] = [
+  { to: "/", label: "Overview", icon: "◎" },
+  { to: "/transactions", label: "Transactions", icon: "≡" },
+  { to: "/import", label: "Import", icon: "⇪" },
+  { to: "/accounts", label: "Accounts", icon: "▣" },
+  { to: "/budgets", label: "Budgets", icon: "▤" },
+  { to: "/plan", label: "Next steps", icon: "↗" },
+  { to: "/bills", label: "Bills", icon: "↻", sub: true },
+  { to: "/debts", label: "Debts", icon: "↘", sub: true },
+  { to: "/goals", label: "Goals", icon: "◆", sub: true },
+  { to: "/tax", label: "Tax centre", icon: "§" },
 ];
+
+const MORE: NavItem[] = [
+  { to: "/pensions", label: "Pensions", icon: "☂" },
+  { to: "/retirement", label: "Retirement", icon: "◔" },
+  // Wrapper comparisons cover Irish and UK wrappers only.
+  { to: "/investing", label: "Compare wrappers", icon: "⚖", when: (ds) => involves(ds, "IE") || involves(ds, "UK") },
+  { to: "/what-if", label: "What if we moved", icon: "⇄" },
+  { to: "/tax-rules", label: "Tax rules", icon: "¶", badge: "rules" },
+  { to: "/household", label: "Household", icon: "⌂" },
+  { to: "/households", label: "Households", icon: "⌘" },
+  { to: "/account", label: "Account & sync", icon: "⇅" },
+  { to: "/settings", label: "Settings", icon: "⚙" },
+  { to: "/guide", label: "Guide", icon: "?" },
+  { to: "/admin", label: "Server admin", icon: "⛭", adminOnly: true },
+];
+
+const MORE_KEY = "cuntas:nav-more";
 
 const THEMES: { value: ThemePreference; label: string; icon: string }[] = [
   { value: "light", label: "Light", icon: "☀" },
@@ -137,41 +125,69 @@ function RulesCount() {
   return <span aria-label={`${prompts.length} to do`} className="ml-auto rounded-full bg-amber-100 px-1.5 text-[11px] font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">{prompts.length}</span>;
 }
 
+function readMore(): boolean {
+  try {
+    return localStorage.getItem(MORE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function NavList({ items, terms, onNavigate }: { items: NavItem[]; terms: Terms; onNavigate: () => void }) {
+  const { account } = useStore();
+  const ds = useDataset();
+  const shown = items.filter((n) => (!n.adminOnly || account?.isAdmin) && (!n.when || n.when(ds)));
+  return (
+    <div className="space-y-0.5">
+      {shown.map((n) => (
+        <Link
+          key={n.to}
+          to={n.to}
+          onClick={onNavigate}
+          className={cx("flex items-center gap-3 rounded-lg px-3 py-1 text-sm text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800", n.sub && "pl-10")}
+          activeProps={{ className: "bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-100" }}
+          activeOptions={{ exact: n.to === "/" }}
+        >
+          {!n.sub && <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>}
+          {n.to === "/pensions" ? terms.pensions : n.label}
+          {n.badge === "rules" && <RulesCount />}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export function Layout() {
-  const { sync, account } = useStore();
+  const { sync } = useStore();
   const terms = termsFor(useDataset());
   // Dates render in the household's style; set before children render.
   setDisplayLocale(terms.locale);
   const [open, setOpen] = useState(false);
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const [moreSaved, setMoreSaved] = useState(() => readMore());
+  const moreOpen = moreSaved || MORE.some((n) => n.to === pathname);
+  const toggleMore = (next: boolean) => {
+    setMoreSaved(next);
+    try {
+      localStorage.setItem(MORE_KEY, next ? "1" : "0");
+    } catch {
+      // Storage can be blocked; the toggle still works for this visit.
+    }
+  };
   return (
     <div className="min-h-screen md:flex">
       <aside className={cx("fixed inset-y-0 left-0 z-40 flex w-60 transform flex-col border-r border-stone-200 bg-white p-4 transition md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")}>
         <HouseholdSwitcher onNavigate={() => setOpen(false)} />
         <nav className="-mx-1 flex-1 space-y-3 overflow-y-auto px-1" aria-label="Main">
-          {NAV.map((g) => {
-            const items = g.items.filter((n) => !n.adminOnly || account?.isAdmin);
-            return (
-              <div key={g.group}>
-                <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">{g.group}</div>
-                <div className="space-y-0.5">
-                  {items.map((n) => (
-                    <Link
-                      key={n.to}
-                      to={n.to}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 rounded-lg px-3 py-1 text-sm text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-                      activeProps={{ className: "bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-100" }}
-                      activeOptions={{ exact: n.to === "/" }}
-                    >
-                      <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>
-                      {n.to === "/pensions" ? terms.pensions : n.label}
-                      {n.badge === "rules" && <RulesCount />}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+          <NavList items={MAIN} terms={terms} onNavigate={() => setOpen(false)} />
+          <div>
+            <button type="button" aria-expanded={moreOpen} onClick={() => toggleMore(!moreOpen)} className="flex w-full items-center gap-3 rounded-lg px-3 py-1 text-left text-sm text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800">
+              <span aria-hidden className="w-4 text-center text-stone-400">{moreOpen ? "▾" : "▸"}</span>
+              More
+              {!moreOpen && <RulesCount />}
+            </button>
+            {moreOpen && <NavList items={MORE} terms={terms} onNavigate={() => setOpen(false)} />}
+          </div>
         </nav>
         <div className="mt-4 space-y-2 border-t border-stone-100 pt-3 text-xs text-stone-500 dark:border-stone-800">
           <div>{sync ? (sync.dirty ? "● Changes not yet synced" : "✓ Synced") : "Stored on this device only"}</div>

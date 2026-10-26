@@ -1,4 +1,4 @@
-import type { Currency } from "@cuntas/rules";
+import { isCurrency, type Currency } from "@cuntas/rules";
 import { assignContentIds } from "./hash";
 import { cleanPayee, parseAmount } from "./parse";
 import type { ParsedStatement } from "./types";
@@ -8,9 +8,9 @@ const tag = (block: string, name: string) => block.match(new RegExp(`<${name}>([
 /** OFX 1.x (SGML) and 2.x (XML) bank and credit card statements. */
 export function importOfx(text: string): ParsedStatement {
   const cur = tag(text, "CURDEF");
-  const currency: Currency = cur === "GBP" ? "GBP" : "EUR";
+  const currency: Currency = cur && isCurrency(cur) ? cur : "EUR";
   const warnings: string[] = [];
-  if (cur && cur !== "EUR" && cur !== "GBP") warnings.push(`Currency ${cur} is not supported; treated as EUR.`);
+  if (cur && !isCurrency(cur)) warnings.push(`Currency ${cur} is not supported; treated as EUR.`);
   const blocks = text.match(/<STMTTRN>[\s\S]*?(<\/STMTTRN>|(?=<STMTTRN>)|(?=<\/BANKTRANLIST>))/gi) ?? [];
   const txs = blocks.flatMap((b) => {
     const dt = tag(b, "DTPOSTED");

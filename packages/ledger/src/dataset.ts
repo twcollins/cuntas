@@ -1,13 +1,21 @@
 import type { ParsedStatement } from "@cuntas/importers";
-import type { Currency } from "@cuntas/rules";
+import type { Currency, Jurisdiction } from "@cuntas/rules";
 import { recategorise } from "./categories";
 import { DEFAULT_CATEGORIES } from "./categories";
 import { FxTable } from "./fx";
 import { newId } from "./ids";
-import { SCHEMA_VERSION, type Dataset, type Transaction } from "./schema";
+import { newMember, SCHEMA_VERSION, type Dataset, type Transaction } from "./schema";
 import { matchTransfers } from "./transfers";
 
-export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR", now = new Date().toISOString()): Dataset {
+/** Placeholder date of birth for a person added before they give one; residence runs from it. */
+const UNKNOWN_BIRTH_DATE = "1990-01-01";
+
+/**
+ * A new household. With `first`, it starts with that person resident in `home`, so the plan,
+ * wording and rules match where the household lives from the first screen.
+ */
+export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR", now = new Date().toISOString(), first?: { name: string; home: Jurisdiction }): Dataset {
+  const member = first ? newMember({ id: newId("m"), name: first.name, dateOfBirth: UNKNOWN_BIRTH_DATE, nationality: [first.home] }) : null;
   return {
     schemaVersion: SCHEMA_VERSION,
     household: {
@@ -26,8 +34,8 @@ export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR",
         children: 0,
       },
     },
-    members: [],
-    residencePeriods: [],
+    members: member ? [member] : [],
+    residencePeriods: member && first ? [{ id: newId("rp"), memberId: member.id, jurisdiction: first.home, from: UNKNOWN_BIRTH_DATE, to: null, declaredBy: "user" }] : [],
     institutions: [],
     connections: [],
     accounts: [],

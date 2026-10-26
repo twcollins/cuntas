@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import type { Currency } from "@cuntas/rules";
+import { isCurrency } from "@cuntas/rules";
 import { assignContentIds } from "./hash";
 import { cleanPayee, parseAmount } from "./parse";
 import type { ParsedStatement, ParsedTransaction } from "./types";
@@ -21,7 +21,7 @@ export function importCamt053(xml: string): ParsedStatement {
   for (const stmt of stmts) {
     const iban = text(get(stmt, "Acct.Id.IBAN"));
     const acctCcy = text(get(stmt, "Acct.Ccy"));
-    account = { ...(iban ? { iban } : {}), ...(acctCcy === "EUR" || acctCcy === "GBP" ? { currency: acctCcy } : {}) };
+    account = { ...(iban ? { iban } : {}), ...(acctCcy && isCurrency(acctCcy) ? { currency: acctCcy } : {}) };
     for (const e of arr(stmt.Ntry as Node | Node[])) {
       const amt = get(e, "Amt") as Node | string;
       const value = parseAmount(text(amt) ?? "");
@@ -41,7 +41,7 @@ export function importCamt053(xml: string): ParsedStatement {
       txs.push({
         bookedAt: date,
         amountMinor: credit ? Math.abs(value) : -Math.abs(value),
-        currency: (ccy === "GBP" ? "GBP" : "EUR") as Currency,
+        currency: isCurrency(ccy) ? ccy : "EUR",
         payee: party ?? cleanPayee(rawDescription),
         rawDescription,
         ...(ref ? { externalId: `camt:${ref}` } : {}),

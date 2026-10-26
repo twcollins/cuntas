@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { budgetReport, netWorthSeries, periodOf, periodRange, totalsByCategory } from "@cuntas/ledger";
 import { classify } from "@cuntas/rules";
@@ -8,7 +8,7 @@ import { NextStep } from "../components/NextStep";
 import { RulesBanner } from "../components/RulesBanner";
 import { Badge, Card, Disclaimer, PageHeader, Stat } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
-import { money, monthLabel } from "../lib/format";
+import { formatDate, money, monthLabel } from "../lib/format";
 import { useChartColors } from "../lib/theme";
 import { useDataset } from "../lib/store";
 import { currencyWord } from "../lib/region";
@@ -21,6 +21,7 @@ export function OverviewPage() {
   const catName = useCategoryName(ds);
   const series = useMemo(() => netWorthSeries(ds, asOf, 12), [ds, asOf]);
   const latest = series[series.length - 1]!;
+  const hasAccounts = ds.accounts.some((a) => !a.archived);
   const period = periodOf(asOf, ds.household.settings.paydayDayOfMonth);
   const range = periodRange(period, ds.household.settings.paydayDayOfMonth);
   const report = useMemo(() => budgetReport(ds, period), [ds, period]);
@@ -80,6 +81,9 @@ export function OverviewPage() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card title="Net worth" actions={<Badge>{base}</Badge>}>
+          {!hasAccounts ? (
+            <ChartEmpty>Add an account or import a statement to see your net worth over time. <Link to="/accounts" className="text-brand-700 underline dark:text-brand-500">Add an account</Link> · <Link to="/import" className="text-brand-700 underline dark:text-brand-500">Import</Link></ChartEmpty>
+          ) : (
           <div className="h-56">
             <ResponsiveContainer>
               <AreaChart data={series.map((p) => ({ date: p.date.slice(0, 7), net: p.netMinor / 100, fx: p.fxEffectMinor / 100 }))}>
@@ -88,15 +92,19 @@ export function OverviewPage() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} />
-                <YAxis tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} width={60} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
+                <YAxis tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} width={60} tickFormatter={(v: number) => (Math.abs(v) >= 1000 ? `${Math.round(v / 1000)}k` : String(Math.round(v)))} />
                 <Tooltip contentStyle={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 8 }} formatter={(v: number, k: string) => [money(Math.round(v * 100), base), k === "net" ? "Net worth" : "FX effect"]} />
                 <Area type="monotone" dataKey="net" stroke={colors.primary} fill="url(#nw)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-2 text-xs text-stone-500">Balances in other currencies are converted at ECB reference rates; the tooltip shows the part of each month's change caused by exchange rates.</p>
+          )}
+          {hasAccounts && <p className="mt-2 text-xs text-stone-500">Balances in other currencies are converted at ECB reference rates; the tooltip shows the part of each month's change caused by exchange rates.</p>}
         </Card>
         <Card title={`Spending this period`} actions={<Link to="/transactions" className="text-sm text-brand-700 underline dark:text-brand-500">All transactions</Link>}>
+          {spending.length === 0 ? (
+            <ChartEmpty>No spending recorded since {formatDate(range.start)}. <Link to="/import" className="text-brand-700 underline dark:text-brand-500">Import a statement</Link></ChartEmpty>
+          ) : (
           <div className="h-56">
             <ResponsiveContainer>
               <BarChart data={spending} layout="vertical" margin={{ left: 20 }}>
@@ -107,9 +115,14 @@ export function OverviewPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          )}
         </Card>
       </div>
       <Disclaimer />
     </div>
   );
+}
+
+function ChartEmpty({ children }: { children: ReactNode }) {
+  return <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-stone-300 p-6 text-center text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400"><p>{children}</p></div>;
 }

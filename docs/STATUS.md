@@ -1,6 +1,6 @@
 # Cúntas: where we are
 
-As of 2026-10-25. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents. For how the code fits together, read [ARCHITECTURE.md](ARCHITECTURE.md).
+As of 2026-10-26. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents. For how the code fits together, read [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Design documents
 
@@ -25,8 +25,9 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | USA phase 2 | Federal tax 2026 (payroll, FICA, self-employment, child tax credit), retirement and HSA limits, quarterly estimated tax, r/personalfinance ladder, 10 US bank CSV presets, en-US wording, IE–US and UK–US what-if |
 | USA phase 3 | All 50 states and D.C. have provisional 2026 packs with sources and golden tests. Local income taxes are out at launch, except Indiana's 92 county taxes |
 | Guide | Covers US households, state packs and Indiana counties |
+| UX phase 1 | Onboarding creates the first person with their residence; account countries follow currency; USD kept in OFX/CAMT/bank sync; Irish-only options and text hidden from others; empty chart states; sidebar trimmed with a More section |
 
-Checks on 2026-10-25: 399 Vitest tests and 26 Playwright tests pass (2 skipped); lint and typecheck clean.
+Checks on 2026-10-26: 404 Vitest tests and 26 Playwright tests pass (2 skipped); lint and typecheck clean.
 
 ## Rule packs
 
@@ -44,7 +45,7 @@ Checks on 2026-10-25: 399 Vitest tests and 26 Playwright tests pass (2 skipped);
 
 ## Next
 
-1. UX phases 1-6 in [design/ux-review.md](design/ux-review.md): quick add, spending estimate, import that finishes the job, review queue, setup checklist.
+1. UX phases 2-6 in [design/ux-review.md](design/ux-review.md): quick add, spending estimate, import that finishes the job, review queue, setup checklist. Phase 1 is done.
 2. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
 3. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
 4. Verify provisional packs (P0 in the backlog).

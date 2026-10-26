@@ -4,7 +4,7 @@ import { StudentLoanPicker } from "./tax/StudentLoanPicker";
 import { Badge, Button, Card, Field, Input, Modal, MoneyInput, PageHeader, Select } from "../components/ui";
 import { useAsOf } from "../lib/derived";
 import { currencyOptions, formatDate, money, taxCountryOptions, usFilingOptions, usStateOptions } from "../lib/format";
-import { homeOf } from "../lib/region";
+import { homeOf, involves } from "../lib/region";
 import { update, useDataset } from "../lib/store";
 import { COUNTRIES, COUNTRY_INFO, packOn, statePackFor, today, US_STATES, type Currency, type Jurisdiction } from "@cuntas/rules";
 
@@ -56,13 +56,13 @@ export function HouseholdPage() {
               <Field label="Expected mortgage payment" hint="For the mortgage-readiness test.">{(id) => <MoneyInput id={id} value={s.expectedMortgagePaymentMinor ?? 0} onChange={(v) => setSettings({ expectedMortgagePaymentMinor: v || null })} />}</Field>
             </div>
           )}
-          <fieldset className="mt-4 text-sm">
+          {involves(ds, "IE", asOf) && <fieldset className="mt-4 text-sm">
             <legend className="mb-1 text-xs font-medium text-stone-600">Features awaiting legislation</legend>
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={s.flags.includes("investmentAccount")} onChange={(e) => setSettings({ flags: e.target.checked ? [...s.flags, "investmentAccount"] : s.flags.filter((f) => f !== "investmentAccount") })} />
               Investment Account (from 1 July 2027, Finance Bill 2026)
             </label>
-          </fieldset>
+          </fieldset>}
         </Card>
       </div>
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Member">
