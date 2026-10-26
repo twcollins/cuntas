@@ -47,6 +47,11 @@ Checks on 2026-10-26: 425 Vitest tests and 33 Playwright tests pass (3 skipped);
 
 ## Next
 
+**Pick up here (2026-10-26):** UX phase 4, as designed in [design/ux-review.md](design/ux-review.md) §3 "Import that finishes the job": several files at once, drop anywhere, account matching, remembered mappings, a result screen, and the 60-day tracking rule. Items carried forward from phases 1 to 3, all listed under "Progress" in the review:
+- The setup checklist (phase 6) should ask for date of birth (a placeholder until edited), pay and state.
+- It should also offer the spending estimate where step 0 now offers only import.
+- The phone's floating + button moves to the centre of the bottom tab bar when that is built.
+
 1. UX phases 4-6 in [design/ux-review.md](design/ux-review.md): import that finishes the job, review queue, setup checklist. Phases 1 to 3 are done.
 2. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
 3. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
