@@ -1,6 +1,6 @@
 import { formatMoney, sumMinor, usRetirementLimits, type UsPack } from "@cuntas/rules";
 import type { EvalContext, MemberState, OptionCard, StepDefinition } from "../../types";
-import { chartRef, fullFundTarget, money, nonMortgageDebts, packRef, pct, starterFundTarget } from "../../helpers";
+import { chartRef, fundBasisUsed, fullFundTarget, money, nonMortgageDebts, packRef, pct, starterFundTarget } from "../../helpers";
 
 // US next steps, in the r/personalfinance order: budget, starter emergency fund, employer match,
 // high-interest debt, full emergency fund, HSA, IRA, 401(k) to the limit, then other goals.
@@ -116,7 +116,7 @@ const starterFund: StepDefinition<UsPack> = {
           gap: money(ctx, Math.max(0, target - s.liquidSavingsMinor)),
           floor: money(ctx, s.thresholds.starterFundFloorMinor),
           months: s.thresholds.starterFundMonths,
-          basis: s.thresholds.fundBasis === "netPay" ? "take-home pay" : "essential spending",
+          basis: fundBasisUsed(s) === "netPay" ? "take-home pay" : "essential spending",
           target: money(ctx, target),
           saved: money(ctx, s.liquidSavingsMinor),
         };
@@ -196,7 +196,7 @@ const debt: StepDefinition<UsPack> = {
         return {
           target: money(ctx, f.targetMinor),
           months: f.months,
-          basis: s.thresholds.fundBasis === "netPay" ? "take-home pay" : "essential spending",
+          basis: fundBasisUsed(s) === "netPay" ? "take-home pay" : "essential spending",
           reason: f.months === s.thresholds.fullFundMonthsHigh ? "Single-income and self-employed households use the upper end." : "Two-income households use the lower end.",
           saved: money(ctx, s.liquidSavingsMinor),
         };

@@ -26,7 +26,8 @@ import { periodOf, periodRange } from "./budgets";
 import { FxTable } from "./fx";
 import { goalProgress } from "./goals";
 import type { Dataset, Member } from "./schema";
-import { categoryMap, essentialMonthlySpend, isCashflow, totalsByCategory } from "./spending";
+import { essentialSpend } from "./estimate";
+import { categoryMap, isCashflow, totalsByCategory } from "./spending";
 import { paydayWaterfall, ESSENTIAL_BUCKETS } from "./waterfall";
 
 export function residenceOn(ds: Dataset, memberId: string, date: IsoDate): Jurisdiction {
@@ -230,8 +231,14 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart?: ChartDefaults)
   const netMonthlyPay = members.reduce((a, m) => a + m.netMonthlyMinor, 0);
   const needs: Record<string, number> = {};
   const budget = ds.budgets.find((b) => b.period === period);
+  const essential = essentialSpend(ds, asOf, MONTHS_PER_YEAR, fx);
   if (budget) {
     for (const l of budget.lines) {
+      const w = cats.get(l.categoryId)?.waterfall;
+      if (w) needs[w] = (needs[w] ?? 0) + l.amountMinor;
+    }
+  } else if (essential.source === "estimate") {
+    for (const l of ds.household.spendingEstimate!.lines) {
       const w = cats.get(l.categoryId)?.waterfall;
       if (w) needs[w] = (needs[w] ?? 0) + l.amountMinor;
     }
@@ -264,7 +271,7 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart?: ChartDefaults)
     members,
     netMonthlyPayMinor: netMonthlyPay,
     liquidSavingsMinor: liquid,
-    essentialMonthlySpendMinor: essentialMonthlySpend(ds, asOf, MONTHS_PER_YEAR, fx),
+    essentialMonthlySpendMinor: essential.monthlyMinor,
     tracking: {
       hasBudgetThisPeriod: hasBudget,
       transactionsLast30Days: last30.length,

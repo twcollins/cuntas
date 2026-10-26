@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { budgetReport, netWorthSeries, periodOf, periodRange, totalsByCategory } from "@cuntas/ledger";
+import { budgetReport, essentialSpend, netWorthSeries, periodOf, periodRange, totalsByCategory } from "@cuntas/ledger";
 import { classify } from "@cuntas/rules";
-import { starterFundTarget } from "@cuntas/engine";
+import { fundBasisUsed, starterFundTarget } from "@cuntas/engine";
 import { NextStep } from "../components/NextStep";
 import { RulesBanner } from "../components/RulesBanner";
+import { SpendingEstimateSheet } from "../components/SpendingEstimate";
 import { Badge, Card, Disclaimer, PageHeader, Stat } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
 import { formatDate, money, monthLabel } from "../lib/format";
@@ -31,6 +32,18 @@ export function OverviewPage() {
   }, [ds, range.start, range.end, catName]);
   const debtTotal = snapshot.debts.filter((d) => d.kind !== "mortgage").reduce((a, d) => a + d.balanceMinor, 0);
   const starter = starterFundTarget(snapshot);
+  const essential = useMemo(() => essentialSpend(ds, asOf), [ds, asOf]);
+  const [estimating, setEstimating] = useState(false);
+  const linkCls = "text-brand-700 underline dark:text-brand-500";
+  // Say what the target rests on when it isn't pay, and ask for a figure when there's nothing to go on.
+  const fundHint =
+    fundBasisUsed(snapshot) === "essentialSpend" && essential.source === "estimate" ? (
+      <>Starter target {money(starter, base)}, based on your estimate · <button type="button" className={linkCls} onClick={() => setEstimating(true)}>Change</button></>
+    ) : snapshot.netMonthlyPayMinor <= 0 && essential.source === "none" ? (
+      <>Starter target {money(starter, base)} · <button type="button" className={linkCls} onClick={() => setEstimating(true)}>Add your monthly spending</button> for a target that fits</>
+    ) : (
+      `Starter target ${money(starter, base)}`
+    );
   const warnings = useMemo(() => {
     const out: string[] = [];
     for (const a of ds.accounts.filter((x) => x.wrapper === "ISA" && !x.archived)) {
@@ -73,7 +86,7 @@ export function OverviewPage() {
         </div>
         <div className="space-y-4">
           <Stat label="Net worth" value={money(latest.netMinor, base)} hint={fxNow !== 0 ? `FX effect this month ${money(fxNow, base)}` : `Assets ${money(latest.assetsMinor, base)} · debts ${money(latest.liabilitiesMinor, base)}`} />
-          <Stat label="Emergency fund" value={money(snapshot.liquidSavingsMinor, base)} hint={`Starter target ${money(starter, base)}`} tone={snapshot.liquidSavingsMinor >= starter ? "good" : undefined} />
+          <Stat label="Emergency fund" value={money(snapshot.liquidSavingsMinor, base)} hint={fundHint} tone={snapshot.liquidSavingsMinor >= starter ? "good" : undefined} />
           <Stat label="Debt (excl. mortgage)" value={money(debtTotal, base)} tone={debtTotal > 0 ? "bad" : "good"} hint={<Link to="/debts" className="underline">Payoff planner</Link>} />
           {report && <Stat label="Left to spend this period" value={money(report.lines.reduce((a, l) => a + Math.max(0, l.availableMinor), 0), base)} hint={`${money(report.spentMinor, base)} spent of ${money(report.budgetedMinor, base)} budgeted`} />}
         </div>
@@ -119,6 +132,7 @@ export function OverviewPage() {
         </Card>
       </div>
       <Disclaimer />
+      <SpendingEstimateSheet open={estimating} onClose={() => setEstimating(false)} />
     </div>
   );
 }

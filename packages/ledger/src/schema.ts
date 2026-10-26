@@ -29,6 +29,11 @@ export const householdSchema = z.object({
     expectedMortgagePaymentMinor: minor.nullable().default(null),
     children: z.number().int().min(0).default(0),
   }),
+  /** Rough monthly spending per category, in base currency; stands in for transactions until they cover two months. */
+  spendingEstimate: z
+    .object({ setOn: isoDate, lines: z.array(z.object({ categoryId: id, amountMinor: minor })) })
+    .nullable()
+    .default(null),
 });
 
 export const memberSchema = z.object({

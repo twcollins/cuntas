@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { addMonths } from "@cuntas/rules";
-import { BUCKET_LABELS, budgetReport, newId, paydayWaterfall, periodOf, periodRange, previousPeriod, totalsByCategory, type Budget, type WaterfallBucket } from "@cuntas/ledger";
+import { BUCKET_LABELS, budgetFromEstimate, budgetReport, newId, paydayWaterfall, periodOf, periodRange, previousPeriod, totalsByCategory, type Budget, type WaterfallBucket } from "@cuntas/ledger";
+import { starterFundTarget } from "@cuntas/engine";
+import { SpendingEstimateSheet } from "../components/SpendingEstimate";
 import { Badge, Button, Card, Empty, MoneyInput, PageHeader, ProgressBar, Select, Table } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
 import { formatDate, money, monthLabel } from "../lib/format";
@@ -17,8 +19,14 @@ export function BudgetsPage() {
   const report = useMemo(() => budgetReport(ds, period), [ds, period]);
   const range = periodRange(period, payday);
   const [adding, setAdding] = useState("");
+  const [estimating, setEstimating] = useState(false);
 
   const saveBudget = (b: Budget) => update((d) => ({ ...d, budgets: [...d.budgets.filter((x) => x.period !== b.period), b] }));
+
+  const fromEstimate = () => update((d) => {
+    const b = budgetFromEstimate(d, period);
+    return b ? { ...d, budgets: [...d.budgets.filter((x) => x.period !== period), b] } : d;
+  });
 
   function create(from: "previous" | "spending") {
     const prev = ds.budgets.find((b) => b.period === previousPeriod(period));
@@ -38,7 +46,7 @@ export function BudgetsPage() {
       if (w) out[w] = (out[w] ?? 0) + l.amountMinor;
     }
     out.minimumDebt = Math.max(out.minimumDebt ?? 0, snapshot.debts.reduce((a, d) => a + d.minPaymentMinor, 0));
-    const gap = Math.max(0, snapshot.thresholds.starterFundFloorMinor, snapshot.netMonthlyPayMinor) - snapshot.liquidSavingsMinor;
+    const gap = starterFundTarget(snapshot) - snapshot.liquidSavingsMinor;
     out.emergencyFund = Math.max(out.emergencyFund ?? 0, gap);
     return out;
   }, [budget, ds.categories, snapshot]);
@@ -62,9 +70,14 @@ export function BudgetsPage() {
           {!budget || !report ? (
             <Card>
               <Empty title="No budget for this period">
-                <div className="mt-3 flex justify-center gap-2">
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
                   <Button variant="primary" onClick={() => create("previous")} disabled={!ds.budgets.some((b) => b.period === previousPeriod(period))}>Copy last period</Button>
                   <Button onClick={() => create("spending")}>Start from last period's spending</Button>
+                  {ds.household.spendingEstimate ? (
+                    <Button onClick={fromEstimate}>Start from your monthly estimate</Button>
+                  ) : (
+                    <Button onClick={() => setEstimating(true)}>Start from a rough monthly figure</Button>
+                  )}
                 </div>
               </Empty>
             </Card>
@@ -139,6 +152,7 @@ export function BudgetsPage() {
           </div>
         </Card>
       </div>
+      <SpendingEstimateSheet open={estimating} onClose={() => setEstimating(false)} saveLabel="Save and make a budget" onSaved={fromEstimate} />
     </div>
   );
 }

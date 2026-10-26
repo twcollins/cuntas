@@ -1,5 +1,5 @@
 import type { EvalContext, StepDefinition } from "../../types";
-import { chartRef, money, starterFundTarget } from "../../helpers";
+import { chartRef, fundBasisUsed, money, starterFundTarget } from "../../helpers";
 
 // DIRT is Irish; a household with nobody resident in Ireland doesn't pay it.
 const paysDirt = (ctx: EvalContext) => ctx.snapshot.members.length === 0 || ctx.snapshot.members.some((m) => m.residence === "IE");
@@ -19,7 +19,7 @@ export const starterFund: StepDefinition = {
       progress: ({ snapshot }) => ({ current: snapshot.liquidSavingsMinor, target: starterFundTarget(snapshot), unit: snapshot.currency }),
       headline: "Save {gap} more for your starter emergency fund",
       explain:
-        "The chart's starter fund is the greater of {floor} or {months} month's net pay ({target}). You have {saved} in cash savings.{dirtNote}",
+        "The chart's starter fund is the greater of {floor} or {months} month's {basis} ({target}). You have {saved} in cash savings.{dirtNote}",
       vars: (ctx) => {
         const s = ctx.snapshot;
         const target = starterFundTarget(s);
@@ -27,6 +27,7 @@ export const starterFund: StepDefinition = {
           gap: money(ctx, Math.max(0, target - s.liquidSavingsMinor)),
           floor: money(ctx, s.thresholds.starterFundFloorMinor),
           months: s.thresholds.starterFundMonths,
+          basis: fundBasisUsed(s) === "netPay" ? "net pay" : "essential spending",
           target: money(ctx, target),
           saved: money(ctx, s.liquidSavingsMinor),
           dirtNote: paysDirt(ctx) ? ` Interest on deposits is subject to DIRT at ${ctx.pack.dirt.rate * 100}%.` : "",

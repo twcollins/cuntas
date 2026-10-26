@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getPack, toMinor } from "@cuntas/rules";
-import { evaluate } from "../src";
+import { evaluate, fundBasisUsed } from "../src";
 import { member, snapshot } from "./fixtures";
 
 const pack = getPack("IE", "2026");
@@ -38,6 +38,17 @@ describe("next-step engine", () => {
     expect(r.current?.headline).toBe("Save €1,200 more for your starter emergency fund");
     const low = evaluate(snapshot({ liquidSavingsMinor: toMinor(1000), netMonthlyPayMinor: toMinor(1000) }), pack);
     expect(low.current?.progress.target).toBe(toMinor(1500));
+  });
+
+  it("with no pay recorded, the funds are based on essential spending instead", () => {
+    const noPay = { liquidSavingsMinor: toMinor(500), netMonthlyPayMinor: 0, essentialMonthlySpendMinor: toMinor(2400) };
+    const r = evaluate(snapshot(noPay), pack);
+    expect(fundBasisUsed(snapshot(noPay))).toBe("essentialSpend");
+    expect(r.current?.progress.target).toBe(toMinor(2400));
+    expect(r.current?.why).toContain("1 month's essential spending (€2,400)");
+    // Neither known: the floor.
+    expect(evaluate(snapshot({ ...noPay, essentialMonthlySpendMinor: 0 }), pack).current?.progress.target).toBe(toMinor(1500));
+    expect(fundBasisUsed(snapshot())).toBe("netPay");
   });
 
   it("step 2 is always-on: an unclaimed match shows as a second card beside the current step", () => {

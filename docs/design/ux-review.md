@@ -1,6 +1,6 @@
 # Cúntas: UX review, getting money in
 
-2026-10-25 · Review and proposed design. Status: proposed, not started.
+2026-10-25 · Review and proposed design. Status: phases 1 to 3 done (see Progress).
 
 Getting money into Cúntas is the weakest part of the app. There is no way to add a single spend by hand, no way to give a rough monthly spend without importing a statement, and an import leaves you with raw bank text and a column of "Uncategorised" to fix one dropdown at a time. The planning and tax side is strong, but most people will never reach it if the first ten minutes feel like data entry. This review sets out the problems found and a design that makes the first useful result take under three minutes.
 
@@ -213,6 +213,20 @@ Changed from the design above:
 - An import merges a matching hand-entered row on its own (same account and amount, dates within 3 days) and reports how many it matched, instead of asking. That keeps import free of extra choices, which phase 4 aims for.
 - Moved can't use the Cash wallet as the destination, since its balance isn't kept; depositing cash is recorded as Moved from Cash.
 - The phone button is a floating one at the bottom right until the bottom tab bar from mobile-apps.md phase 2 gives it a centre slot.
+
+**Phase 3, done 2026-10-26.** A household with no transactions and no pay gets an emergency-fund target from its estimate ($3,000 for $3,000 of essentials a month, instead of the $1,000 floor), and one tap makes a first budget from it (`packages/ledger/test/estimate.test.ts`, `e2e/estimate.spec.ts`).
+
+- The form has the seven lines above, prefilled from rent (or the mortgage payment for owners) and debt minimum payments, then from the saved estimate. It opens from the Emergency fund figure on Overview ("Add your monthly spending", or "Change" once set) and from Budgets.
+- `household.spendingEstimate` stores the non-zero lines and the date. `essentialSpend` uses transactions once any is two months old, the estimate before that, and any transactions when there's no estimate. The snapshot's waterfall uses the estimate when there's no budget.
+- Overview says "based on your estimate" when the starter target comes from it.
+- Budgets: "Start from your monthly estimate", or "Start from a rough monthly figure", which opens the form and saves it as the budget too.
+
+Changed from the design above:
+
+- The chart bases the fund on net pay by default, so the estimate alone wouldn't change the target. The engine now uses essential spending whenever no pay is recorded (`fundBasisUsed`), and the card wording follows. With pay recorded, the target stays on pay unless the household chose essential spending on Next steps.
+- "Two full months" is read as: some transaction is at least two months old.
+- "Utilities and phone" maps to the Energy category, since each line maps to one category; the budget it makes shows that line as Energy.
+- Step 0 still says "Start tracking" with an import button; the setup checklist (phase 6) will offer the estimate there.
 
 ## Testing
 

@@ -63,6 +63,13 @@ describe("US next steps (r/personalfinance order)", () => {
     expect(r.current?.headline).toBe("Save $3,000 more for a starter emergency fund");
   });
 
+  it("starter fund: with no pay yet, one month of essential spending", () => {
+    const r = evaluateUs(usSnapshot({ members: [], netMonthlyPayMinor: 0, liquidSavingsMinor: 0 }), pack);
+    expect(r.current?.check).toBe("us.starter-fund");
+    expect(r.current?.headline).toBe("Save $3,000 more for a starter emergency fund");
+    expect(r.current?.why).toContain("1 month of essential spending");
+  });
+
   it("an unclaimed employer match shows beside the current step", () => {
     const m = usMember({ pension: { ...usMember().pension, employeeRate: 0.02 } });
     const r = evaluateUs(usSnapshot({ members: [m], liquidSavingsMinor: toMinor(2000) }), pack);

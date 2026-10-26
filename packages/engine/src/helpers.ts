@@ -20,8 +20,13 @@ export function defaultThresholds(chart: ChartDefaults): Thresholds {
   };
 }
 
+/** The basis the fund targets use: the household's choice, or essential spending while no pay is recorded. */
+export function fundBasisUsed(s: HouseholdSnapshot): Thresholds["fundBasis"] {
+  return s.thresholds.fundBasis === "essentialSpend" || (s.netMonthlyPayMinor <= 0 && s.essentialMonthlySpendMinor > 0) ? "essentialSpend" : "netPay";
+}
+
 function fundBasisMinor(s: HouseholdSnapshot): number {
-  return s.thresholds.fundBasis === "essentialSpend" ? s.essentialMonthlySpendMinor : s.netMonthlyPayMinor;
+  return fundBasisUsed(s) === "essentialSpend" ? s.essentialMonthlySpendMinor : s.netMonthlyPayMinor;
 }
 
 export function starterFundTarget(s: HouseholdSnapshot): number {

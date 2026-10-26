@@ -219,13 +219,17 @@ flowchart LR
 
 When the user corrects a category on [Transactions](../apps/web/src/pages/Transactions.tsx), `suggestRule` offers a `payeeContains` rule for similar lines.
 
+### Spending estimate
+
+`household.spendingEstimate` holds rough monthly amounts per category (`{ setOn, lines: [{ categoryId, amountMinor }] }`), set from [components/SpendingEstimate.tsx](../apps/web/src/components/SpendingEstimate.tsx) on Overview or Budgets. [ledger/src/estimate.ts](../packages/ledger/src/estimate.ts) maps the form's seven lines to default categories (`ESTIMATE_LINES`), prefills them from rent, mortgage and debt payments (`estimateForm`), and makes a first budget from them (`budgetFromEstimate`). `essentialSpend(ds, asOf)` returns essential monthly spending and its source: transactions once any is at least two months old, otherwise the estimate's essential lines, otherwise whatever transactions exist. `buildSnapshot` uses it for `essentialMonthlySpendMinor`, and fills the waterfall's needs from the estimate when there is no budget and the estimate is the source. In the engine, `fundBasisUsed` switches the fund targets to essential spending when the household chose that or no pay is recorded.
+
 ### 4b. Snapshot, engine and the next step
 
 1. **Hook.** `usePlan(ds)` in [apps/web/src/lib/derived.ts](../apps/web/src/lib/derived.ts) memoises on the dataset, today's date and `rules.revision` (bumped when a rule file loads).
 2. **Snapshot.** `buildSnapshot(ds, asOf)` in [ledger/src/snapshot.ts](../packages/ledger/src/snapshot.ts) produces a `HouseholdSnapshot` ([engine/src/types.ts](../packages/engine/src/types.ts)). It contains:
    - `plan` (`"IE"` or `"US"`, from `planFor`) and the base `currency`.
    - Per member (`MemberState`): age, residence, gross and net monthly pay (from `memberPay`, see 4c), marginal rate, pension rates and employer match, MyFutureFund status, and for US members a `us` block (MAGI, workplace plan coverage, IRA and HSA contributions this year).
-   - Household figures: liquid savings (accounts marked as emergency fund), 12-month essential spend, tracking counts, the payday waterfall result, debts, sinking funds, housing, children and college goals, dismissals, and the tax set-aside for the self-employed (IE/UK preliminary tax, or US quarterly estimated tax).
+   - Household figures: liquid savings (accounts marked as emergency fund), 12-month essential spend (or the spending estimate until transactions cover two months), tracking counts, the payday waterfall result, debts, sinking funds, housing, children and college goals, dismissals, and the tax set-aside for the self-employed (IE/UK preliminary tax, or US quarterly estimated tax).
    - `thresholds` from the flowchart file (`chartDefaults(plan)`) with the household's `thresholdOverrides` applied (`thresholdsFor`).
 3. **Evaluate.** `evaluate(snapshot, iePack)` or `evaluateUs(snapshot, usPack)` in [engine/src/engine.ts](../packages/engine/src/engine.ts). Both call `runLadder`:
    - Steps run in `order`. A step's `scope` is `household` (once) or `member` (once per member).

@@ -186,7 +186,7 @@ The MVP (P0) is a trustworthy household ledger plus the next-step engine for Iri
 | Income | Variable income and bonuses | IE, UK | P1 | Smooths irregular pay for budgeting; marginal tax on a bonus |
 | Debt | Debt register and payoff planner | IE, UK | P0 MVP | Avalanche or snowball; payoff date, total interest, interest saved per extra EUR 50 |
 | Debt | Mortgage overpay vs invest vs pension | IE, UK | P1 | Compares after-tax outcomes using the user's marginal rate and the rule pack |
-| Goals | Goals and emergency fund | IE, UK | P0 MVP | Chart targets by default (greater of EUR 1,500 or one month's net pay, then EUR 4,500-9,000 or 3-6 months), with an option to base them on essential spending; goal pots with dates and monthly amount needed |
+| Goals | Goals and emergency fund | IE, UK | P0 MVP | Chart targets by default (greater of EUR 1,500 or one month's net pay, then EUR 4,500-9,000 or 3-6 months), with an option to base them on essential spending (used automatically while no pay is recorded; essential spending comes from a rough monthly estimate until transactions cover two months); goal pots with dates and monthly amount needed |
 | Goals | Help to Buy estimator | IE | P1 | Lowest of EUR 35,000, 10% of price, and tax plus DIRT paid over 4 years |
 | Pensions | Pension register | IE, UK | P0 MVP | Occupational DC/DB, PRSA, AVC, MyFutureFund, ARF, UK workplace DC/DB, SIPP, both State Pensions |
 | Pensions | Tax-relief headroom | IE (UK annual allowance P1) | P0 MVP | Unused age-band relief this year, euro value at marginal rate, deadline (31 Oct via Form 11/ROS for prior year) |

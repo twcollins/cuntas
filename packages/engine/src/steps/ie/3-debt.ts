@@ -1,6 +1,6 @@
 import { sumMinor } from "@cuntas/rules";
 import type { EvalContext, StepDefinition } from "../../types";
-import { chartRef, fullFundTarget, money, nonMortgageDebts, pct } from "../../helpers";
+import { chartRef, fundBasisUsed, fullFundTarget, money, nonMortgageDebts, pct } from "../../helpers";
 
 const high = (ctx: EvalContext) => nonMortgageDebts(ctx.snapshot).filter((d) => d.apr > ctx.snapshot.thresholds.highAprAbove);
 const moderate = (ctx: EvalContext) =>
@@ -54,7 +54,7 @@ export const debt: StepDefinition = {
         return {
           target: money(ctx, f.targetMinor),
           months: f.months,
-          basis: s.thresholds.fundBasis === "netPay" ? "net pay" : "essential spending",
+          basis: fundBasisUsed(s) === "netPay" ? "net pay" : "essential spending",
           reason:
             f.months === s.thresholds.fullFundMonthsHigh
               ? "Single-income and self-employed households use the upper end."

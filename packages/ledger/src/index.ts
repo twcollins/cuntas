@@ -13,6 +13,7 @@ export * from "./goals";
 export * from "./snapshot";
 export * from "./dataset";
 export * from "./manual";
+export * from "./estimate";
 export * from "./io";
 export * from "./recurring";
 export * from "./retirement";
