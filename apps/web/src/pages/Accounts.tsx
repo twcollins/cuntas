@@ -63,7 +63,7 @@ export function AccountsPage() {
                       </td>
                       <td className="px-2 py-2 text-stone-500">{typeLabel(a.type, terms)}</td>
                       <td className="px-2 py-2 text-right tabular-nums">
-                        {moneyExact(native.get(a.id) ?? 0, a.currency)}
+                        {a.tracksBalance === false ? <span className="text-stone-500" title="Spending from this wallet counts; its balance isn't kept.">Not tracked</span> : moneyExact(native.get(a.id) ?? 0, a.currency)}
                         {valued && <div className="text-xs text-stone-500">valued {formatDate(valued.date)}</div>}
                       </td>
                       <td className="px-2 py-2 text-right tabular-nums text-stone-500">{base.get(a.id) === null ? "FX rate needed" : money(base.get(a.id)!, baseCur)}</td>
@@ -168,6 +168,7 @@ function BankConnections() {
     const rows = await api!.connectionTransactions(sync!.householdId, connId, "2000-01-01");
     let d = ds;
     let added = 0;
+    let merged = 0;
     for (const acc of accounts) {
       let local = d.accounts.find((a) => a.institutionId === `conn:${connId}:${acc.ref}`);
       if (!local) {
@@ -178,9 +179,10 @@ function BankConnections() {
       const r = importStatement(d, local.id, { format: "csv", warnings: [], transactions: rows.filter((x) => x.accountRef === acc.ref).map((x) => x.transaction) });
       d = r.dataset;
       added += r.added;
+      merged += r.merged;
     }
     replaceDataset(d);
-    setMessage(`Synced: ${added} new transactions.`);
+    setMessage(`Synced: ${added} new transactions${merged ? `; ${merged} matched to ones you added by hand` : ""}.`);
   }
 
   return (

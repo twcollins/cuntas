@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { reconcile, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
+import { reconcile, removeManualTransaction, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
+import { openQuickAdd } from "../components/QuickAdd";
 import { Badge, Button, Card, Empty, Input, PageHeader, Select, Table } from "../components/ui";
 import { useCategoryName } from "../lib/derived";
 import { formatDate, moneyExact } from "../lib/format";
@@ -27,6 +28,10 @@ export function TransactionsPage() {
 
   const categoryOptions = [{ value: "", label: "Uncategorised" }, ...ds.categories.map((c) => ({ value: c.id, label: `${c.group}: ${c.name}` }))];
 
+  function removeManual(t: Transaction) {
+    if (window.confirm(`Delete ${t.payee || "this entry"} (${moneyExact(t.amountMinor, t.currency)})?`)) update((d) => removeManualTransaction(d, t.id));
+  }
+
   function setCategoryFor(t: Transaction, categoryId: string) {
     update((d) => ({ ...d, transactions: d.transactions.map((x) => (x.id === t.id ? { ...x, categoryId: categoryId || null, categorySource: categoryId ? "user" : "none" } : x)) }), "transaction.recategorise");
     if (!categoryId) return;
@@ -38,7 +43,7 @@ export function TransactionsPage() {
 
   return (
     <div>
-      <PageHeader title="Transactions" subtitle={`${ds.transactions.length} transactions. Transfers between your own accounts are matched automatically and not counted as spending.`} />
+      <PageHeader title="Transactions" subtitle={`${ds.transactions.length} transactions. Transfers between your own accounts are matched automatically and not counted as spending.`} actions={<Button variant="primary" onClick={openQuickAdd}>Add transaction</Button>} />
       {offer && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm dark:border-brand-900 dark:bg-brand-900/30">
           <span>
@@ -67,8 +72,10 @@ export function TransactionsPage() {
                 <tr key={t.id} className="align-middle">
                   <td className="whitespace-nowrap px-2 py-2 text-stone-500">{formatDate(t.bookedAt)}</td>
                   <td className="px-2 py-2">
-                    <div className="font-medium">{t.payee || t.rawDescription}</div>
-                    <div className="flex gap-1">
+                    <div className="font-medium">{t.payee || t.rawDescription || "Added by hand"}</div>
+                    <div className="flex items-center gap-1">
+                      {t.source === "manual" && <Badge>by hand</Badge>}
+                      {t.source === "manual" && <button type="button" className="text-xs text-stone-500 underline hover:text-rose-700" aria-label={`Delete ${t.payee || "entry"} on ${formatDate(t.bookedAt)}`} onClick={() => removeManual(t)}>Delete</button>}
                       {t.transferPairId && <Badge tone="info">Transfer · {accounts.get(ds.transactions.find((x) => x.id === t.transferPairId)?.accountId ?? "")?.name ?? "matched"}</Badge>}
                       {t.categorySource === "dictionary" && <Badge>auto</Badge>}
                       {t.categorySource === "rule" && <Badge>rule</Badge>}

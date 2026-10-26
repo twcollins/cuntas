@@ -7,6 +7,7 @@ import { switchHousehold, useDataset, useStore } from "../lib/store";
 import { setTheme, useTheme, type ThemePreference } from "../lib/theme";
 import { setDisplayLocale } from "../lib/format";
 import { involves, termsFor, type Terms } from "../lib/region";
+import { openQuickAdd, QuickAddHost } from "./QuickAdd";
 import { cx } from "./ui";
 
 type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules"; sub?: boolean; when?: (ds: Dataset) => boolean };
@@ -178,6 +179,9 @@ export function Layout() {
     <div className="min-h-screen md:flex">
       <aside className={cx("fixed inset-y-0 left-0 z-40 flex w-60 transform flex-col border-r border-stone-200 bg-white p-4 transition md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")}>
         <HouseholdSwitcher onNavigate={() => setOpen(false)} />
+        <button type="button" title="Add a spend, money received or a move (N)" onClick={() => { setOpen(false); openQuickAdd(); }} className="mb-4 hidden w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 md:flex">
+          <span aria-hidden>+</span> Add
+        </button>
         <nav className="-mx-1 flex-1 space-y-3 overflow-y-auto px-1" aria-label="Main">
           <NavList items={MAIN} terms={terms} onNavigate={() => setOpen(false)} />
           <div>
@@ -199,9 +203,13 @@ export function Layout() {
           <button type="button" aria-label="Open menu" className="rounded p-1 text-xl" onClick={() => setOpen(true)}>☰</button>
           <span className="font-semibold">Cúntas</span>
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
+        <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:px-8 md:py-8">
           <Outlet />
         </main>
+        <button type="button" aria-label="Add" onClick={openQuickAdd} className="fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-3xl text-white shadow-lg hover:bg-brand-700 md:hidden" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
+          <span aria-hidden>+</span>
+        </button>
+        <QuickAddHost />
       </div>
     </div>
   );

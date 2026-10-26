@@ -58,7 +58,7 @@ export function ImportPage() {
     const r = importStatement(d, target, parsed);
     replaceDataset(r.dataset);
     setAccountId(target);
-    setResult(`Imported ${r.added} new transaction${r.added === 1 ? "" : "s"}${r.skipped ? `; skipped ${r.skipped} already imported` : ""}.${r.warnings.length ? ` ${r.warnings.length} warning(s).` : ""}`);
+    setResult(`Imported ${r.added} new transaction${r.added === 1 ? "" : "s"}${r.merged ? `; ${r.merged} matched to ones you added by hand` : ""}${r.skipped ? `; skipped ${r.skipped} already imported` : ""}.${r.warnings.length ? ` ${r.warnings.length} warning(s).` : ""}`);
   }
 
   const colOptions = [{ value: "", label: "—" }, ...headers.map((h) => ({ value: h, label: h }))];

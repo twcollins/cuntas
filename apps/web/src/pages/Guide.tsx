@@ -18,6 +18,7 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
     intro: "Where the money goes, and what is coming up.",
     topics: [
       { to: "/", label: "Overview", body: "Net worth, emergency fund, debt, what is left to spend this period, and your next step at a glance." },
+      { to: "/transactions", label: "Add a spend", body: "Press + Add (or N on a keyboard) on any page to record a cash spend, money received or a move between your accounts: amount, category, Save. Tick \"every month\" to add it to Bills as well. If the same payment later arrives in a bank import, it's matched to your entry instead of counted twice." },
       { to: "/transactions", label: "Transactions", body: "Search and categorise. Correct one transaction and you'll be offered a rule for the rest from that merchant." },
       { to: "/budgets", label: "Budgets", body: "Envelope or cap budgets per category. Periods run from your payday, set on the Household page." },
       { to: "/bills", label: "Bills", body: "Subscriptions and bills found in your transactions, price rises flagged, plus a calendar of the yearly ones that are easy to forget." },

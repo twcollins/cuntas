@@ -12,6 +12,7 @@ export * from "./netWorth";
 export * from "./goals";
 export * from "./snapshot";
 export * from "./dataset";
+export * from "./manual";
 export * from "./io";
 export * from "./recurring";
 export * from "./retirement";

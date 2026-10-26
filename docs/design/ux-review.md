@@ -201,6 +201,19 @@ Changed from the design above:
 - A UK-only household still runs the Irish step order and thresholds; only the Irish-only text is removed. A UK ladder is separate work.
 - The first person's date of birth is a placeholder (1 January 1990) until edited. The "You" line of the setup checklist (phase 6) should ask for it with pay and state.
 
+**Phase 2, done 2026-10-26.** A cash spend takes four taps (+ Add, amount, category chip, Save), and a later import of the same payment merges into it rather than double counting (`packages/ledger/test/manual.test.ts`, `e2e/quick-add.spec.ts`).
+
+- **+ Add** in the sidebar on desktop, a floating button on phone, **Add transaction** on Transactions, and `N` on a keyboard open the sheet. Spent, Received or Moved; amount; optional payee, which fills the category; six category chips (most used, then common ones) and a More menu; account; date; "every month" adds a monthly bill. Enter saves; Shift+Enter or **Save and add another** keeps the sheet open.
+- Rows entered by hand carry `source: "manual"`, show a "by hand" badge on Transactions and can be deleted there (a move deletes both sides).
+- The Cash account is created on first use with `tracksBalance: false`: its spending counts, its balance is shown as "Not tracked" and stays out of net worth, so cash spending doesn't drive net worth negative.
+- Typing "Netflix" picked Commute and fuel because the dictionary's `tfl` matched inside it; short brand names in that pattern now match whole words only.
+
+Changed from the design above:
+
+- An import merges a matching hand-entered row on its own (same account and amount, dates within 3 days) and reports how many it matched, instead of asking. That keeps import free of extra choices, which phase 4 aims for.
+- Moved can't use the Cash wallet as the destination, since its balance isn't kept; depositing cash is recorded as Moved from Cash.
+- The phone button is a floating one at the bottom right until the bottom tab bar from mobile-apps.md phase 2 gives it a centre slot.
+
 ## Testing
 
 - Unit tests for merchant cleaning (a table of real-looking bank strings and expected names), the account matcher, manual/import merging, and the estimate fallback in the snapshot.

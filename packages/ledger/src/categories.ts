@@ -40,7 +40,7 @@ export const MERCHANT_DICTIONARY: { pattern: RegExp; categoryId: string }[] = [
   { pattern: /uisce [eé]ireann|irish water|panda waste|greyhound|city bin|thames water|nw water/i, categoryId: "cat_water_bins" },
   { pattern: /boots|pharmacy|chemist|hickey'?s|lloyds pharmacy|superdrug/i, categoryId: "cat_toiletries" },
   { pattern: /\bvhi\b|laya|irish life health|level health|bupa|axa health/i, categoryId: "cat_health_insurance" },
-  { pattern: /leap card|\btfi\b|irish rail|iarnr[oó]d|dublin bus|bus [eé]ireann|luas|go-?ahead|translink|tfl|trainline|circle k|applegreen|maxol|texaco|topaz|emo\b|shell|\bbp\b|esso|parking|eflow|m50/i, categoryId: "cat_commute" },
+  { pattern: /leap card|\btfi\b|irish rail|iarnr[oó]d|dublin bus|bus [eé]ireann|luas|go-?ahead|translink|\btfl\b|trainline|circle k|applegreen|maxol|texaco|topaz|\bemo\b|\bshell\b|\bbp\b|\besso\b|parking|eflow|m50/i, categoryId: "cat_commute" },
   { pattern: /motor tax|\bnct\b|aviva|axa|allianz|liberty insurance|fbd|zurich|an post insurance|chill insurance|123\.ie|dvla|\bmot\b/i, categoryId: "cat_car" },
   { pattern: /\beir\b|vodafone|three\.ie|\bthree\b|virgin media|sky\b|\bbt\b|bt group|48\.ie|gomo|tesco mobile|giffgaff|\bee\b|o2|pure telecom|digiweb/i, categoryId: "cat_phone_internet" },
   { pattern: /netflix|spotify|disney\+?|amazon prime|apple\.com|icloud|youtube premium|now tv|tv licen[cs]e|xbox|playstation|audible/i, categoryId: "cat_tv_subs" },

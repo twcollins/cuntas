@@ -10,6 +10,7 @@ export function latestValuation(account: Account, asOf: IsoDate) {
 
 /** Balance in the account's own currency. Liabilities are negative. */
 export function accountBalance(account: Account, transactions: readonly Transaction[], asOf: IsoDate): number {
+  if (account.tracksBalance === false) return 0;
   if (VALUED.includes(account.type) && account.valuations.length > 0) {
     return latestValuation(account, asOf)?.valueMinor ?? 0;
   }

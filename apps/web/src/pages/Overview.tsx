@@ -21,7 +21,7 @@ export function OverviewPage() {
   const catName = useCategoryName(ds);
   const series = useMemo(() => netWorthSeries(ds, asOf, 12), [ds, asOf]);
   const latest = series[series.length - 1]!;
-  const hasAccounts = ds.accounts.some((a) => !a.archived);
+  const hasAccounts = ds.accounts.some((a) => !a.archived && a.tracksBalance !== false);
   const period = periodOf(asOf, ds.household.settings.paydayDayOfMonth);
   const range = periodRange(period, ds.household.settings.paydayDayOfMonth);
   const report = useMemo(() => budgetReport(ds, period), [ds, period]);
@@ -111,7 +111,7 @@ export function OverviewPage() {
                 <XAxis type="number" hide />
                 <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11, fill: colors.axis }} stroke={colors.grid} />
                 <Tooltip contentStyle={{ background: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, borderRadius: 8 }} formatter={(v: number) => money(Math.round(v * 100), base)} />
-                <Bar dataKey="value" fill={colors.primaryFill} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="value" fill={colors.primaryFill} radius={[0, 4, 4, 0]} maxBarSize={28} />
               </BarChart>
             </ResponsiveContainer>
           </div>

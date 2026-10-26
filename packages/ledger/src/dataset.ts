@@ -1,5 +1,5 @@
 import type { ParsedStatement } from "@cuntas/importers";
-import type { Currency, Jurisdiction } from "@cuntas/rules";
+import { daysBetween, type Currency, type Jurisdiction } from "@cuntas/rules";
 import { recategorise } from "./categories";
 import { DEFAULT_CATEGORIES } from "./categories";
 import { FxTable } from "./fx";
@@ -70,6 +70,8 @@ export function reconcile(ds: Dataset): Dataset {
 export interface ImportResult {
   dataset: Dataset;
   added: number;
+  /** Hand-entered rows the statement matched, updated in place instead of added again. */
+  merged: number;
   skipped: number;
   warnings: string[];
 }
@@ -78,6 +80,9 @@ export interface ImportResult {
  * Adds parsed statement lines to an account. Idempotent: lines whose (account, externalId)
  * already exist are skipped, so re-importing the same file creates no duplicates.
  */
+/** How far apart a hand-entered row and a statement line can be and still be the same payment. */
+const MERGE_DAYS = 3;
+
 export function importStatement(ds: Dataset, accountId: string, statement: ParsedStatement): ImportResult {
   const account = ds.accounts.find((a) => a.id === accountId);
   if (!account) throw new Error(`Unknown account ${accountId}`);
@@ -86,12 +91,22 @@ export function importStatement(ds: Dataset, accountId: string, statement: Parse
   const warnings = [...statement.warnings];
   const added: Transaction[] = [];
   let skipped = 0;
+  // Hand-entered rows on this account that a statement line can replace: same amount, within MERGE_DAYS.
+  const manual = ds.transactions.filter((t) => t.accountId === accountId && t.source === "manual");
+  const mergedInto = new Map<string, ParsedStatement["transactions"][number]>();
   for (const p of statement.transactions) {
     if (existing.has(p.externalId)) {
       skipped++;
       continue;
     }
     existing.add(p.externalId);
+    const match = manual
+      .filter((t) => !mergedInto.has(t.id) && t.amountMinor === p.amountMinor && Math.abs(daysBetween(t.bookedAt, p.bookedAt)) <= MERGE_DAYS)
+      .sort((a, b) => Math.abs(daysBetween(a.bookedAt, p.bookedAt)) - Math.abs(daysBetween(b.bookedAt, p.bookedAt)))[0];
+    if (match) {
+      mergedInto.set(match.id, p);
+      continue;
+    }
     if (p.currency !== account.currency) warnings.push(`A ${p.currency} line was booked to a ${account.currency} account at face value.`);
     added.push({
       id: newId("tx"),
@@ -110,6 +125,11 @@ export function importStatement(ds: Dataset, accountId: string, statement: Parse
       notes: "",
     });
   }
-  const next = reconcile({ ...ds, transactions: [...ds.transactions, ...added] });
-  return { dataset: withAudit(next, "user", `import:${added.length}`, `account:${accountId}`), added: added.length, skipped, warnings };
+  // The bank's date and reference replace the hand-entered ones; the user's payee, category and note stay.
+  const kept = ds.transactions.map((t) => {
+    const p = mergedInto.get(t.id);
+    return p ? { ...t, bookedAt: p.bookedAt, externalId: p.externalId, rawDescription: p.rawDescription, payee: t.payee || p.payee, source: "import" as const } : t;
+  });
+  const next = reconcile({ ...ds, transactions: [...kept, ...added] });
+  return { dataset: withAudit(next, "user", `import:${added.length}`, `account:${accountId}`), added: added.length, merged: mergedInto.size, skipped, warnings };
 }

@@ -109,6 +109,8 @@ export const accountSchema = z.object({
   valuations: z.array(z.object({ date: isoDate, valueMinor: minor })).default([]),
   isEmergencyFund: z.boolean().default(false),
   archived: z.boolean().default(false),
+  /** False for a wallet whose balance isn't kept (the quick-add Cash account): its spending counts, its balance is 0. */
+  tracksBalance: z.boolean().optional(),
 });
 
 export const transactionSchema = z.object({
@@ -127,6 +129,8 @@ export const transactionSchema = z.object({
   transferPairId: id.nullable().default(null),
   splits: z.array(z.object({ categoryId: id, amountMinor: minor })).default([]),
   notes: z.string().default(""),
+  /** "manual" for a row entered by hand; absent (or "import") for a row from a file or bank sync. */
+  source: z.enum(["import", "manual"]).optional(),
 });
 
 export const waterfallBuckets = ["housing", "food", "essentialBills", "incomeCosts", "minimumDebt", "emergencyFund", "nonEssentialBills"] as const;

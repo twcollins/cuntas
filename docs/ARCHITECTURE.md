@@ -126,8 +126,8 @@ The schema is zod, in [packages/ledger/src/schema.ts](../packages/ledger/src/sch
 | `members` | A person | Date of birth, nationality, employment, gross pay, pay frequency, IE assessment, US filing status / state / locality / HSA coverage, UK region, student loans, retirement age, contribution years, self-assessment history |
 | `residencePeriods` | Tax residence over time | `memberId` → member; `jurisdiction` (IE, UK, US); `from`/`to` |
 | `institutions`, `connections` | Banks and bank-sync consents | Present in the schema; the web app links synced accounts by `institutionId = "conn:<id>:<ref>"` instead |
-| `accounts` | Current, savings, card, loan, mortgage, pension, brokerage, property, vehicle, cash | `memberIds` → members; `currency`; `wrapper` (ISA, PRSA, ...); `jurisdiction`; opening balance; `valuations` for manually valued assets; `isEmergencyFund` |
-| `transactions` | A booked line | `accountId` → account; `amountMinor` + `currency`; `fxRateToBase`; `externalId` (dedupe key); `categoryId` + `categorySource` (user, rule, dictionary, none); `transferPairId` → the other half of a transfer; `splits` |
+| `accounts` | Current, savings, card, loan, mortgage, pension, brokerage, property, vehicle, cash | `memberIds` → members; `currency`; `wrapper` (ISA, PRSA, ...); `jurisdiction`; opening balance; `valuations` for manually valued assets; `isEmergencyFund`; `tracksBalance: false` for the quick-add Cash wallet (spending counts, balance is 0) |
+| `transactions` | A booked line | `accountId` → account; `amountMinor` + `currency`; `fxRateToBase`; `externalId` (dedupe key); `categoryId` + `categorySource` (user, rule, dictionary, none); `transferPairId` → the other half of a transfer; `splits`; `source: "manual"` for rows entered by hand (absent for imported rows) |
 | `categories`, `categoryRules` | Categories and user rules | Category has `group`, `isEssential`, `kind`, `waterfall` bucket. Rule matches payee text, regex, amount range or account. |
 | `budgets` | One per period (`YYYY-MM`) | `mode`: envelope or cap; `lines` → categories, with rollover |
 | `goals` | Emergency fund, house deposit, sinking fund, college, tax set-aside, other | `linkedAccountIds` → accounts, or `savedMinor`; monthly contribution |
@@ -160,7 +160,7 @@ erDiagram
   BILL }o--o| CATEGORY : in
 ```
 
-Helpers: `createEmptyDataset` and `importStatement` in [dataset.ts](../packages/ledger/src/dataset.ts); `createDemoDataset` in [demo.ts](../packages/ledger/src/demo.ts); `newMember` in [schema.ts](../packages/ledger/src/schema.ts).
+Helpers: `createEmptyDataset` and `importStatement` in [dataset.ts](../packages/ledger/src/dataset.ts); `addManualTransaction`, `removeManualTransaction`, `topCategories` and `suggestCategory` in [manual.ts](../packages/ledger/src/manual.ts); `createDemoDataset` in [demo.ts](../packages/ledger/src/demo.ts); `newMember` in [schema.ts](../packages/ledger/src/schema.ts).
 
 ### Residence decides the rules
 
@@ -207,11 +207,15 @@ flowchart LR
    - CSV: [csv.ts](../packages/importers/src/csv.ts). `detectPreset` matches normalised headers against each preset's `signature`; `detectHeaderlessPreset` handles exports with no header row (HSBC UK). With no match, the page shows a column mapper seeded by `guessMapping`, and calls `importFile` again with the mapping. Shared parsing is in [parse.ts](../packages/importers/src/parse.ts): `parseCsv` (RFC 4180, delimiter sniffing), `parseAmount` (to minor units, handles `(12.30)`, `CR/DR`, decimal comma), `parseDate`, `cleanPayee`.
    - OFX: [ofx.ts](../packages/importers/src/ofx.ts). CAMT.053: [camt.ts](../packages/importers/src/camt.ts) with `fast-xml-parser`.
 4. **Ids.** Bank ids are used when present. Otherwise `assignContentIds` in [hash.ts](../packages/importers/src/hash.ts) builds `h:<fnv1a64(date|amount|description|n)>`, where `n` counts identical rows in the same file. Two identical coffees on one day both import; the same file imported twice adds nothing.
-5. **Into the ledger.** The page calls `importStatement(ds, accountId, statement)` in [ledger/src/dataset.ts](../packages/ledger/src/dataset.ts). It skips lines whose `(accountId, externalId)` already exists, stores amounts in the account's currency, sets `fxRateToBase` from the FX table when the account is not in the base currency, and warns about lines in another currency.
+5. **Into the ledger.** The page calls `importStatement(ds, accountId, statement)` in [ledger/src/dataset.ts](../packages/ledger/src/dataset.ts). It skips lines whose `(accountId, externalId)` already exists. A line with the same amount as a hand-entered row on that account, within 3 days, is merged into it: the row takes the bank's date, reference and description and keeps the user's payee, category and note (`ImportResult.merged`). It stores amounts in the account's currency, sets `fxRateToBase` from the FX table when the account is not in the base currency, and warns about lines in another currency.
 6. **Reconcile.** `reconcile` runs over the whole ledger:
    - `recategorise` ([categories.ts](../packages/ledger/src/categories.ts)): user rules first (highest `priority`), then `MERCHANT_DICTIONARY`. Lines set by the user (`categorySource: "user"`) are never changed. A salary match on an outflow is ignored.
    - `matchTransfers` ([transfers.ts](../packages/ledger/src/transfers.ts)): pairs an outflow with an inflow in another account within 3 days; same currency must match exactly, cross-currency within 3% at the ECB rate.
 7. **Save.** The page calls `replaceDataset`; the store writes to IndexedDB after 150 ms. An audit event `import:<n>` is added.
+
+### Quick add
+
+`QuickAddHost` in [components/QuickAdd.tsx](../apps/web/src/components/QuickAdd.tsx) is mounted once in the layout; `openQuickAdd()` opens it from the sidebar's **+ Add**, the phone's floating button, Transactions, or the `N` key. It calls `addManualTransaction(ds, entry)`: a spend or income becomes one row with `source: "manual"` and `externalId: manual:<id>`; a move becomes two rows paired by `transferPairId`; "every month" also adds a monthly bill. With no account chosen, a Cash account (`type: "cash"`, `tracksBalance: false`) is created on first use. Category chips come from `topCategories`; typing a payee fills the category through `suggestCategory` (the last category used for that payee, then rules and the dictionary). The last account used is remembered per household in `localStorage`.
 
 When the user corrects a category on [Transactions](../apps/web/src/pages/Transactions.tsx), `suggestRule` offers a `payeeContains` rule for similar lines.
 
