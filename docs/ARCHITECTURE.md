@@ -217,7 +217,7 @@ flowchart LR
 
 ### Quick add
 
-`QuickAddHost` in [components/QuickAdd.tsx](../apps/web/src/components/QuickAdd.tsx) is mounted once in the layout; `openQuickAdd()` opens it from the sidebar's **+ Add**, the phone's floating button, Transactions, or the `N` key. It calls `addManualTransaction(ds, entry)`: a spend or income becomes one row with `source: "manual"` and `externalId: manual:<id>`; a move becomes two rows paired by `transferPairId`; "every month" also adds a monthly bill. With no account chosen, a Cash account (`type: "cash"`, `tracksBalance: false`) is created on first use. Category chips come from `topCategories`; typing a payee fills the category through `suggestCategory` (the last category used for that payee, then rules and the dictionary). The last account used is remembered per household in `localStorage`.
+`QuickAddHost` in [components/QuickAdd.tsx](../apps/web/src/components/QuickAdd.tsx) is mounted once in the layout; `openQuickAdd()` opens it from the sidebar's **+ Add**, the centre of the phone tab bar, Transactions, or the `N` key. It calls `addManualTransaction(ds, entry)`: a spend or income becomes one row with `source: "manual"` and `externalId: manual:<id>`; a move becomes two rows paired by `transferPairId`; "every month" also adds a monthly bill. With no account chosen, a Cash account (`type: "cash"`, `tracksBalance: false`) is created on first use. Category chips come from `topCategories`; typing a payee fills the category through `suggestCategory` (the last category used for that payee, then rules and the dictionary). The last account used is remembered per household in `localStorage`.
 
 When the user corrects a category on [Transactions](../apps/web/src/pages/Transactions.tsx), `suggestRule` offers a `payeeContains` rule for similar lines.
 
@@ -409,7 +409,9 @@ Reminders are queued only; nothing delivers them yet (no email or push).
 
 ### Routing
 
-[src/router.tsx](../apps/web/src/router.tsx) is a flat list of code-based routes under one root route. To add a page, add a `[path, Component]` pair. The sidebar in [Layout.tsx](../apps/web/src/components/Layout.tsx) has two lists: `MAIN` (Overview, Transactions, Import, Accounts, Budgets, Next steps with Bills, Debts and Goals under it, Tax centre) and `MORE`, collapsed until opened or until one of its pages is open. An item can carry `when(ds)` to hide it from households it doesn't apply to (Compare wrappers needs someone in Ireland or the UK). The table groups pages by area, as the Guide does:
+[src/router.tsx](../apps/web/src/router.tsx) is a flat list of code-based routes under one root route. To add a page, add a `[path, Component]` pair. The sidebar in [Layout.tsx](../apps/web/src/components/Layout.tsx) has two lists: `MAIN` (Overview, Transactions, Import, Accounts, Budgets, Next steps with Bills, Debts and Goals under it, Tax centre) and `MORE`, collapsed until opened or until one of its pages is open. An item can carry `when(ds)` to hide it from households it doesn't apply to (Compare wrappers needs someone in Ireland or the UK). Below the `md` breakpoint the sidebar becomes a drawer and a bottom `TabBar` (Overview, Transactions, + Add, Next steps, More) takes its place; More opens the drawer. Pages that switch layout at that breakpoint (Transactions: table or list) use `useMedia(WIDE)` from [lib/media.ts](../apps/web/src/lib/media.ts).
+
+A new household's Overview shows `SetupChecklist` ([components/Setup.tsx](../apps/web/src/components/Setup.tsx)) while `setupChecklist(ds).show` ([ledger/src/setup.ts](../packages/ledger/src/setup.ts)), in place of step 0's tracking and budget cards. Its lines use `confirmYou`, `starterBudget` and `hideSetup`; `household.setup` keeps when the details were confirmed and when the checklist was hidden. The table groups pages by area, as the Guide does:
 
 | Group | Path | Page | Main logic used |
 | --- | --- | --- | --- |

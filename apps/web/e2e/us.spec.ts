@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function go(page: Page, label: string) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
   const nav = page.getByRole("navigation", { name: "Main" });
   const link = nav.getByRole("link", { name: label, exact: true });
@@ -19,7 +19,7 @@ test("a US household: dollars, US wording, federal take-home and the US next ste
   await page.getByRole("button", { name: "Create household" }).click();
 
   // Onboarding made Alex a US resident: the first screen uses US rules, with nothing Irish.
-  await expect(page.getByText("Start tracking where your money goes")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get set up" })).toBeVisible();
   await expect(page.getByText(/IE-20\d\d/)).toHaveCount(0);
   await go(page, "Household");
   await expect(page.getByText("US resident", { exact: false }).first()).toBeVisible();
@@ -48,13 +48,13 @@ test("a US household: dollars, US wording, federal take-home and the US next ste
   await expect(page.getByText(/Gross \$60,000 → net \$47,458 a year/)).toBeVisible();
 
   await go(page, "Overview");
-  await expect(page.getByText("Start tracking where your money goes")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get set up" })).toBeVisible();
   await expect(page.getByText("Check your 2026 US tax figures")).toBeVisible();
   await expect(page.getByText("Check your 2026 Indiana tax figures")).toBeVisible();
 
   await go(page, "401(k) and IRAs");
   await go(page, "Accounts");
-  await page.getByRole("button", { name: "Add account" }).click();
+  await page.getByRole("button", { name: "Add account" }).first().click();
   await expect(page.getByRole("dialog").getByLabel("Type")).toContainText("Checking account");
   await page.getByRole("dialog").getByRole("button", { name: "Cancel" }).click();
 

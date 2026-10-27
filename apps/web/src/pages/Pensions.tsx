@@ -1,7 +1,8 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { newId, pensionKinds, type PensionPlan } from "@cuntas/ledger";
 import { ageOn, applyRate, type Currency, myFutureFundStatus, pensionReliefHeadroom, toMinor } from "@cuntas/rules";
-import { Badge, Button, Card, Disclaimer, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Why } from "../components/ui";
+import { Badge, Button, Card, Disclaimer, Empty, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Why } from "../components/ui";
 import { usePlan } from "../lib/derived";
 import { AnnualAllowanceCard } from "./tax/AnnualAllowance";
 import { currencyOptions, formatDate, money, pct } from "../lib/format";
@@ -22,6 +23,7 @@ export function PensionsPage() {
   return (
     <div>
       <PageHeader title="Pensions" subtitle={`Tax relief limits from rule pack ${pack.version}. Relief for ${pack.taxYear} can be claimed until ${formatDate(`${Number(pack.taxYear) + pack.pension.reliefClaimDeadline.yearOffset}-${pack.pension.reliefClaimDeadline.monthDay}`)}.`} actions={ds.members[0] && <Button variant="primary" onClick={() => setEditing({ id: newId("pp"), memberId: ds.members[0]!.id, name: "", kind: "occupationalDC", jurisdiction: "IE", currency: "EUR", valueMinor: 0, employeeRate: 0, employerRate: 0, employerMatchRule: null, isEmployerScheme: false })}>Add pension</Button>} />
+      {snapshot.members.length === 0 && <Empty title="Add yourself first">Pension limits and the half-your-age gauge depend on each person's age and pay. <Link to="/household" className="font-medium text-brand-700 underline dark:text-brand-500">Add people on the Household page</Link></Empty>}
       <div className="grid gap-4 md:grid-cols-2">
         {snapshot.members.map((m) => {
           const member = ds.members.find((x) => x.id === m.id)!;

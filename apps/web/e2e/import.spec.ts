@@ -7,7 +7,7 @@ const CHASE = "Details,Posting Date,Description,Amount,Type,Balance,Check or Sli
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../../../packages/importers/fixtures");
 
 async function go(page: Page, label: string) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
   const nav = page.getByRole("navigation", { name: "Main" });
   const link = nav.getByRole("link", { name: label, exact: true });
@@ -20,7 +20,7 @@ async function newUsHousehold(page: Page) {
   await page.getByLabel("Your first name").fill("Alex");
   await page.getByLabel("Where do you live?").selectOption("US");
   await page.getByRole("button", { name: "Create household" }).click();
-  await expect(page.getByText("Start tracking where your money goes")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get set up" })).toBeVisible();
 }
 
 /** Drops files on the page the way a browser does when they're dragged in from the desktop. */
@@ -71,7 +71,7 @@ test("two statements at once need no choices beyond Import, and say what to do n
 
   // Last month's statement counts as tracking, and Overview shows its spending with its dates.
   await go(page, "Overview");
-  await expect(page.getByRole("heading", { name: "Start tracking where your money goes" })).toHaveCount(0);
+  await expect(page.getByRole("listitem", { name: "Spending: done" })).toBeVisible();
   await expect(page.getByText(/^Spending Sep 1, 2026 – Sep 30, 2026$/)).toBeVisible();
   await go(page, "Accounts");
   await expect(page.getByText("Chase (checking)")).toBeVisible();

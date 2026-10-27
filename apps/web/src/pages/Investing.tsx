@@ -73,7 +73,7 @@ export function InvestingPage() {
       )}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card title="Inputs">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 [&_input]:w-full [&_select]:w-full">
             {ds.members.length > 0 && <Field label="For">{(id) => <Select id={id} value={memberId} onChange={(e) => { setMemberId(e.target.value); setResidence(residenceOn(ds, e.target.value, asOf) === "UK" ? "UK" : "IE"); }} options={ds.members.map((x) => ({ value: x.id, label: x.name }))} />}</Field>}
             <Field label="Resident in">{(id) => <Select id={id} value={residence} onChange={(e) => setResidence(e.target.value as Jurisdiction)} options={[{ value: "IE", label: "Ireland" }, { value: "UK", label: "UK" }]} />}</Field>
             <Field label="Each year (cost to you)">{(id) => <MoneyInput id={id} value={contribution} onChange={setContribution} />}</Field>

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { accountTypes, importStatement, isLiability, latestValuation, newId, wrappers, type Account } from "@cuntas/ledger";
@@ -78,7 +79,7 @@ export function AccountsPage() {
             </Card>
           );
         })}
-        {ds.accounts.length === 0 && <Empty title="No accounts yet">Add a manual account, import a bank file, or connect a bank through a self-hosted server.</Empty>}
+        {ds.accounts.length === 0 && <Empty title="No accounts yet">Import a statement and its account is created for you, or add one by hand.<div className="mt-3 flex justify-center gap-2"><Link to="/import" className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700">Import statements</Link><Button onClick={() => setEditing(blankAccount(ds, asOf))}>Add account</Button></div></Empty>}
       </div>
 
       <Modal open={!!editing} onClose={() => setEditing(null)} title={editing && ds.accounts.some((a) => a.id === editing.id) ? "Edit account" : "Add account"}>

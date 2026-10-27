@@ -6,3 +6,7 @@
 :root.dark { color-scheme: dark; }
 body { font-feature-settings: "tnum" 0; -webkit-font-smoothing: antialiased; }
 .tabular-nums { font-variant-numeric: tabular-nums; }
+/* Grid items default to their content's minimum width, so one wide table pushed whole pages sideways on phones. */
+.grid > * { min-width: 0; }
+/* A chart tooltip left near the right edge would otherwise widen the page; clip (not hide) keeps sticky headers working. */
+main { overflow-x: clip; }

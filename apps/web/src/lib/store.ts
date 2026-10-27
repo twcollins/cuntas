@@ -72,6 +72,9 @@ function persist() {
   saveTimer = setTimeout(() => void flush(), 150);
 }
 
+// Leaving the page (closing the tab, reloading) within the save delay would drop the last change; write it now.
+if (typeof window !== "undefined") window.addEventListener("pagehide", () => void flush());
+
 /** Write any pending change now; called before switching households so nothing is lost. */
 export async function flush() {
   clearTimeout(saveTimer);

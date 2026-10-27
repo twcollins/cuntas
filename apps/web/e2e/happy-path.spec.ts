@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../../../packages/importers/fixtures");
 
 async function go(page: Page, label: string) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
   const nav = page.getByRole("navigation", { name: "Main" });
   const link = nav.getByRole("link", { name: label });
@@ -14,7 +14,7 @@ async function go(page: Page, label: string) {
   await link.click();
 }
 
-test("demo household: next step, import without duplicates, recategorise, export", async ({ page }) => {
+test("demo household: next step, import without duplicates, recategorise, export", async ({ page, isMobile }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Open demo" }).click();
 
@@ -40,10 +40,13 @@ test("demo household: next step, import without duplicates, recategorise, export
   // Correcting a category offers a rule.
   await go(page, "Transactions");
   await page.getByLabel("Search").fill("Insomnia");
+  // On a phone each row opens in a sheet to change its category.
+  if (isMobile) await page.getByRole("button", { name: /^Insomnia Coffee/ }).first().click();
   await page.getByLabel("Category for Insomnia Coffee").first().selectOption({ label: "Lifestyle: Entertainment" });
   await expect(page.getByText(/Always categorise payees containing/)).toBeVisible();
   await page.getByRole("button", { name: "Create rule" }).click();
-  await expect(page.getByLabel("Category for Insomnia Coffee").last()).toHaveValue("cat_entertainment");
+  if (isMobile) await expect(page.getByRole("button", { name: /^Insomnia Coffee/ }).last()).toContainText("Entertainment");
+  else await expect(page.getByLabel("Category for Insomnia Coffee").last()).toHaveValue("cat_entertainment");
 
   // Export downloads a JSON file.
   await go(page, "Settings");
@@ -55,7 +58,7 @@ test("demo household: next step, import without duplicates, recategorise, export
 test("new household: take-home pay matches the golden EUR 50,000 case", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Create household" }).click();
-  await expect(page.getByRole("heading", { name: "Start tracking where your money goes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Get set up" })).toBeVisible();
   await go(page, "Tax centre");
   await page.getByLabel("Tax year").first().selectOption("2027");
   await page.getByLabel("Gross annual pay").fill("50000");

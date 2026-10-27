@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function openSidebar(page: Page) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
 }
 

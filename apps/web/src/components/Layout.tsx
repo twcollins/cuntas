@@ -169,8 +169,40 @@ function NavList({ items, terms, onNavigate }: { items: NavItem[]; terms: Terms;
   );
 }
 
+/** Phone navigation: the everyday pages, + Add in the centre, and More for the full menu. */
+function TabBar({ pathname, menuOpen, onMenu }: { pathname: string; menuOpen: boolean; onMenu: () => void }) {
+  const tab = "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px]";
+  const idle = "text-stone-500 dark:text-stone-400";
+  const active = "font-medium text-brand-700 dark:text-brand-500";
+  const on = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
+  const link = (to: string, label: string, icon: string) => (
+    <Link to={to} className={cx(tab, on(to) ? active : idle)} aria-current={on(to) ? "page" : undefined}>
+      <span aria-hidden className="text-lg leading-none">{icon}</span>
+      {label}
+    </Link>
+  );
+  return (
+    <nav aria-label="Tabs" className="fixed inset-x-0 bottom-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-900/95" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="flex items-stretch">
+        {link("/", "Overview", "◎")}
+        {link("/transactions", "Transactions", "≡")}
+        <div className="flex flex-1 items-center justify-center">
+          <button type="button" aria-label="Add" title="Add a spend, money received or a move" onClick={openQuickAdd} className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-3xl text-white shadow-lg ring-4 ring-stone-50 hover:bg-brand-700 dark:ring-stone-950">
+            <span aria-hidden>+</span>
+          </button>
+        </div>
+        {link("/plan", "Next steps", "↗")}
+        <button type="button" aria-expanded={menuOpen} aria-haspopup="dialog" onClick={onMenu} className={cx(tab, ["/", "/transactions", "/plan"].some(on) ? idle : active)}>
+          <span aria-hidden className="text-lg leading-none">⋯</span>
+          More
+        </button>
+      </div>
+    </nav>
+  );
+}
+
 export function Layout() {
-  const { sync } = useStore();
+  const { sync, dataset } = useStore();
   const terms = termsFor(useDataset());
   // Dates render in the household's style; set before children render.
   setDisplayLocale(terms.locale);
@@ -188,7 +220,7 @@ export function Layout() {
   };
   return (
     <div className="min-h-screen md:flex">
-      <aside className={cx("fixed inset-y-0 left-0 z-40 flex w-60 transform flex-col border-r border-stone-200 bg-white p-4 transition md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cx("fixed inset-y-0 left-0 z-40 flex w-60 transform flex-col border-r border-stone-200 bg-white p-4 transition md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-stone-800 dark:bg-stone-900", open ? "translate-x-0" : "-translate-x-full")} style={{ paddingTop: "max(1rem, env(safe-area-inset-top))", paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
         <HouseholdSwitcher onNavigate={() => setOpen(false)} />
         <button type="button" title="Add a spend, money received or a move (N)" onClick={() => { setOpen(false); openQuickAdd(); }} className="mb-4 hidden w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 md:flex">
           <span aria-hidden>+</span> Add
@@ -210,16 +242,14 @@ export function Layout() {
       </aside>
       {open && <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setOpen(false)} />}
       <div className="flex-1">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-stone-200 bg-white/90 px-4 py-3 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-900/90">
-          <button type="button" aria-label="Open menu" className="rounded p-1 text-xl" onClick={() => setOpen(true)}>☰</button>
-          <span className="font-semibold">Cúntas</span>
+        <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-stone-200 bg-white/90 px-4 pb-3 backdrop-blur md:hidden dark:border-stone-800 dark:bg-stone-900/90" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+          <img src="/icon.svg" alt="" className="h-6 w-6" />
+          <span className="truncate font-semibold">{dataset?.household.name ?? "Cúntas"}</span>
         </header>
-        <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:px-8 md:py-8">
+        <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-8 md:py-8">
           <Outlet />
         </main>
-        <button type="button" aria-label="Add" onClick={openQuickAdd} className="fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-3xl text-white shadow-lg hover:bg-brand-700 md:hidden" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
-          <span aria-hidden>+</span>
-        </button>
+        <TabBar pathname={pathname} menuOpen={open} onMenu={() => setOpen(true)} />
         <QuickAddHost />
         <DropImportHost />
       </div>

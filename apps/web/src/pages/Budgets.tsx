@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { addMonths } from "@cuntas/rules";
-import { BUCKET_LABELS, budgetFromEstimate, budgetReport, newId, paydayWaterfall, periodOf, periodRange, previousPeriod, totalsByCategory, type Budget, type WaterfallBucket } from "@cuntas/ledger";
+import { BUCKET_LABELS, budgetFromEstimate, budgetFromSpending, budgetReport, newId, paydayWaterfall, periodOf, periodRange, previousPeriod, type Budget, type WaterfallBucket } from "@cuntas/ledger";
 import { starterFundTarget } from "@cuntas/engine";
 import { SpendingEstimateSheet } from "../components/SpendingEstimate";
 import { Badge, Button, Card, Empty, MoneyInput, PageHeader, ProgressBar, Select, Table } from "../components/ui";
@@ -32,11 +32,7 @@ export function BudgetsPage() {
     const prev = ds.budgets.find((b) => b.period === previousPeriod(period));
     if (from === "previous" && prev) return saveBudget({ ...prev, id: newId("budget"), period });
     const p = periodRange(previousPeriod(period), payday);
-    const totals = totalsByCategory(ds, p.start, p.end);
-    const lines = [...totals.values()]
-      .filter((t) => t.categoryId && t.spentMinor > 0 && ds.categories.find((c) => c.id === t.categoryId)?.kind === "expense")
-      .map((t) => ({ categoryId: t.categoryId!, amountMinor: Math.ceil(t.spentMinor / 1000) * 1000, rollover: true }));
-    saveBudget({ id: newId("budget"), period, mode: "envelope", lines });
+    saveBudget(budgetFromSpending(ds, period, p.start, p.end));
   }
 
   const needs = useMemo(() => {

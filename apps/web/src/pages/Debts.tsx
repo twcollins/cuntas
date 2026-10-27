@@ -36,7 +36,7 @@ export function DebtsPage() {
     <div>
       <PageHeader title="Debts" subtitle={`High interest is above ${pct(t.highAprAbove)}; moderate is ${pct(t.moderateAprFrom)} to ${pct(t.highAprAbove)}.`} actions={<Button variant="primary" onClick={() => setEditing({ id: newId("debt"), name: "", accountId: null, kind: "creditCard", balanceMinor: 0, currency: base, aprBps: 0, minPaymentMinor: 0, termEnd: null })}>Add debt</Button>} />
       <Card title="Debt register">
-        {ds.debts.length === 0 ? <Empty title="No debts recorded" /> : (
+        {ds.debts.length === 0 ? <Empty title="No debts recorded">Add a card balance, loan or car finance to see what to pay off first and when you'll be clear.<div className="mt-3"><Button variant="primary" onClick={() => setEditing({ id: newId("debt"), name: "", accountId: null, kind: "creditCard", balanceMinor: 0, currency: base, aprBps: 0, minPaymentMinor: 0, termEnd: null })}>Add a debt</Button></div></Empty> : (
           <Table head={["Debt", "Balance", "APR", "Minimum", "", ""]}>
             {ds.debts.map((d) => {
               const s = snapshot.debts.find((x) => x.id === d.id)!;

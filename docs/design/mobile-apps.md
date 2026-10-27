@@ -166,6 +166,8 @@ Store rules here come from memory; check each against Apple's App Review Guideli
 
 ## Phases
 
+The phone layout from phase 2 (safe areas, bottom tabs, More, stacked Transactions rows) shipped in the PWA with UX phase 6 on 2026-10-27; the status bar, splash screen and keyboard items wait for the apps.
+
 Each phase ends with tests green and the app usable.
 
 1. **Platform layer and storage.** `lib/platform/`, `store.ts` and `rulepacks.ts` on `platform.kv`, SQLite with SQLCipher, migration from IndexedDB. Gate: every current test passes; data survives app kill and reinstall-from-backup.

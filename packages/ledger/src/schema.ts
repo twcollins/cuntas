@@ -34,6 +34,8 @@ export const householdSchema = z.object({
     .object({ setOn: isoDate, lines: z.array(z.object({ categoryId: id, amountMinor: minor })) })
     .nullable()
     .default(null),
+  /** The setup checklist: when the first person confirmed their details, and when the checklist was hidden. */
+  setup: z.object({ youConfirmedAt: z.string().optional(), hiddenAt: z.string().optional() }).default({}),
 });
 
 export const memberSchema = z.object({

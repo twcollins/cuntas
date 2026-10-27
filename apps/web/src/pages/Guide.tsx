@@ -17,7 +17,7 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
     title: "Day to day",
     intro: "Where the money goes, and what is coming up.",
     topics: [
-      { to: "/", label: "Overview", body: "Net worth, emergency fund, debt, what is left to spend this period, and your next step at a glance." },
+      { to: "/", label: "Overview", body: "Net worth, emergency fund, debt, what is left to spend this period, and your next step at a glance. A new household first sees Get set up: your details, accounts, spending and a first budget made for you, each done in place. Hide it if you'd rather set up your own way." },
       { to: "/transactions", label: "Add a spend", body: "Press + Add (or N on a keyboard) on any page to record a cash spend, money received or a move between your accounts: amount, category, Save. Tick \"every month\" to add it to Bills as well. If the same payment later arrives in a bank import, it's matched to your entry instead of counted twice." },
       { to: "/transactions", label: "Transactions", body: "Search and categorise. Correct one transaction and you'll be offered a rule for the rest from that merchant." },
       { to: "/review", label: "Review", body: "Transactions without a category, one merchant at a time, biggest first. Tap a category (or press 1 to 4) to file every transaction from that merchant, with a rule so the next import files it too; Undo stays for 10 seconds. Skip with S, or a swipe left on a phone." },

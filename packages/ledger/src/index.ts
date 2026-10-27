@@ -17,6 +17,7 @@ export * from "./dataset";
 export * from "./imports";
 export * from "./manual";
 export * from "./estimate";
+export * from "./setup";
 export * from "./io";
 export * from "./recurring";
 export * from "./retirement";

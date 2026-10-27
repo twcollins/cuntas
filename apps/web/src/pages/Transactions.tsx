@@ -2,9 +2,10 @@ import { Link, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { reconcile, removeManualTransaction, reviewCount, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
 import { openQuickAdd } from "../components/QuickAdd";
-import { Badge, Button, Card, Empty, Input, PageHeader, Select, Table } from "../components/ui";
+import { Badge, Button, Card, Empty, Input, Modal, PageHeader, Select, Table } from "../components/ui";
 import { useCategoryName } from "../lib/derived";
 import { formatDate, moneyExact } from "../lib/format";
+import { useMedia, WIDE } from "../lib/media";
 import { update, useDataset } from "../lib/store";
 
 const PAGE = 100;
@@ -19,6 +20,10 @@ export function TransactionsPage() {
   const [q, setQ] = useState("");
   const [limit, setLimit] = useState(PAGE);
   const [offer, setOffer] = useState<{ rule: CategoryRule; matches: number } | null>(null);
+  // Phones get a list grouped by date; a tapped row opens in a sheet.
+  const wide = useMedia(WIDE);
+  const [editing, setEditing] = useState<string | null>(null);
+  const edited = editing ? ds.transactions.find((t) => t.id === editing) : undefined;
   const accounts = new Map(ds.accounts.map((a) => [a.id, a]));
   const toReview = useMemo(() => reviewCount(ds), [ds]);
 
@@ -73,7 +78,21 @@ export function TransactionsPage() {
           <Select aria-label="Category" value={category} onChange={(e) => setCategory(e.target.value)} options={[{ value: "", label: "All categories" }, { value: "__none", label: "Uncategorised" }, ...ds.categories.map((c) => ({ value: c.id, label: c.name }))]} />
         </div>
         {rows.length === 0 ? (
-          <Empty title="No transactions">Import a bank file or connect an account.</Empty>
+          ds.transactions.length === 0 ? (
+            <Empty title="No transactions yet">
+              <p>Import a statement from your bank, or add a spend by hand.</p>
+              <div className="mt-3 flex justify-center gap-2">
+                <Link to="/import" className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700">Import statements</Link>
+                <Button onClick={openQuickAdd}>Add a spend</Button>
+              </div>
+            </Empty>
+          ) : (
+            <Empty title="Nothing matches">
+              <Button className="mt-2" onClick={() => { setQ(""); setAccount(""); setCategory(""); }}>Clear search and filters</Button>
+            </Empty>
+          )
+        ) : !wide ? (
+          <PhoneList rows={rows.slice(0, limit)} catName={catName} otherSide={(t) => accounts.get(ds.transactions.find((x) => x.id === t.transferPairId)?.accountId ?? "")?.name ?? "matched"} onOpen={setEditing} />
         ) : (
           <Table head={["Date", "Payee", "Account", "Category", "Amount"]}>
             {rows.slice(0, limit).map((t) => {
@@ -105,6 +124,62 @@ export function TransactionsPage() {
           <div className="mt-4 text-center"><Button onClick={() => setLimit(limit + PAGE)}>Show more ({rows.length - limit} left)</Button></div>
         )}
       </Card>
+      {edited && (
+        <Modal open onClose={() => setEditing(null)} title={edited.payee || "Added by hand"}>
+          <div className="space-y-3 text-sm">
+            <div className={`text-2xl font-semibold tabular-nums ${edited.amountMinor > 0 ? "text-brand-700 dark:text-brand-500" : ""}`}>{moneyExact(edited.amountMinor, edited.currency)}</div>
+            <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-1">
+              <dt className="text-stone-500">Date</dt><dd>{formatDate(edited.bookedAt)}</dd>
+              <dt className="text-stone-500">Account</dt><dd>{accounts.get(edited.accountId)?.name}</dd>
+              {edited.rawDescription && edited.rawDescription !== edited.payee && <><dt className="text-stone-500">Bank text</dt><dd className="break-words">{edited.rawDescription}</dd></>}
+              {edited.transferPairId && <><dt className="text-stone-500">Transfer</dt><dd>{accounts.get(ds.transactions.find((x) => x.id === edited.transferPairId)?.accountId ?? "")?.name ?? "matched"}</dd></>}
+            </dl>
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-stone-600 dark:text-stone-400">Category</span>
+              <Select aria-label={`Category for ${edited.payee}`} value={edited.categoryId ?? ""} onChange={(e) => { setCategoryFor(edited, e.target.value); setEditing(null); }} options={categoryOptions} className="w-full" />
+            </label>
+            <div className="flex justify-between gap-2 pt-2">
+              {edited.source === "manual" ? <Button variant="danger" onClick={() => { removeManual(edited); setEditing(null); }}>Delete</Button> : <span />}
+              <Button onClick={() => setEditing(null)}>Close</Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+/** Phone transactions: one row per transaction under its date, payee and category on the left, amount on the right. */
+function PhoneList({ rows, catName, otherSide, onOpen }: { rows: Transaction[]; catName: (id: string | null) => string; otherSide: (t: Transaction) => string; onOpen: (id: string) => void }) {
+  const days: { date: string; rows: Transaction[] }[] = [];
+  for (const t of rows) {
+    const last = days[days.length - 1];
+    if (last?.date === t.bookedAt) last.rows.push(t);
+    else days.push({ date: t.bookedAt, rows: [t] });
+  }
+  return (
+    <div className="-mx-5">
+      {days.map((d) => (
+        <section key={d.date}>
+          <h3 className="bg-stone-50 px-5 py-1 text-xs font-medium text-stone-500 dark:bg-stone-800/60">{formatDate(d.date)}</h3>
+          <ul className="divide-y divide-stone-100 dark:divide-stone-800">
+            {d.rows.map((t) => (
+              <li key={t.id}>
+                <button type="button" onClick={() => onOpen(t.id)} className="flex min-h-14 w-full items-center gap-3 px-5 py-2 text-left active:bg-stone-100 dark:active:bg-stone-800">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{t.payee || t.rawDescription || "Added by hand"}</span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-1 text-xs">
+                      <span className={t.transferPairId ? "text-sky-700 dark:text-sky-400" : t.categoryId ? "text-stone-600 dark:text-stone-400" : "text-amber-700 dark:text-amber-400"}>{t.transferPairId ? `Transfer · ${otherSide(t)}` : catName(t.categoryId)}</span>
+                      {t.source === "manual" && <Badge>by hand</Badge>}
+                    </span>
+                  </span>
+                  <span className={`shrink-0 tabular-nums ${t.amountMinor > 0 ? "text-brand-700 dark:text-brand-500" : ""}`}>{moneyExact(t.amountMinor, t.currency)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }

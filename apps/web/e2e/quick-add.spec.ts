@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function go(page: Page, label: string) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
   const nav = page.getByRole("navigation", { name: "Main" });
   const link = nav.getByRole("link", { name: label, exact: true });
@@ -10,7 +10,7 @@ async function go(page: Page, label: string) {
   await link.click();
 }
 
-test("quick add: a cash spend in four taps, a monthly bill, and a move between accounts", async ({ page }) => {
+test("quick add: a cash spend in four taps, a monthly bill, and a move between accounts", async ({ page, isMobile }) => {
   await page.goto("/");
   await page.getByLabel("Your first name").fill("Alex");
   await page.getByLabel("Where do you live?").selectOption("US");
@@ -40,8 +40,11 @@ test("quick add: a cash spend in four taps, a monthly bill, and a move between a
 
   await go(page, "Transactions");
   await expect(page.getByText("Added by hand")).toBeVisible();
-  await expect(page.getByLabel("Category for Netflix")).toHaveValue("cat_tv_subs");
   await expect(page.getByText("by hand", { exact: true })).toHaveCount(2);
+  // On a phone the list shows the category; tapping a row opens it to change.
+  if (isMobile) await page.getByRole("button", { name: /^Netflix/ }).click();
+  await expect(page.getByLabel("Category for Netflix")).toHaveValue("cat_tv_subs");
+  if (isMobile) await page.getByRole("dialog", { name: "Netflix" }).getByRole("button", { name: "Close", exact: true }).last().click();
 
   await go(page, "Bills");
   await expect(page.getByText("Netflix").first()).toBeVisible();
@@ -50,10 +53,10 @@ test("quick add: a cash spend in four taps, a monthly bill, and a move between a
   await expect(page.getByRole("row", { name: /Cash/ })).toContainText("Not tracked");
 
   // A move needs two accounts that keep a balance.
-  await page.getByRole("button", { name: "Add account" }).click();
+  await page.getByRole("button", { name: "Add account" }).first().click();
   await page.getByRole("dialog").getByLabel("Name").fill("Checking");
   await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
-  await page.getByRole("button", { name: "Add account" }).click();
+  await page.getByRole("button", { name: "Add account" }).first().click();
   await page.getByRole("dialog").getByLabel("Name").fill("Savings");
   await page.getByRole("dialog").getByLabel("Type").selectOption("savings");
   await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
@@ -69,8 +72,14 @@ test("quick add: a cash spend in four taps, a monthly bill, and a move between a
 
   // Delete a hand-entered row.
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: /^Delete Netflix/ }).click();
-  await expect(page.getByLabel("Category for Netflix")).toHaveCount(0);
+  if (isMobile) {
+    await page.getByRole("button", { name: /^Netflix/ }).click();
+    await page.getByRole("dialog", { name: "Netflix" }).getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByRole("button", { name: /^Netflix/ })).toHaveCount(0);
+  } else {
+    await page.getByRole("button", { name: /^Delete Netflix/ }).click();
+    await expect(page.getByLabel("Category for Netflix")).toHaveCount(0);
+  }
 });
 
 test("quick add opens with N on a keyboard", async ({ page, isMobile }) => {

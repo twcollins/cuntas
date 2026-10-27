@@ -8,7 +8,7 @@ const chase = (name: string, rows: [string, string, string][]) => ({
 });
 
 async function go(page: Page, label: string) {
-  const menu = page.getByRole("button", { name: "Open menu" });
+  const menu = page.getByRole("navigation", { name: "Tabs" }).getByRole("button", { name: "More" });
   if (await menu.isVisible()) await menu.click();
   const nav = page.getByRole("navigation", { name: "Main" });
   const link = nav.getByRole("link", { name: label });

@@ -1,6 +1,6 @@
 # Cúntas: UX review, getting money in
 
-2026-10-25 · Review and proposed design. Status: phases 1 to 5 done (see Progress).
+2026-10-25 · Review and proposed design. Status: phases 1 to 6 done (see Progress).
 
 Getting money into Cúntas is the weakest part of the app. There is no way to add a single spend by hand, no way to give a rough monthly spend without importing a statement, and an import leaves you with raw bank text and a column of "Uncategorised" to fix one dropdown at a time. The planning and tax side is strong, but most people will never reach it if the first ten minutes feel like data entry. This review sets out the problems found and a design that makes the first useful result take under three minutes.
 
@@ -254,6 +254,22 @@ Changed from the design above:
 - Payees already in the ledger aren't rewritten; the queue cleans them as it groups, so old and new rows from one shop land in one group.
 - Rules match the cleaned name as payee text. Bank text from before cleaning that an alias renames (old "AMZN Mktp" rows) isn't matched by an "amazon" rule, but those rows are filed by the group itself.
 - The open question on confirming auto-categorised rows stays open: the queue shows only uncategorised rows.
+
+**Phase 6, done 2026-10-27.** From the checklist, a new US user reaches a first budget in 13 actions: name, country and Create; the details button, three fields and Save for You; Import statements, two files and Import; back to Overview and Make my budget (`e2e/setup.spec.ts`). Done together with the phone layout from mobile-apps.md phase 2.
+
+- `setupChecklist` in `ledger/src/setup.ts`: You (first person's birth date, pay if working, state if a US resident), Accounts (any open account that keeps a balance), Spending (any transaction, or an estimate), Budget (any budget). Shown until all four are done or it's hidden (`household.setup.hiddenAt`). It replaces step 0's tracking and budget checks on Overview; the waterfall check still shows.
+- Lines act in place: the You and Add-an-account sheets, quick add, the estimate sheet, and **Make my budget** (`starterBudget`: last period's spending, else the latest period with spending, else the estimate). `confirmYou` saves the details, marks them confirmed so a real 1 January 1990 birthday counts, and moves the first residence period to start at the birth date.
+- Phone (below `md`): a bottom tab bar with Overview, Transactions, + Add (centre), Next steps and More, which opens the full menu; safe-area padding with `viewport-fit=cover`. Transactions is a list grouped by date; a tapped row opens a sheet with the bank text, account, category and Delete for hand-entered rows.
+- Empty states with the action: Transactions (Import statements, Add a spend; or Clear search and filters), Accounts, Debts, Goals, Pensions, Retirement and What-if.
+- Fixed on the way: grid columns now shrink to the screen (`.grid > * { min-width: 0 }`), which stopped Budgets and Compare wrappers scrolling sideways on phones; `main` clips sideways overflow so a chart tooltip near the edge can't widen the page; the store writes pending changes on `pagehide`.
+
+Changed from the design above:
+
+- The tab bar is Overview, Transactions, + Add, Next steps, More. mobile-apps.md listed Next steps and Plan, which are the same page here, so the slot went to + Add as this review asked.
+- More opens the existing side menu rather than a new sheet grouped as in the Guide; it already holds every page.
+- The You line asks for pay and state but not filing status or the household's other people, which stay on the Household page.
+- Status bar, splash screen and keyboard handling from mobile-apps.md phase 2 are native and wait for the apps.
+- The 3-minute goal is checked as an action count, not timed with a person.
 
 ## Testing
 

@@ -6,6 +6,7 @@ import { classify } from "@cuntas/rules";
 import { fundBasisUsed, starterFundTarget } from "@cuntas/engine";
 import { NextStep } from "../components/NextStep";
 import { RulesBanner } from "../components/RulesBanner";
+import { SetupChecklist, useSetupShowing } from "../components/Setup";
 import { SpendingEstimateSheet } from "../components/SpendingEstimate";
 import { Badge, Card, Disclaimer, PageHeader, Stat } from "../components/ui";
 import { useCategoryName, usePlan } from "../lib/derived";
@@ -13,6 +14,8 @@ import { formatDate, money, monthLabel } from "../lib/format";
 import { useChartColors } from "../lib/theme";
 import { useDataset } from "../lib/store";
 import { currencyWord } from "../lib/region";
+
+const STEP_ZERO = new Set(["ie.track-budget.tracking", "ie.track-budget.budget", "us.budget.tracking", "us.budget.budget"]);
 
 export function OverviewPage() {
   const colors = useChartColors();
@@ -59,6 +62,9 @@ export function OverviewPage() {
     return out;
   }, [ds, asOf]);
   const fxNow = latest.fxEffectMinor;
+  // While the setup checklist shows, it stands in for step 0's "start tracking" and "set a budget".
+  const setup = useSetupShowing();
+  const stepZero = !!result.current && STEP_ZERO.has(result.current.check);
 
   return (
     <div>
@@ -66,7 +72,8 @@ export function OverviewPage() {
       <RulesBanner ds={ds} asOf={asOf} />
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          {result.current ? (
+          {setup && <SetupChecklist />}
+          {setup && stepZero ? null : result.current ? (
             <NextStep card={result.current} />
           ) : (
             <Card title="Every step on the ladder is met">

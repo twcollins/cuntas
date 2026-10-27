@@ -2,7 +2,7 @@ import { useState } from "react";
 import { fullFundTarget, starterFundTarget } from "@cuntas/engine";
 import { goalProgress, newId, type Goal } from "@cuntas/ledger";
 import { type Currency, ieHelpToBuy, packOn, toMinor } from "@cuntas/rules";
-import { Badge, Button, Card, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Stat, Why } from "../components/ui";
+import { Badge, Button, Card, Empty, Field, Input, Modal, MoneyInput, PageHeader, ProgressBar, Select, Stat, Why } from "../components/ui";
 import { usePlan } from "../lib/derived";
 import { currencyOptions, formatDate, money } from "../lib/format";
 import { update, useDataset } from "../lib/store";
@@ -35,6 +35,12 @@ export function GoalsPage() {
         <Stat label="Starter fund target" value={money(starter, base)} hint={`Greater of ${money(snapshot.thresholds.starterFundFloorMinor, base)} or ${snapshot.thresholds.starterFundMonths} month's ${snapshot.thresholds.fundBasis === "netPay" ? "net pay" : "essential spending"}`} tone={snapshot.liquidSavingsMinor >= starter ? "good" : undefined} />
         <Stat label="Full fund target" value={money(full.targetMinor, base)} hint={`${full.months} months, after high-interest debt is cleared`} tone={snapshot.liquidSavingsMinor >= full.targetMinor ? "good" : undefined} />
       </div>
+      {ds.goals.length === 0 && (
+        <Empty title="No goals yet">
+          Save towards something with a date (a holiday, a car, a deposit) and see what to put aside each month.
+          <div className="mt-3"><Button variant="primary" onClick={() => setEditing({ id: newId("goal"), name: "", type: "sinkingFund", targetMinor: 0, currency: base, targetDate: null, linkedAccountIds: [], savedMinor: 0, monthlyContributionMinor: 0 })}>Add a goal</Button></div>
+        </Empty>
+      )}
       <div className="grid gap-4 md:grid-cols-2">
         {ds.goals.map((g) => {
           const p = goalProgress(ds, g, asOf);

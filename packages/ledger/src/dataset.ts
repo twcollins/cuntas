@@ -9,7 +9,8 @@ import { newMember, SCHEMA_VERSION, type Account, type Dataset, type Transaction
 import { matchTransfers } from "./transfers";
 
 /** Placeholder date of birth for a person added before they give one; residence runs from it. */
-const UNKNOWN_BIRTH_DATE = "1990-01-01";
+/** Onboarding asks only for a name; the birth date stays this until the setup checklist asks for it. */
+export const UNKNOWN_BIRTH_DATE = "1990-01-01";
 
 /**
  * A new household. With `first`, it starts with that person resident in `home`, so the plan,
@@ -35,6 +36,7 @@ export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR",
         children: 0,
       },
       spendingEstimate: null,
+      setup: {},
     },
     members: member ? [member] : [],
     residencePeriods: member && first ? [{ id: newId("rp"), memberId: member.id, jurisdiction: first.home, from: UNKNOWN_BIRTH_DATE, to: null, declaredBy: "user" }] : [],

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { retirementPlan } from "@cuntas/ledger";
@@ -24,7 +25,7 @@ export function RetirementPage() {
   const chosen = plan.projections.find((p) => p.scenario.id === scenario) ?? plan.projections[1];
   const youngest = Math.min(...plan.members.map((m) => m.age));
 
-  if (ds.members.length === 0) return <div><PageHeader title="Retirement" /><Empty title="Add household members first">Ages, pay and pensions drive the projection.</Empty></div>;
+  if (ds.members.length === 0) return <div><PageHeader title="Retirement" /><Empty title="Add yourself first">Ages, pay and pensions drive the projection. <Link to="/household" className="font-medium text-brand-700 underline dark:text-brand-500">Add people on the Household page</Link></Empty></div>;
 
   return (
     <div>

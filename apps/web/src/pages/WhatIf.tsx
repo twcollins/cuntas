@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { residenceOn, residenceWhatIf } from "@cuntas/ledger";
 import { COUNTRY_INFO, TAX_JURISDICTIONS, type Classification, type Jurisdiction } from "@cuntas/rules";
@@ -23,7 +24,7 @@ export function WhatIfPage() {
   const changed = r.items.filter((i) => i.changed);
   const same = r.items.filter((i) => !i.changed);
 
-  if (ds.members.length === 0) return <div><PageHeader title="What if we moved" /><Empty title="Add household members first" /></div>;
+  if (ds.members.length === 0) return <div><PageHeader title="What if we moved" /><Empty title="Add yourself first">The comparison needs each person's pay and residence. <Link to="/household" className="font-medium text-brand-700 underline dark:text-brand-500">Add people on the Household page</Link></Empty></div>;
 
   return (
     <div>
