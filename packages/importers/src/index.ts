@@ -7,7 +7,7 @@ export * from "./types";
 export * from "./parse";
 export * from "./hash";
 export { PRESETS } from "./presets";
-export { detectHeaderlessPreset, detectPreset, guessMapping, importCsv, readCsvHeaders } from "./csv";
+export { csvHeaderKey, detectHeaderlessPreset, detectPreset, guessMapping, importCsv, readCsvHeaders } from "./csv";
 export { importOfx } from "./ofx";
 export { importCamt053 } from "./camt";
 

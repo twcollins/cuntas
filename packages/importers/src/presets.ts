@@ -34,6 +34,7 @@ export const PRESETS: CsvPreset[] = [
     currency: "Posted Currency",
     defaultCurrency: "EUR",
     balance: "Balance",
+    accountNumber: "Posted Account",
   },
   {
     id: "boi",
@@ -123,6 +124,7 @@ export const PRESETS: CsvPreset[] = [
     amount: "Amount",
     description: ["Memo"],
     defaultCurrency: "GBP",
+    accountNumber: "Account",
   },
   {
     id: "hsbc-uk",
@@ -185,6 +187,7 @@ export const PRESETS: CsvPreset[] = [
     amount: "Amount",
     description: ["Description"],
     defaultCurrency: "USD",
+    accountType: "creditCard",
   },
   {
     id: "bofa-checking",
@@ -211,6 +214,7 @@ export const PRESETS: CsvPreset[] = [
     description: ["Payee"],
     externalId: "Reference Number",
     defaultCurrency: "USD",
+    accountType: "creditCard",
   },
   {
     id: "wells-fargo",
@@ -235,6 +239,8 @@ export const PRESETS: CsvPreset[] = [
     credit: "Credit",
     description: ["Description"],
     defaultCurrency: "USD",
+    accountNumber: "Card No.",
+    accountType: "creditCard",
   },
   {
     id: "capital-one-360",
@@ -248,6 +254,7 @@ export const PRESETS: CsvPreset[] = [
     description: ["Transaction Description"],
     defaultCurrency: "USD",
     balance: "Balance",
+    accountNumber: "Account Number",
   },
   {
     id: "citi",
@@ -261,6 +268,7 @@ export const PRESETS: CsvPreset[] = [
     description: ["Description"],
     defaultCurrency: "USD",
     where: { column: "Status", equals: "Cleared" },
+    accountType: "creditCard",
   },
   {
     id: "amex",
@@ -273,6 +281,8 @@ export const PRESETS: CsvPreset[] = [
     invertAmount: true,
     description: ["Description"],
     defaultCurrency: "USD",
+    accountNumber: "Account #",
+    accountType: "creditCard",
   },
   {
     id: "discover",
@@ -285,5 +295,6 @@ export const PRESETS: CsvPreset[] = [
     invertAmount: true,
     description: ["Description"],
     defaultCurrency: "USD",
+    accountType: "creditCard",
   },
 ];

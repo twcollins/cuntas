@@ -126,7 +126,7 @@ The schema is zod, in [packages/ledger/src/schema.ts](../packages/ledger/src/sch
 | `members` | A person | Date of birth, nationality, employment, gross pay, pay frequency, IE assessment, US filing status / state / locality / HSA coverage, UK region, student loans, retirement age, contribution years, self-assessment history |
 | `residencePeriods` | Tax residence over time | `memberId` → member; `jurisdiction` (IE, UK, US); `from`/`to` |
 | `institutions`, `connections` | Banks and bank-sync consents | Present in the schema; the web app links synced accounts by `institutionId = "conn:<id>:<ref>"` instead |
-| `accounts` | Current, savings, card, loan, mortgage, pension, brokerage, property, vehicle, cash | `memberIds` → members; `currency`; `wrapper` (ISA, PRSA, ...); `jurisdiction`; opening balance; `valuations` for manually valued assets; `isEmergencyFund`; `tracksBalance: false` for the quick-add Cash wallet (spending counts, balance is 0) |
+| `accounts` | Current, savings, card, loan, mortgage, pension, brokerage, property, vehicle, cash | `memberIds` → members; `currency`; `wrapper` (ISA, PRSA, ...); `jurisdiction`; opening balance; `valuations` for manually valued assets; `isEmergencyFund`; `tracksBalance: false` for the quick-add Cash wallet (spending counts, balance is 0); `importHints` (presets, account numbers, last import) for matching the next file |
 | `transactions` | A booked line | `accountId` → account; `amountMinor` + `currency`; `fxRateToBase`; `externalId` (dedupe key); `categoryId` + `categorySource` (user, rule, dictionary, none); `transferPairId` → the other half of a transfer; `splits`; `source: "manual"` for rows entered by hand (absent for imported rows) |
 | `categories`, `categoryRules` | Categories and user rules | Category has `group`, `isEssential`, `kind`, `waterfall` bucket. Rule matches payee text, regex, amount range or account. |
 | `budgets` | One per period (`YYYY-MM`) | `mode`: envelope or cap; `lines` → categories, with rollover |
@@ -137,6 +137,7 @@ The schema is zod, in [packages/ledger/src/schema.ts](../packages/ledger/src/sch
 | `fxRates` | ECB reference rates | Always `base: "EUR"`; any pair converts through EUR ([fx.ts](../packages/ledger/src/fx.ts)) |
 | `stepStates` | Dismissed or recorded engine checks | `stepId`, optional `memberId` |
 | `payslips` | Typed-in payslips for checks | → member |
+| `importMappings` | Column mappings the user made for unrecognised CSVs | `headerKey` (normalised header row) → mapping |
 | `bills`, `recurringDismissed` | Confirmed bills and detected payees the user rejected | `payeeKey` links a bill to a detected recurring series |
 | `auditEvents` | Local audit trail | Appended by `withAudit` |
 
@@ -160,7 +161,7 @@ erDiagram
   BILL }o--o| CATEGORY : in
 ```
 
-Helpers: `createEmptyDataset` and `importStatement` in [dataset.ts](../packages/ledger/src/dataset.ts); `addManualTransaction`, `removeManualTransaction`, `topCategories` and `suggestCategory` in [manual.ts](../packages/ledger/src/manual.ts); `createDemoDataset` in [demo.ts](../packages/ledger/src/demo.ts); `newMember` in [schema.ts](../packages/ledger/src/schema.ts).
+Helpers: `createEmptyDataset` and `importStatement` in [dataset.ts](../packages/ledger/src/dataset.ts); `guessAccount`, `planImports`, `applyImports`, `rememberMapping` and `mappingFor` in [imports.ts](../packages/ledger/src/imports.ts); `addManualTransaction`, `removeManualTransaction`, `topCategories` and `suggestCategory` in [manual.ts](../packages/ledger/src/manual.ts); `createDemoDataset` in [demo.ts](../packages/ledger/src/demo.ts); `newMember` in [schema.ts](../packages/ledger/src/schema.ts).
 
 ### Residence decides the rules
 
@@ -201,17 +202,18 @@ flowchart LR
 
 ### 4a. Importing a bank file
 
-1. **Page.** [apps/web/src/pages/Import.tsx](../apps/web/src/pages/Import.tsx) reads the file as text and calls `importFile(name, text)`.
+1. **Page.** [apps/web/src/pages/Import.tsx](../apps/web/src/pages/Import.tsx) takes several files at once, from its file picker or dropped on any page (`DropImportHost` in [components/DropImport.tsx](../apps/web/src/components/DropImport.tsx), mounted in the layout, queues them and opens Import). It reads each as text and calls `importFile(name, text)`.
 2. **Detect the format.** `detectFileKind` in [importers/src/index.ts](../packages/importers/src/index.ts) checks the first 2,000 characters: CAMT.053 (`BkToCstmrStmt`), OFX (`OFXHEADER`, `<OFX>`, `.ofx`/`.qfx`), else CSV.
 3. **Parse.**
-   - CSV: [csv.ts](../packages/importers/src/csv.ts). `detectPreset` matches normalised headers against each preset's `signature`; `detectHeaderlessPreset` handles exports with no header row (HSBC UK). With no match, the page shows a column mapper seeded by `guessMapping`, and calls `importFile` again with the mapping. Shared parsing is in [parse.ts](../packages/importers/src/parse.ts): `parseCsv` (RFC 4180, delimiter sniffing), `parseAmount` (to minor units, handles `(12.30)`, `CR/DR`, decimal comma), `parseDate`, `cleanPayee`.
+   - CSV: [csv.ts](../packages/importers/src/csv.ts). `detectPreset` matches normalised headers against each preset's `signature`; `detectHeaderlessPreset` handles exports with no header row (HSBC UK). With no match, the page shows a column mapper seeded by the mapping kept for that header row (`csvHeaderKey`, `mappingFor`), else by `guessMapping` (headers, and the date format from the rows), and calls `importFile` again with the mapping; the statement's `preset` is then `csv:<header key>`. Presets can name an `accountNumber` column and an `accountType` (credit card), which fill `ParsedStatement.account`; OFX reads `ACCTID` and marks `CCACCTFROM` statements as cards. Shared parsing is in [parse.ts](../packages/importers/src/parse.ts): `parseCsv` (RFC 4180, delimiter sniffing), `parseAmount` (to minor units, handles `(12.30)`, `CR/DR`, decimal comma), `parseDate`, `cleanPayee`.
    - OFX: [ofx.ts](../packages/importers/src/ofx.ts). CAMT.053: [camt.ts](../packages/importers/src/camt.ts) with `fast-xml-parser`.
 4. **Ids.** Bank ids are used when present. Otherwise `assignContentIds` in [hash.ts](../packages/importers/src/hash.ts) builds `h:<fnv1a64(date|amount|description|n)>`, where `n` counts identical rows in the same file. Two identical coffees on one day both import; the same file imported twice adds nothing.
-5. **Into the ledger.** The page calls `importStatement(ds, accountId, statement)` in [ledger/src/dataset.ts](../packages/ledger/src/dataset.ts). It skips lines whose `(accountId, externalId)` already exists. A line with the same amount as a hand-entered row on that account, within 3 days, is merged into it: the row takes the bank's date, reference and description and keeps the user's payee, category and note (`ImportResult.merged`). It stores amounts in the account's currency, sets `fxRateToBase` from the FX table when the account is not in the base currency, and warns about lines in another currency.
-6. **Reconcile.** `reconcile` runs over the whole ledger:
+5. **Pick the account.** `planImports` in [ledger/src/imports.ts](../packages/ledger/src/imports.ts) calls `guessAccount` for each file: an account whose `importHints.numbers` hold the same account number or IBAN (`sameAccountNumber`: same digits, or one the tail of the other); else the account that last took the same `preset` (unless the file names a different number); else, for accounts from before imports were remembered, one of the same type and currency named after the bank; else a new account named after the bank (with the number's last four), typed and priced from the file. The user can change any guess.
+6. **Into the ledger.** `applyImports(ds, items)` creates the new accounts (files naming the same new account share one) and calls `importStatement(ds, accountId, statement)` in [ledger/src/dataset.ts](../packages/ledger/src/dataset.ts) for each, then returns an `ImportSummary`: added, skipped, merged, transfer pairs, categorised and uncategorised rows, spending and the dates covered. The page shows it with links to the uncategorised rows (`/transactions?category=__none`) and Budgets. `importStatement` records the file's preset and account number in the account's `importHints`. It skips lines whose `(accountId, externalId)` already exists. A line with the same amount as a hand-entered row on that account, within 3 days, is merged into it: the row takes the bank's date, reference and description and keeps the user's payee, category and note (`ImportResult.merged`). It stores amounts in the account's currency, sets `fxRateToBase` from the FX table when the account is not in the base currency, and warns about lines in another currency.
+7. **Reconcile.** `reconcile` runs over the whole ledger:
    - `recategorise` ([categories.ts](../packages/ledger/src/categories.ts)): user rules first (highest `priority`), then `MERCHANT_DICTIONARY`. Lines set by the user (`categorySource: "user"`) are never changed. A salary match on an outflow is ignored.
    - `matchTransfers` ([transfers.ts](../packages/ledger/src/transfers.ts)): pairs an outflow with an inflow in another account within 3 days; same currency must match exactly, cross-currency within 3% at the ECB rate.
-7. **Save.** The page calls `replaceDataset`; the store writes to IndexedDB after 150 ms. An audit event `import:<n>` is added.
+8. **Save.** The page calls `replaceDataset`; mappings the user made are kept with `rememberMapping`; the store writes to IndexedDB after 150 ms. An audit event `import:<n>` is added.
 
 ### Quick add
 
@@ -229,7 +231,7 @@ When the user corrects a category on [Transactions](../apps/web/src/pages/Transa
 2. **Snapshot.** `buildSnapshot(ds, asOf)` in [ledger/src/snapshot.ts](../packages/ledger/src/snapshot.ts) produces a `HouseholdSnapshot` ([engine/src/types.ts](../packages/engine/src/types.ts)). It contains:
    - `plan` (`"IE"` or `"US"`, from `planFor`) and the base `currency`.
    - Per member (`MemberState`): age, residence, gross and net monthly pay (from `memberPay`, see 4c), marginal rate, pension rates and employer match, MyFutureFund status, and for US members a `us` block (MAGI, workplace plan coverage, IRA and HSA contributions this year).
-   - Household figures: liquid savings (accounts marked as emergency fund), 12-month essential spend (or the spending estimate until transactions cover two months), tracking counts, the payday waterfall result, debts, sinking funds, housing, children and college goals, dismissals, and the tax set-aside for the self-employed (IE/UK preliminary tax, or US quarterly estimated tax).
+   - Household figures: liquid savings (accounts marked as emergency fund), 12-month essential spend (or the spending estimate until transactions cover two months), tracking counts (transactions in the last 60 days, so last month's statement imported late still counts), the payday waterfall result, debts, sinking funds, housing, children and college goals, dismissals, and the tax set-aside for the self-employed (IE/UK preliminary tax, or US quarterly estimated tax).
    - `thresholds` from the flowchart file (`chartDefaults(plan)`) with the household's `thresholdOverrides` applied (`thresholdsFor`).
 3. **Evaluate.** `evaluate(snapshot, iePack)` or `evaluateUs(snapshot, usPack)` in [engine/src/engine.ts](../packages/engine/src/engine.ts). Both call `runLadder`:
    - Steps run in `order`. A step's `scope` is `household` (once) or `member` (once per member).

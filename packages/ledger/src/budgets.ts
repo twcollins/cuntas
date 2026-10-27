@@ -1,7 +1,7 @@
 import { addDays, addMonths, type IsoDate } from "@cuntas/rules";
 import { FxTable } from "./fx";
 import type { Budget, Dataset } from "./schema";
-import { totalsByCategory } from "./spending";
+import { categoryMap, isCashflow, totalsByCategory } from "./spending";
 
 /** Budget period for a key (YYYY-MM): from the payday in that month to the day before the next payday. */
 export function periodRange(period: string, paydayDayOfMonth = 1): { start: IsoDate; end: IsoDate } {
@@ -12,6 +12,19 @@ export function periodRange(period: string, paydayDayOfMonth = 1): { start: IsoD
 export function periodOf(date: IsoDate, paydayDayOfMonth = 1): string {
   const day = Number(date.slice(8, 10));
   return day >= paydayDayOfMonth ? date.slice(0, 7) : addMonths(`${date.slice(0, 7)}-01`, -1).slice(0, 7);
+}
+
+/**
+ * The dates to show spending for: the current pay period, or, when it has no spending yet, the
+ * latest period that does (an import of last month's statement), with `latest` set so it can be labelled.
+ */
+export function spendingWindow(ds: Dataset, asOf: IsoDate, paydayDayOfMonth = 1): { start: IsoDate; end: IsoDate; latest: boolean } {
+  const current = periodRange(periodOf(asOf, paydayDayOfMonth), paydayDayOfMonth);
+  const cats = categoryMap(ds);
+  const spends = ds.transactions.filter((t) => t.amountMinor < 0 && t.bookedAt <= asOf && isCashflow(t, cats));
+  if (spends.length === 0 || spends.some((t) => t.bookedAt >= current.start)) return { ...current, latest: false };
+  const last = spends.reduce((max, t) => (t.bookedAt > max ? t.bookedAt : max), spends[0]!.bookedAt);
+  return { ...periodRange(periodOf(last, paydayDayOfMonth), paydayDayOfMonth), latest: true };
 }
 
 export function previousPeriod(period: string): string {

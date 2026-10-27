@@ -2,7 +2,7 @@ import { isCurrency, type Currency } from "@cuntas/rules";
 import { assignContentIds } from "./hash";
 import { cleanPayee, normaliseHeader, parseAmount, parseCsv, parseDate } from "./parse";
 import { PRESETS } from "./presets";
-import type { ColumnMapping, CsvPreset, ParsedStatement, ParsedTransaction } from "./types";
+import type { ColumnMapping, CsvPreset, DateFormat, ParsedStatement, ParsedTransaction } from "./types";
 
 /** Finds the most specific preset whose signature headers are all present. */
 export function detectPreset(headers: string[]): CsvPreset | undefined {
@@ -24,6 +24,11 @@ export function detectHeaderlessPreset(rows: string[][]): CsvPreset | undefined 
   });
 }
 
+/** The header row, normalised, as a key for remembering a column mapping. */
+export function csvHeaderKey(text: string): string {
+  return (parseCsv(text)[0] ?? []).map(normaliseHeader).join("|");
+}
+
 export function readCsvHeaders(text: string): { headers: string[]; sample: string[][] } {
   const rows = parseCsv(text);
   return { headers: (rows[0] ?? []).map((h) => h.trim()), sample: rows.slice(1, 6) };
@@ -37,8 +42,20 @@ const HEADER_GUESSES: Record<"date" | "description" | "amount" | "debit" | "cred
   credit: /credit|moneyin|paidin|lodge|deposit|in$/,
 };
 
-/** A starting column mapping for an unrecognised CSV, guessed from header names. */
-export function guessMapping(headers: string[], defaultCurrency: Currency): ColumnMapping {
+const DATE_FORMATS: DateFormat[] = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY", "DD.MM.YYYY", "DD MMM YYYY"];
+
+/** The first date format that reads every sample, trying month first for dollar accounts. */
+function guessDateFormat(values: string[], defaultCurrency: Currency): DateFormat {
+  const order: DateFormat[] = defaultCurrency === "USD" ? ["MM/DD/YYYY", ...DATE_FORMATS.filter((f) => f !== "MM/DD/YYYY")] : DATE_FORMATS;
+  const seen = values.map((v) => v.trim()).filter(Boolean);
+  return order.find((f) => seen.length > 0 && seen.every((v) => parseDate(v, f) !== null && sameShape(v, f))) ?? order[0]!;
+}
+
+/** Whether a date string is laid out like the format (year first or last), so 2026-09-02 isn't read as DD-MM. */
+const sameShape = (v: string, f: DateFormat) => /^\d{4}/.test(v) === f.startsWith("YYYY");
+
+/** A starting column mapping for an unrecognised CSV, guessed from header names and, given sample rows, the date format. */
+export function guessMapping(headers: string[], defaultCurrency: Currency, sample: string[][] = []): ColumnMapping {
   const find = (key: keyof typeof HEADER_GUESSES, skip: string[] = []) =>
     headers.find((h) => !skip.includes(h) && HEADER_GUESSES[key].test(normaliseHeader(h)));
   const date = find("date") ?? headers[0] ?? "";
@@ -48,7 +65,8 @@ export function guessMapping(headers: string[], defaultCurrency: Currency): Colu
   const description = find("description", used) ?? headers.find((h) => !used.includes(h)) ?? date;
   const split = debit && credit;
   const amount = split ? undefined : (find("amount", [...used, description]) ?? headers.find((h) => ![...used, description].includes(h)));
-  return { date, dateFormat: "DD/MM/YYYY", description: [description], defaultCurrency, ...(split ? { debit, credit } : { amount }) };
+  const dateValues = sample.map((r) => r[headers.indexOf(date)] ?? "");
+  return { date, dateFormat: guessDateFormat(dateValues, defaultCurrency), description: [description], defaultCurrency, ...(split ? { debit, credit } : { amount }) };
 }
 
 const asCurrency = (v: string | undefined, fallback: Currency): Currency => (v && isCurrency(v) ? v : fallback);
@@ -56,10 +74,10 @@ const asCurrency = (v: string | undefined, fallback: Currency): Currency => (v &
 /** How far down a file to look for the header row, past summary lines some banks put first. */
 const HEADER_SEARCH_ROWS = 12;
 
-export function importCsv(text: string, mapping?: ColumnMapping & { id?: string }): ParsedStatement {
+export function importCsv(text: string, mapping?: ColumnMapping & { id?: string; accountType?: "creditCard" }): ParsedStatement {
   let rows = parseCsv(text);
   let headers = (rows[0] ?? []).map((h) => h.trim());
-  let preset: (ColumnMapping & { id?: string }) | undefined = mapping ?? detectPreset(headers);
+  let preset: (ColumnMapping & { id?: string; accountType?: "creditCard" }) | undefined = mapping ?? detectPreset(headers);
   if (!preset) {
     // Some exports (Bank of America checking) open with a summary block before the header row.
     for (let i = 1; i < Math.min(rows.length, HEADER_SEARCH_ROWS) && !preset; i++) {
@@ -91,6 +109,7 @@ export function importCsv(text: string, mapping?: ColumnMapping & { id?: string 
 
   const warnings: string[] = [];
   const parsed: (Omit<ParsedTransaction, "externalId"> & { externalId?: string })[] = [];
+  let number: string | undefined;
   rows.slice(1).forEach((row, n) => {
     const line = n + 2;
     if (preset.where && col(row, preset.where.column) !== preset.where.equals) return;
@@ -109,6 +128,7 @@ export function importCsv(text: string, mapping?: ColumnMapping & { id?: string 
       amount = Math.abs(credit) - Math.abs(debit);
       if (!col(row, preset.debit) && !col(row, preset.credit)) amount = null;
     }
+    number ??= col(row, preset.accountNumber) || undefined;
     if (!date || amount === null) {
       warnings.push(`Line ${line}: skipped (unreadable date or amount).`);
       return;
@@ -136,6 +156,7 @@ export function importCsv(text: string, mapping?: ColumnMapping & { id?: string 
   return {
     format: "csv",
     ...("id" in preset && preset.id ? { preset: preset.id } : {}),
+    ...(number || preset.accountType ? { account: { ...(number ? { number } : {}), ...(preset.accountType ? { type: preset.accountType } : {}) } } : {}),
     transactions: assignContentIds(parsed),
     warnings,
   };

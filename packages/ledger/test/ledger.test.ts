@@ -230,7 +230,7 @@ describe("demo household end to end", () => {
 
   it("builds a sensible snapshot", () => {
     expect(snap.members).toHaveLength(2);
-    expect(snap.tracking.transactionsLast30Days).toBeGreaterThan(20);
+    expect(snap.tracking.transactionsLast60Days).toBeGreaterThan(20);
     expect(snap.tracking.hasBudgetThisPeriod).toBe(true);
     expect(snap.members.find((m) => m.id === "m_sean")!.pension.myFutureFund).toBe("auto-enrolled");
     expect(snap.debts.find((d) => d.id === "debt_cc")!.balanceMinor).toBeGreaterThan(0);

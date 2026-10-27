@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { budgetReport, essentialSpend, netWorthSeries, periodOf, periodRange, totalsByCategory } from "@cuntas/ledger";
+import { budgetReport, essentialSpend, netWorthSeries, periodOf, spendingWindow, totalsByCategory } from "@cuntas/ledger";
 import { classify } from "@cuntas/rules";
 import { fundBasisUsed, starterFundTarget } from "@cuntas/engine";
 import { NextStep } from "../components/NextStep";
@@ -24,7 +24,8 @@ export function OverviewPage() {
   const latest = series[series.length - 1]!;
   const hasAccounts = ds.accounts.some((a) => !a.archived && a.tracksBalance !== false);
   const period = periodOf(asOf, ds.household.settings.paydayDayOfMonth);
-  const range = periodRange(period, ds.household.settings.paydayDayOfMonth);
+  // This period's spending, or the latest period with some (last month's statement, imported late).
+  const range = useMemo(() => spendingWindow(ds, asOf, ds.household.settings.paydayDayOfMonth), [ds, asOf]);
   const report = useMemo(() => budgetReport(ds, period), [ds, period]);
   const spending = useMemo(() => {
     const totals = totalsByCategory(ds, range.start, range.end);
@@ -114,7 +115,7 @@ export function OverviewPage() {
           )}
           {hasAccounts && <p className="mt-2 text-xs text-stone-500">Balances in other currencies are converted at ECB reference rates; the tooltip shows the part of each month's change caused by exchange rates.</p>}
         </Card>
-        <Card title={`Spending this period`} actions={<Link to="/transactions" className="text-sm text-brand-700 underline dark:text-brand-500">All transactions</Link>}>
+        <Card title={range.latest ? `Spending ${formatDate(range.start)} – ${formatDate(range.end)}` : "Spending this period"} actions={<Link to="/transactions" className="text-sm text-brand-700 underline dark:text-brand-500">All transactions</Link>}>
           {spending.length === 0 ? (
             <ChartEmpty>No spending recorded since {formatDate(range.start)}. <Link to="/import" className="text-brand-700 underline dark:text-brand-500">Import a statement</Link></ChartEmpty>
           ) : (

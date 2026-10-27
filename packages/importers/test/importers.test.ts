@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { guessMapping, importFile, parseAmount, parseDate, PRESETS } from "../src";
+import { csvHeaderKey, guessMapping, importFile, parseAmount, parseDate, PRESETS } from "../src";
 
 const fixture = (name: string) => readFileSync(join(__dirname, "../fixtures", name), "utf8");
 
@@ -104,6 +104,13 @@ describe("bank presets", () => {
     });
     expect(guessMapping(["When", "What", "Value"], "GBP")).toMatchObject({ date: "When", description: ["What"], amount: "Value" });
   });
+  it("guesses the date format from the rows, preferring month first for dollars", () => {
+    const rows = [["13/09/2026", "x", "1"], ["02/09/2026", "y", "2"]];
+    expect(guessMapping(["Date", "What", "Value"], "EUR", rows).dateFormat).toBe("DD/MM/YYYY");
+    expect(guessMapping(["Date", "What", "Value"], "USD", [["09/13/2026", "x", "1"]]).dateFormat).toBe("MM/DD/YYYY");
+    expect(guessMapping(["Date", "What", "Value"], "USD", [["09/02/2026", "x", "1"]]).dateFormat).toBe("MM/DD/YYYY");
+    expect(guessMapping(["Date", "What", "Value"], "USD", [["2026-09-02", "x", "1"]]).dateFormat).toBe("YYYY-MM-DD");
+  });
   it("HSBC UK: paid out/in columns with quoted thousands", () => {
     const r = importFile("hsbc-uk.csv", fixture("hsbc-uk.csv"));
     expect(r.transactions.map((t) => t.amountMinor)).toEqual([-104210, 285000, -2345]);
@@ -185,3 +192,26 @@ describe("US bank presets", () => {
   });
 });
 
+
+describe("account details for matching", () => {
+  const account = (file: string) => importFile(file, fixture(file)).account;
+  it("reads the account or card number where the export has one", () => {
+    expect(account("aib.csv")?.number).toBe("93-11-22 12345678");
+    expect(account("barclays.csv")?.number).toBe("20-00-00 12345678");
+    expect(account("capitalone-360.csv")?.number).toBe("3601");
+    expect(account("capitalone-card.csv")?.number).toBe("1234");
+    expect(account("amex.csv")?.number).toBe("-11003");
+    expect(account("sample.ofx")?.number).toBe("12345678");
+    expect(account("chase-checking.csv")?.number).toBeUndefined();
+  });
+  it("says when the statement is a credit card", () => {
+    for (const f of ["chase-card.csv", "bofa-card.csv", "capitalone-card.csv", "citi.csv", "amex.csv", "discover.csv"]) expect(account(f)?.type, f).toBe("creditCard");
+    for (const f of ["chase-checking.csv", "aib.csv", "monzo.csv", "sample.ofx"]) expect(account(f)?.type ?? "current", f).toBe("current");
+    const card = fixture("sample.ofx").replace("<BANKMSGSRSV1>", "<CREDITCARDMSGSRSV1>").replace(/<BANKACCTFROM>.*<\/BANKACCTFROM>/, "<CCACCTFROM><ACCTID>4111</CCACCTFROM>");
+    expect(importFile("card.qfx", card).account).toMatchObject({ type: "creditCard", number: "4111" });
+  });
+  it("keys a CSV by its header row, so a mapping can be remembered", () => {
+    expect(csvHeaderKey("When, What ,Value\n2026-09-01,Thing,-1.00\n")).toBe("when|what|value");
+    expect(csvHeaderKey("﻿When;What;Value\n")).toBe("when|what|value");
+  });
+});

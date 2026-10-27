@@ -174,7 +174,7 @@ The MVP (P0) is a trustworthy household ledger plus the next-step engine for Iri
 | Module | Feature | Jurisdiction | Priority | Behaviour and acceptance notes |
 | --- | --- | --- | --- | --- |
 | Accounts | Bank sync via licensed aggregator | IE, UK | P0 MVP | Read-only AIS consent; 90-day re-consent reminder 7 days ahead; nightly sync; never stores bank credentials |
-| Accounts | File import (CSV, OFX, CAMT.053) with bank presets | IE, UK | P0 MVP | Presets for AIB, BOI, PTSB, Revolut, An Post Money, credit unions, Monzo, Starling, Barclays, Danske NI; column mapper for anything else; idempotent re-import |
+| Accounts | File import (CSV, OFX, CAMT.053) with bank presets | IE, UK | P0 MVP | Presets for AIB, BOI, PTSB, Revolut, An Post Money, credit unions, Monzo, Starling, Barclays, Danske NI; column mapper for anything else, remembered per header row; idempotent re-import; several files at once, each matched to its account by account number, bank layout or name before a new account is proposed |
 | Accounts | Manual accounts and assets | IE, UK | P0 MVP | Credit union shares and loans, cash, property, vehicles, State Savings, prize bonds |
 | Accounts | Multi-currency and transfer matching | IE, UK | P0 MVP | EUR and GBP native; daily ECB reference rates; matches internal transfers across currencies so they are not counted as spending |
 | Spending | Categorisation | IE, UK | P0 MVP | User rules first, then an Irish/UK merchant dictionary, then optional on-device ML; every auto-category is reversible and learns from corrections |

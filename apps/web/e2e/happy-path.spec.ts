@@ -25,15 +25,17 @@ test("demo household: next step, import without duplicates, recategorise, export
   await page.getByRole("button", { name: "Why?" }).first().click();
   await expect(page.getByText(/Rule pack IE-2026\.3/)).toBeVisible();
 
-  // Import an AIB file twice: the second import adds nothing.
+  // Import an AIB file twice: it goes into the AIB account, and the second import adds nothing.
   await go(page, "Import");
-  await page.getByLabel("Statement file").setInputFiles(join(fixtures, "aib.csv"));
+  await page.getByLabel("Statement files").setInputFiles(join(fixtures, "aib.csv"));
   await expect(page.getByText("Detected: AIB")).toBeVisible();
-  await page.getByRole("button", { name: "Import transactions" }).click();
-  await expect(page.getByRole("status")).toHaveText(/Imported 3 new transactions/);
-  await page.getByLabel("Statement file").setInputFiles(join(fixtures, "aib.csv"));
-  await page.getByRole("button", { name: "Import transactions" }).click();
-  await expect(page.getByRole("status")).toHaveText(/Imported 0 new transactions; skipped 3 already imported/);
+  await expect(page.getByLabel("Account for aib.csv")).toHaveValue("acc_aib");
+  await page.getByRole("button", { name: "Import 3 transactions" }).click();
+  await expect(page.getByRole("status")).toHaveText("Imported 3 transactions from 1 file");
+  await page.getByLabel("Statement files").setInputFiles(join(fixtures, "aib.csv"));
+  await page.getByRole("button", { name: "Import 3 transactions" }).click();
+  await expect(page.getByRole("status")).toHaveText("Imported 0 transactions from 1 file");
+  await expect(page.getByText("3 already imported (skipped)")).toBeVisible();
 
   // Correcting a category offers a rule.
   await go(page, "Transactions");

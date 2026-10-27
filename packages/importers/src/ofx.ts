@@ -35,7 +35,7 @@ export function importOfx(text: string): ParsedStatement {
   const acct = tag(text, "ACCTID");
   return {
     format: "ofx",
-    account: { currency, ...(acct ? { number: acct } : {}) },
+    account: { currency, ...(acct ? { number: acct } : {}), ...(/<CCACCTFROM>/i.test(text) ? { type: "creditCard" as const } : {}) },
     transactions: assignContentIds(txs),
     warnings,
   };

@@ -1,3 +1,4 @@
+import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { reconcile, removeManualTransaction, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
 import { openQuickAdd } from "../components/QuickAdd";
@@ -12,7 +13,9 @@ export function TransactionsPage() {
   const ds = useDataset();
   const catName = useCategoryName(ds);
   const [account, setAccount] = useState("");
-  const [category, setCategory] = useState("");
+  // Import's "Review now" opens the page filtered to uncategorised rows (?category=__none).
+  const search = useSearch({ strict: false }) as { category?: string };
+  const [category, setCategory] = useState(search.category ?? "");
   const [q, setQ] = useState("");
   const [limit, setLimit] = useState(PAGE);
   const [offer, setOffer] = useState<{ rule: CategoryRule; matches: number } | null>(null);

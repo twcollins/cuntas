@@ -1,6 +1,6 @@
 # Cúntas: UX review, getting money in
 
-2026-10-25 · Review and proposed design. Status: phases 1 to 3 done (see Progress).
+2026-10-25 · Review and proposed design. Status: phases 1 to 4 done (see Progress).
 
 Getting money into Cúntas is the weakest part of the app. There is no way to add a single spend by hand, no way to give a rough monthly spend without importing a statement, and an import leaves you with raw bank text and a column of "Uncategorised" to fix one dropdown at a time. The planning and tax side is strong, but most people will never reach it if the first ten minutes feel like data entry. This review sets out the problems found and a design that makes the first useful result take under three minutes.
 
@@ -227,6 +227,20 @@ Changed from the design above:
 - "Two full months" is read as: some transaction is at least two months old.
 - "Utilities and phone" maps to the Energy category, since each line maps to one category; the budget it makes shows that line as Energy.
 - Step 0 still says "Start tracking" with an import button; the setup checklist (phase 6) will offer the estimate there.
+
+**Phase 4, done 2026-10-27.** Importing two statements (a Chase checking CSV and an Amex CSV) into a new US household needs no choices beyond pressing Import, and importing them again goes to the same accounts and adds nothing (`packages/ledger/test/import.test.ts`, `e2e/import.spec.ts`).
+
+- The Import page takes several files at once, from the picker or dropped on any page; a drop elsewhere opens Import with the files.
+- Account matching: account number or IBAN from the file (Barclays, AIB, Capital One, Amex columns; OFX `ACCTID`; CAMT IBAN), compared by digits so a masked card number matches its full number; then the account that last took the same bank layout; then a new account named after the bank, with the number's last four when there is one. Card presets and OFX card statements make credit-card accounts. Accounts remember the layouts and numbers they've had (`importHints`).
+- Unknown CSVs open the mapper with the guess applied, including the date format read from the rows (month first for dollar households), and a live preview. The mapping is kept per header row and used the next time ("Columns as last time"); the header row then also stands in for a bank layout when matching the account.
+- Result screen: transactions and files, already imported, matched to hand-entered rows, transfers matched, categorised automatically, needing a category with **Review now** (Transactions filtered to uncategorised), and spending over the dates covered with **Set up a budget from this**.
+- Step 0 counts as tracking with any transaction in the last 60 days. Overview's spending card shows the latest period with spending, titled with its dates, when the current period has none.
+
+Changed from the design above:
+
+- Accounts made before this phase have no import history, so the matcher has one more step before a new account: an account of the same type and currency whose name or bank contains the bank's name (the demo's "AIB joint current" takes `aib.csv`).
+- **Review now** opens Transactions filtered to uncategorised rows until the review queue (phase 5) exists. **Set up a budget from this** opens Budgets, whose "start from last period's spending" does the rest.
+- Phone share-sheet import waits for the mobile apps (mobile-apps.md).
 
 ## Testing
 

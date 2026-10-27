@@ -4,7 +4,7 @@ import { recategorise } from "./categories";
 import { DEFAULT_CATEGORIES } from "./categories";
 import { FxTable } from "./fx";
 import { newId } from "./ids";
-import { newMember, SCHEMA_VERSION, type Dataset, type Transaction } from "./schema";
+import { newMember, SCHEMA_VERSION, type Account, type Dataset, type Transaction } from "./schema";
 import { matchTransfers } from "./transfers";
 
 /** Placeholder date of birth for a person added before they give one; residence runs from it. */
@@ -55,6 +55,7 @@ export function createEmptyDataset(name: string, baseCurrency: Currency = "EUR",
     payslips: [],
     bills: [],
     recurringDismissed: [],
+    importMappings: [],
   };
 }
 
@@ -75,6 +76,34 @@ export interface ImportResult {
   merged: number;
   skipped: number;
   warnings: string[];
+  /** Ids of the transactions this import added. */
+  addedIds: string[];
+}
+
+/** Adds what a statement says about its account (layout, account number or IBAN) to the account's hints. */
+function withHints(hints: Account["importHints"], statement: ParsedStatement, at: string): NonNullable<Account["importHints"]> {
+  const presets = hints?.presets ?? [];
+  const numbers = hints?.numbers ?? [];
+  const found = [statement.account?.number, statement.account?.iban].filter((n): n is string => !!n && !numbers.some((x) => sameAccountNumber(x, n)));
+  return {
+    presets: statement.preset && !presets.includes(statement.preset) ? [...presets, statement.preset] : presets,
+    numbers: [...numbers, ...found],
+    lastImportAt: at,
+  };
+}
+
+/** Shortest masked number that still identifies an account (a card's last four). */
+const MIN_NUMBER_DIGITS = 4;
+
+/**
+ * Whether two account numbers, as banks print them, are the same account: the same digits, or one
+ * the tail of the other ("··1003" against a full number, a sort code and number inside an IBAN).
+ */
+export function sameAccountNumber(a: string, b: string): boolean {
+  const x = a.replace(/\D/g, "");
+  const y = b.replace(/\D/g, "");
+  if (x.length < MIN_NUMBER_DIGITS || y.length < MIN_NUMBER_DIGITS) return false;
+  return x.length >= y.length ? x.endsWith(y) : y.endsWith(x);
 }
 
 /**
@@ -84,7 +113,7 @@ export interface ImportResult {
 /** How far apart a hand-entered row and a statement line can be and still be the same payment. */
 const MERGE_DAYS = 3;
 
-export function importStatement(ds: Dataset, accountId: string, statement: ParsedStatement): ImportResult {
+export function importStatement(ds: Dataset, accountId: string, statement: ParsedStatement, at = new Date().toISOString()): ImportResult {
   const account = ds.accounts.find((a) => a.id === accountId);
   if (!account) throw new Error(`Unknown account ${accountId}`);
   const existing = new Set(ds.transactions.filter((t) => t.accountId === accountId).map((t) => t.externalId));
@@ -131,6 +160,14 @@ export function importStatement(ds: Dataset, accountId: string, statement: Parse
     const p = mergedInto.get(t.id);
     return p ? { ...t, bookedAt: p.bookedAt, externalId: p.externalId, rawDescription: p.rawDescription, payee: t.payee || p.payee, source: "import" as const } : t;
   });
-  const next = reconcile({ ...ds, transactions: [...kept, ...added] });
-  return { dataset: withAudit(next, "user", `import:${added.length}`, `account:${accountId}`), added: added.length, merged: mergedInto.size, skipped, warnings };
+  const accounts = ds.accounts.map((a) => (a.id === accountId ? { ...a, importHints: withHints(a.importHints, statement, at) } : a));
+  const next = reconcile({ ...ds, accounts, transactions: [...kept, ...added] });
+  return {
+    dataset: withAudit(next, "user", `import:${added.length}`, `account:${accountId}`),
+    added: added.length,
+    merged: mergedInto.size,
+    skipped,
+    warnings,
+    addedIds: added.map((t) => t.id),
+  };
 }

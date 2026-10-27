@@ -43,8 +43,8 @@ const budget: StepDefinition<UsPack> = {
     {
       id: "us.budget.tracking",
       title: "Track your spending",
-      isMet: ({ snapshot }) => snapshot.tracking.transactionsLast30Days > 0,
-      progress: ({ snapshot }) => ({ current: Math.min(1, snapshot.tracking.transactionsLast30Days), target: 1, unit: "count" }),
+      isMet: ({ snapshot }) => snapshot.tracking.transactionsLast60Days > 0,
+      progress: ({ snapshot }) => ({ current: Math.min(1, snapshot.tracking.transactionsLast60Days), target: 1, unit: "count" }),
       headline: "Start tracking where your money goes",
       explain: "Every step is measured from your real spending. Import a CSV or QFX file from your bank or card to begin.",
       vars: () => ({}),

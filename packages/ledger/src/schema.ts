@@ -116,6 +116,8 @@ export const accountSchema = z.object({
   archived: z.boolean().default(false),
   /** False for a wallet whose balance isn't kept (the quick-add Cash account): its spending counts, its balance is 0. */
   tracksBalance: z.boolean().optional(),
+  /** What earlier imports said about this account (bank layouts, account numbers), so the next file finds it. */
+  importHints: z.object({ presets: z.array(z.string()), numbers: z.array(z.string()), lastImportAt: z.string() }).optional(),
 });
 
 export const transactionSchema = z.object({
@@ -281,6 +283,23 @@ export const billSchema = z.object({
   payeeKey: z.string().nullable().default(null),
 });
 
+const dateFormats = ["DD/MM/YYYY", "YYYY-MM-DD", "DD-MM-YYYY", "DD MMM YYYY", "MM/DD/YYYY", "DD.MM.YYYY"] as const;
+
+/** A CSV column mapping the user made, kept for the next file with the same header row. */
+export const importMappingSchema = z.object({
+  headerKey: z.string(),
+  mapping: z.object({
+    date: z.string(),
+    dateFormat: z.enum(dateFormats),
+    amount: z.string().optional(),
+    debit: z.string().optional(),
+    credit: z.string().optional(),
+    description: z.array(z.string()),
+    defaultCurrency: currency,
+    decimalComma: z.boolean().optional(),
+  }),
+});
+
 export const auditEventSchema = z.object({ id, actor: z.string(), action: z.string(), entity: z.string(), at: z.string() });
 
 export const SCHEMA_VERSION = 1;
@@ -309,6 +328,7 @@ export const datasetSchema = z.object({
   bills: z.array(billSchema).default([]),
   /** Detected recurring payees the user said are not bills. */
   recurringDismissed: z.array(z.string()).default([]),
+  importMappings: z.array(importMappingSchema).default([]),
 });
 
 export type Household = z.infer<typeof householdSchema>;
@@ -332,6 +352,7 @@ export type StepState = z.infer<typeof stepStateSchema>;
 export type AuditEvent = z.infer<typeof auditEventSchema>;
 export type Payslip = z.infer<typeof payslipSchema>;
 export type Bill = z.infer<typeof billSchema>;
+export type ImportMapping = z.infer<typeof importMappingSchema>;
 export type BillCadence = Bill["cadence"];
 export type Dataset = z.infer<typeof datasetSchema>;
 export type WaterfallBucket = (typeof waterfallBuckets)[number];

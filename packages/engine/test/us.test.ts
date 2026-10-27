@@ -119,7 +119,7 @@ describe("US next steps (r/personalfinance order)", () => {
     const cases = [
       usSnapshot({ liquidSavingsMinor: toMinor(2000) }),
       usSnapshot({ members: [usMember({}, { iraContribYtdMinor: 0 })] }),
-      usSnapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast30Days: 5, uncategorisedLast30Days: 0 } }),
+      usSnapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast60Days: 5, uncategorisedLast60Days: 0 } }),
     ];
     for (const s of cases) {
       const t = text(evaluateUs(s, pack));

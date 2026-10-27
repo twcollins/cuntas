@@ -7,6 +7,7 @@ import { switchHousehold, useDataset, useStore } from "../lib/store";
 import { setTheme, useTheme, type ThemePreference } from "../lib/theme";
 import { setDisplayLocale } from "../lib/format";
 import { involves, termsFor, type Terms } from "../lib/region";
+import { DropImportHost } from "./DropImport";
 import { openQuickAdd, QuickAddHost } from "./QuickAdd";
 import { cx } from "./ui";
 
@@ -210,6 +211,7 @@ export function Layout() {
           <span aria-hidden>+</span>
         </button>
         <QuickAddHost />
+        <DropImportHost />
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ export function snapshot(over: Partial<HouseholdSnapshot> = {}): HouseholdSnapsh
     netMonthlyPayMinor: toMinor(3200),
     liquidSavingsMinor: toMinor(20000),
     essentialMonthlySpendMinor: toMinor(1800),
-    tracking: { hasBudgetThisPeriod: true, transactionsLast30Days: 40, uncategorisedLast30Days: 0 },
+    tracking: { hasBudgetThisPeriod: true, transactionsLast60Days: 40, uncategorisedLast60Days: 0 },
     waterfall: { firstShortBucket: null, shortfallMinor: 0, buckets: 7, bucketsCovered: 7 },
     debts: [],
     sinkingFunds: [],

@@ -30,6 +30,9 @@ import { essentialSpend } from "./estimate";
 import { categoryMap, isCashflow, totalsByCategory } from "./spending";
 import { paydayWaterfall, ESSENTIAL_BUCKETS } from "./waterfall";
 
+/** How recent a transaction must be for the household to count as tracking. */
+const TRACKING_DAYS = 60;
+
 export function residenceOn(ds: Dataset, memberId: string, date: IsoDate): Jurisdiction {
   const p = ds.residencePeriods.find((r) => r.memberId === memberId && r.from <= date && (r.to === null || r.to >= date));
   return p?.jurisdiction ?? "IE";
@@ -223,7 +226,8 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart?: ChartDefaults)
   });
 
   const cats = categoryMap(ds);
-  const last30 = ds.transactions.filter((t) => t.bookedAt > addDays(asOf, -30) && t.bookedAt <= asOf);
+  // A statement counts as tracking while it covers any of the last 60 days, so last month's file imported late still does.
+  const recent = ds.transactions.filter((t) => t.bookedAt > addDays(asOf, -TRACKING_DAYS) && t.bookedAt <= asOf);
   const period = periodOf(asOf, s.paydayDayOfMonth);
   const hasBudget = ds.budgets.some((b) => b.period === period);
 
@@ -274,8 +278,8 @@ export function buildSnapshot(ds: Dataset, asOf: IsoDate, chart?: ChartDefaults)
     essentialMonthlySpendMinor: essential.monthlyMinor,
     tracking: {
       hasBudgetThisPeriod: hasBudget,
-      transactionsLast30Days: last30.length,
-      uncategorisedLast30Days: last30.filter((t) => t.categoryId === null && isCashflow(t, cats)).length,
+      transactionsLast60Days: recent.length,
+      uncategorisedLast60Days: recent.filter((t) => t.categoryId === null && isCashflow(t, cats)).length,
     },
     waterfall: {
       firstShortBucket: firstShort?.label ?? null,

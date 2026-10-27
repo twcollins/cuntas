@@ -91,7 +91,7 @@ export interface HouseholdSnapshot {
   netMonthlyPayMinor: number;
   liquidSavingsMinor: number;
   essentialMonthlySpendMinor: number;
-  tracking: { hasBudgetThisPeriod: boolean; transactionsLast30Days: number; uncategorisedLast30Days: number };
+  tracking: { hasBudgetThisPeriod: boolean; transactionsLast60Days: number; uncategorisedLast60Days: number };
   waterfall: { firstShortBucket: string | null; shortfallMinor: number; buckets: number; bucketsCovered: number };
   debts: DebtState[];
   sinkingFunds: SinkingFundState[];

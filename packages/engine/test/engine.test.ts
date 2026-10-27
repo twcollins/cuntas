@@ -16,7 +16,7 @@ describe("next-step engine", () => {
   });
 
   it("step 0: no tracking comes first", () => {
-    const r = evaluate(snapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast30Days: 0, uncategorisedLast30Days: 0 } }), pack);
+    const r = evaluate(snapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast60Days: 0, uncategorisedLast60Days: 0 } }), pack);
     expect(r.current?.check).toBe("ie.track-budget.tracking");
     expect(r.current?.rulePack).toBe("IE-2026.3");
     expect(r.current?.sources.length).toBeGreaterThan(0);
@@ -143,7 +143,7 @@ describe("next-step engine", () => {
   });
 
   it("every card cites its rule pack and sources", () => {
-    const r = evaluate(snapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast30Days: 0, uncategorisedLast30Days: 0 } }), pack);
+    const r = evaluate(snapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast60Days: 0, uncategorisedLast60Days: 0 } }), pack);
     for (const card of [r.current!, ...r.alwaysOn]) {
       expect(card.rulePack).toMatch(/^IE-/);
       expect(card.chart).toBe("CHART-2.1");

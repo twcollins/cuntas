@@ -13,8 +13,10 @@ export interface ParsedTransaction {
 
 export interface ParsedStatement {
   format: "csv" | "ofx" | "camt053";
+  /** The bank preset id, or `csv:<header key>` for a layout the user mapped by hand. */
   preset?: string;
-  account?: { iban?: string; currency?: Currency; number?: string };
+  /** What the file says about its account, used to pick the account to import into. */
+  account?: { iban?: string; currency?: Currency; number?: string; type?: "current" | "creditCard" };
   transactions: ParsedTransaction[];
   warnings: string[];
 }
@@ -50,6 +52,8 @@ export interface ColumnMapping {
   signFrom?: { column: string; negativeWhen: string };
   /** Skip rows whose column starts with this text (e.g. a "Beginning balance" line). */
   skip?: { column: string; startsWith: string };
+  /** Column holding the account or card number, read from the first row that has one. */
+  accountNumber?: string;
 }
 
 export interface CsvPreset extends ColumnMapping {
@@ -63,4 +67,6 @@ export interface CsvPreset extends ColumnMapping {
    * row to have exactly this many cells, a readable date in `date` and an amount in `amount`.
    */
   headerless?: string[];
+  /** The kind of account the export comes from; current when absent. */
+  accountType?: "creditCard";
 }
