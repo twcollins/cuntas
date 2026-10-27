@@ -11,7 +11,7 @@ pnpm install          # or: npx pnpm@9.15.0 install
 pnpm dev              # http://localhost:5173 — open the demo household or start your own
 ```
 
-Data lives on the device (IndexedDB), one entry per household; keep several and switch from the menu at the top of the sidebar (**Households** to add or remove). Export, encrypted backup and delete-all are under **Settings**. **Guide** gives a short tour.
+Data lives on the device (IndexedDB in the browser, encrypted SQLite in the iOS and Android apps), one entry per household; keep several and switch from the menu at the top of the sidebar (**Households** to add or remove). Export, encrypted backup and delete-all are under **Settings**. **Guide** gives a short tour.
 
 ## Self-hosted stack (household sharing, bank sync, ECB rates)
 

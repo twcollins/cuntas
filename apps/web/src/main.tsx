@@ -5,7 +5,8 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { loadRulePacks, useRulePacks } from "./lib/rulepacks";
 import { loadStore, useStore } from "./lib/store";
-import { initNative } from "./lib/native";
+import { hideSplash, initNative } from "./lib/native";
+import { initPlatform } from "./lib/platform";
 import { initTheme } from "./lib/theme";
 import { JoinPage } from "./pages/Join";
 import { Onboarding } from "./pages/Onboarding";
@@ -19,10 +20,14 @@ function App() {
   const { status } = useStore();
   const rules = useRulePacks();
   useEffect(() => {
-    // Rule files load first so every calculation uses them from the first render.
-    void loadRulePacks().then(loadStore);
+    // Storage first (SQLite in the apps); then rule files, so every calculation uses them from the first render.
+    void initPlatform().then(loadRulePacks).then(loadStore);
   }, []);
-  if (status === "loading" || rules.status === "loading") return <div className="p-8 text-sm text-stone-500">Loading…</div>;
+  const loading = status === "loading" || rules.status === "loading";
+  useEffect(() => {
+    if (!loading) void hideSplash();
+  }, [loading]);
+  if (loading) return <div className="p-8 text-sm text-stone-500">Loading…</div>;
   if (status === "empty") return window.location.pathname === "/join" ? <JoinPage standalone /> : <Onboarding />;
   return <RouterProvider router={router} />;
 }

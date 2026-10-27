@@ -1,25 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { openFiles } from "../lib/opened";
+import { platform } from "../lib/platform";
 
-// Statement files dropped anywhere in the app go to the Import page, which picks them up here.
-
-let pending: File[] = [];
-const listeners = new Set<() => void>();
-
-/** Files dropped since the Import page last looked; empties the queue. */
-export function takeDroppedFiles(): File[] {
-  const out = pending;
-  pending = [];
-  return out;
-}
-
-/** Calls back when files are dropped while the Import page is open. */
-export function onDroppedFiles(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
+// Files dropped anywhere in the app, or opened in it from elsewhere, go to the page that reads them
+// (statements to Import, rule files to Tax rules, backups to Settings) through the queue in lib/opened.
 
 const hasFiles = (e: DragEvent) => !!e.dataTransfer && [...e.dataTransfer.types].includes("Files");
 
@@ -47,11 +32,8 @@ export function DropImportHost() {
       e.preventDefault();
       depth.current = 0;
       setOver(false);
-      const files = [...(e.dataTransfer?.files ?? [])];
-      if (files.length === 0) return;
-      pending = [...pending, ...files];
-      for (const l of listeners) l();
-      void navigate({ to: "/import" });
+      const to = openFiles([...(e.dataTransfer?.files ?? [])]);
+      if (to) void navigate({ to });
     };
     window.addEventListener("dragenter", enter);
     window.addEventListener("dragleave", leave);
@@ -64,12 +46,20 @@ export function DropImportHost() {
       window.removeEventListener("drop", drop);
     };
   }, [navigate]);
+  useEffect(
+    () =>
+      platform().files.onOpen((files) => {
+        const to = openFiles(files);
+        if (to) void navigate({ to });
+      }),
+    [navigate],
+  );
   if (!over) return null;
   return (
     <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-brand-600/10 p-6 backdrop-blur-sm">
       <div className="rounded-2xl border-2 border-dashed border-brand-600 bg-white px-10 py-8 text-center shadow-lg dark:bg-stone-900">
         <p className="text-lg font-semibold">Drop bank files to import</p>
-        <p className="mt-1 text-sm text-stone-500">CSV, OFX, QFX or CAMT.053, several at once</p>
+        <p className="mt-1 text-sm text-stone-500">CSV, OFX, QFX or CAMT.053, several at once; a rule file or backup opens where it belongs</p>
       </div>
     </div>
   );

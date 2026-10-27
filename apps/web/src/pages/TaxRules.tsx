@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   comparePacks,
   listPacks,
@@ -23,6 +23,7 @@ import {
 import { RulesBanner } from "../components/RulesBanner";
 import { Badge, Button, Card, PageHeader, Table } from "../components/ui";
 import { download, formatDate } from "../lib/format";
+import { onOpened, takeOpened } from "../lib/opened";
 import { addRuleFile, removeRuleFile, saveCheck, useRulePacks } from "../lib/rulepacks";
 import { useDataset } from "../lib/store";
 
@@ -58,6 +59,17 @@ export function TaxRulesPage() {
     setMsg(`${file.name} loaded as ${result.key}${result.replaced ? ", replacing the file loaded before" : ""}. Check each section below.`);
     setReview(result.key);
   }
+
+  // A rule file dropped or opened in the app from elsewhere is checked here like a chosen one.
+  const onFileRef = useRef(onFile);
+  onFileRef.current = onFile;
+  useEffect(() => {
+    const take = () => {
+      for (const f of takeOpened("rules")) void onFileRef.current(f);
+    };
+    take();
+    return onOpened(take);
+  }, []);
 
   return (
     <div>

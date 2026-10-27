@@ -54,7 +54,7 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
       { to: "/households", label: "Households", body: "Keep several households on this device and switch between them from the menu at the top of the sidebar. Add a new one, open the demo, or join one with an invite link." },
       { to: "/account", label: "Account & sync", body: "Optional. Sign in to your own Cúntas server with a passkey to sync a household, share it, or use bank sync. Nothing is replaced on this device without asking." },
       { to: "/households", label: "Inviting people", body: "For a synced household, owners invite people from the Households page and choose their role. Each person signs in with their own passkey." },
-      { to: "/settings", label: "Settings", body: "Export to JSON or CSV, make an encrypted backup, update exchange rates, switch light or dark mode, or delete everything on this device." },
+      { to: "/settings", label: "Settings", body: "Export to JSON or CSV, make an encrypted backup (Overview reminds you after a month), restore one, update exchange rates, switch light or dark mode, or delete everything on this device. A backup, export or rule file dropped on any page, or opened in the app, goes where it belongs." },
     ],
   },
 ];

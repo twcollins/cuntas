@@ -4,6 +4,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Too
 import { budgetReport, essentialSpend, netWorthSeries, periodOf, spendingWindow, totalsByCategory } from "@cuntas/ledger";
 import { classify } from "@cuntas/rules";
 import { fundBasisUsed, starterFundTarget } from "@cuntas/engine";
+import { BackupReminder } from "../components/BackupReminder";
 import { NextStep } from "../components/NextStep";
 import { RulesBanner } from "../components/RulesBanner";
 import { SetupChecklist, useSetupShowing } from "../components/Setup";
@@ -70,6 +71,7 @@ export function OverviewPage() {
     <div>
       <PageHeader title={`Hello, ${ds.members.map((m) => m.name).join(" & ") || ds.household.name}`} subtitle={<>Pay period {monthLabel(period)} · rule pack {result.rulePack}{figures && <> · <Badge tone="bad">{figures}</Badge></>}</>} />
       <RulesBanner ds={ds} asOf={asOf} />
+      <BackupReminder />
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           {setup && <SetupChecklist />}

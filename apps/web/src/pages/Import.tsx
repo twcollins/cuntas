@@ -2,9 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { csvHeaderKey, detectFileKind, guessMapping, importFile, PRESETS, readCsvHeaders, type ColumnMapping, type DateFormat, type ParsedStatement } from "@cuntas/importers";
 import { applyImports, mappingFor, planImports, rememberMapping, type ImportSummary, type NewAccountSpec } from "@cuntas/ledger";
-import { onDroppedFiles, takeDroppedFiles } from "../components/DropImport";
 import { Badge, Button, Card, Field, Input, PageHeader, Select, Table } from "../components/ui";
 import { currencyOptions, formatDate, money, moneyExact } from "../lib/format";
+import { onOpened, takeOpened } from "../lib/opened";
 import { countryForCurrency, termsFor } from "../lib/region";
 import { replaceDataset, useDataset } from "../lib/store";
 import type { Currency } from "@cuntas/rules";
@@ -89,8 +89,8 @@ export function ImportPage() {
   const addRef = useRef(addFiles);
   addRef.current = addFiles;
   useEffect(() => {
-    void addRef.current(takeDroppedFiles());
-    return onDroppedFiles(() => void addRef.current(takeDroppedFiles()));
+    void addRef.current(takeOpened("statement"));
+    return onOpened(() => void addRef.current(takeOpened("statement")));
   }, []);
 
   const update = (id: number, change: Partial<FileEntry>) => setFiles((fs) => fs.map((f) => (f.id === id ? { ...f, ...change } : f)));

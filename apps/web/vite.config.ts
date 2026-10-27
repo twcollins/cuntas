@@ -20,6 +20,20 @@ export default defineConfig({
         display: "standalone",
         start_url: "/",
         icons: [{ src: "icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }],
+        // Installed on a desktop, "Open with Cúntas" sends statements, rule files and backups to the right page.
+        file_handlers: [
+          {
+            action: "/",
+            accept: {
+              "text/csv": [".csv"],
+              "application/x-ofx": [".ofx", ".qfx"],
+              "application/xml": [".xml"],
+              "application/yaml": [".yaml", ".yml"],
+              "application/json": [".json"],
+              "application/octet-stream": [".cuntas"],
+            },
+          },
+        ],
       },
       workbox: { globPatterns: ["**/*.{js,css,html,svg}"], navigateFallback: "/index.html" },
     }),

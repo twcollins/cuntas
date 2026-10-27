@@ -1,4 +1,3 @@
-import { del, get, set } from "idb-keyval";
 import { useMemo, useSyncExternalStore } from "react";
 import { residenceOn, type Dataset } from "@cuntas/ledger";
 import {
@@ -14,6 +13,7 @@ import {
   type RuleFileError,
   type RuleNeed,
 } from "@cuntas/rules";
+import { platform } from "./platform";
 
 // Tax rule files the user loaded on this device, and their checks of each pack. Stored once per
 // device (not per household), because tax figures are the same for every household here.
@@ -55,7 +55,7 @@ function emit(next: Partial<State>, packsChanged = false) {
 
 async function persist() {
   const { files, checks, dismissed } = state;
-  await set(KEY, { files, checks, dismissed } satisfies RulePackData);
+  await platform().kv.write([[KEY, { files, checks, dismissed } satisfies RulePackData]]);
 }
 
 /** Registers every stored file that still passes the checks; a file that no longer does is skipped. */
@@ -71,7 +71,7 @@ function register(files: RuleFile[]): RuleFile[] {
 
 export async function loadRulePacks() {
   try {
-    const raw = (await get(KEY)) as Partial<RulePackData> | undefined;
+    const raw = await platform().kv.get<Partial<RulePackData>>(KEY);
     const files = register(raw?.files ?? []);
     emit({ status: "ready", files, checks: raw?.checks ?? [], dismissed: raw?.dismissed ?? {} }, true);
   } catch {
@@ -142,7 +142,7 @@ export async function restoreRulePacks(data: RulePackData) {
 export async function clearRulePacks() {
   setLoadedPacks([]);
   emit({ files: [], checks: [], dismissed: {} }, true);
-  await del(KEY);
+  await platform().kv.write([], [KEY]);
 }
 
 /** The tax rules this household needs today: each member's country of residence, and Scotland or their US state where it applies. */

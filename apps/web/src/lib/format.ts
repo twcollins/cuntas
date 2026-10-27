@@ -1,5 +1,6 @@
 import { COUNTRY_INFO, CURRENCIES, CURRENCY_NAMES, formatMoney, formatRate, TAX_JURISDICTIONS, US_FILING_STATUSES, US_STATE_CODES, US_STATES, type Currency, type UsFilingStatus } from "@cuntas/rules";
 import { parseAmount } from "@cuntas/importers";
+import { platform } from "./platform";
 
 export const money = (minor: number, currency: Currency, decimals = false) => formatMoney(minor, currency, { decimals });
 export const moneyExact = (minor: number, currency: Currency) => formatMoney(minor, currency, { decimals: true });
@@ -46,12 +47,7 @@ export function monthLabel(period: string): string {
   return new Date(`${period}-01T00:00:00Z`).toLocaleDateString(displayLocale, { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
-export function download(filename: string, content: string | Blob, type = "application/json") {
-  const blob = typeof content === "string" ? new Blob([content], { type }) : content;
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+/** Saves a file: a download on the web, the share sheet in the apps. */
+export function download(filename: string, content: string, type = "application/json"): Promise<void> {
+  return platform().files.save([{ name: filename, mime: type, data: content }]);
 }

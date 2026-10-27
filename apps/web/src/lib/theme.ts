@@ -49,6 +49,12 @@ export function initTheme() {
   apply();
 }
 
+/** Calls back whenever the resolved theme may have changed (the apps restyle the status bar). */
+export function onThemeChange(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 /** The preference and the theme it resolves to; re-renders when either changes. */
 export function useTheme(): { preference: ThemePreference; theme: "light" | "dark" } {
   const theme = useSyncExternalStore(

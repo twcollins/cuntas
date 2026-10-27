@@ -1,9 +1,9 @@
-import { del, get, set } from "idb-keyval";
 import { useSyncExternalStore } from "react";
 import { createDemoDataset, createEmptyDataset, datasetSchema, newId, withAudit, type Dataset } from "@cuntas/ledger";
 import { today, type Currency, type Jurisdiction } from "@cuntas/rules";
+import { platform } from "./platform";
 
-// Local-first: every household lives in IndexedDB on this device, one key each, with an index
+// Local-first: every household lives on this device (IndexedDB on the web, SQLite in the apps), one key each, with an index
 // of households and the active one. Server sync is optional and set per household.
 
 const INDEX_KEY = "cuntas:households:v2";
@@ -32,6 +32,12 @@ export interface HouseholdEntry {
   id: string;
   name: string;
   sync: SyncMeta | null;
+  /** When it was added to this device, last changed, and last saved as a backup or JSON export (ISO times). */
+  addedAt?: string;
+  changedAt?: string;
+  backedUpAt?: string;
+  /** "Back up this household" stays hidden until then. */
+  backupHiddenUntil?: string;
 }
 
 interface State {
@@ -57,12 +63,12 @@ function emit(next: Partial<State>) {
 
 function snapshot() {
   const { dataset, activeId, households, account } = state;
-  return async () => {
-    await Promise.all([
-      dataset && activeId ? set(datasetKey(activeId), dataset) : Promise.resolve(),
-      set(INDEX_KEY, { activeId, households }),
-      account ? set(ACCOUNT_KEY, account) : del(ACCOUNT_KEY),
-    ]);
+  return () => {
+    // One write, so the household and the index stay in step (one transaction in the apps).
+    const set: [string, unknown][] = [[INDEX_KEY, { activeId, households }]];
+    if (dataset && activeId) set.push([datasetKey(activeId), dataset]);
+    if (account) set.push([ACCOUNT_KEY, account]);
+    return platform().kv.write(set, account ? [] : [ACCOUNT_KEY]);
   };
 }
 
@@ -72,8 +78,12 @@ function persist() {
   saveTimer = setTimeout(() => void flush(), 150);
 }
 
-// Leaving the page (closing the tab, reloading) within the save delay would drop the last change; write it now.
-if (typeof window !== "undefined") window.addEventListener("pagehide", () => void flush());
+// Leaving the page (closing the tab, reloading, the app going to the background) within the save
+// delay would drop the last change; write it now. The OS may end a backgrounded app without warning.
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", () => void flush());
+  document.addEventListener("visibilitychange", () => document.visibilityState === "hidden" && void flush());
+}
 
 /** Write any pending change now; called before switching households so nothing is lost. */
 export async function flush() {
@@ -84,15 +94,17 @@ export async function flush() {
 }
 
 async function readDataset(id: string): Promise<Dataset | null> {
-  const raw = await get(datasetKey(id));
+  const raw = await platform().kv.get(datasetKey(id));
   const parsed = raw ? datasetSchema.safeParse(raw) : null;
   return parsed?.success ? parsed.data : null;
 }
 
 export async function loadStore() {
   try {
-    const [index, account] = await Promise.all([get(INDEX_KEY), get(ACCOUNT_KEY)]);
-    const households: HouseholdEntry[] = (index as { households?: HouseholdEntry[] } | undefined)?.households ?? [];
+    const [index, account] = await Promise.all([platform().kv.get(INDEX_KEY), platform().kv.get(ACCOUNT_KEY)]);
+    const now = new Date().toISOString();
+    // Households from before the backup reminder count from today.
+    const households: HouseholdEntry[] = ((index as { households?: HouseholdEntry[] } | undefined)?.households ?? []).map((h) => ({ ...h, addedAt: h.addedAt ?? now }));
     let activeId: string | null = (index as { activeId?: string } | undefined)?.activeId ?? households[0]?.id ?? null;
     if (activeId && !households.some((h) => h.id === activeId)) activeId = households[0]?.id ?? null;
     const dataset = activeId ? await readDataset(activeId) : null;
@@ -127,13 +139,13 @@ export function update(fn: (ds: Dataset) => Dataset, auditAction?: string) {
   if (!state.dataset) return;
   let next = fn(state.dataset);
   if (auditAction) next = withAudit(next, "user", auditAction, "household");
-  emit({ dataset: next, households: withActive((h) => ({ ...h, name: next.household.name, sync: h.sync ? { ...h.sync, dirty: true } : null })) });
+  emit({ dataset: next, households: withActive((h) => ({ ...h, name: next.household.name, sync: h.sync ? { ...h.sync, dirty: true } : null, changedAt: new Date().toISOString() })) });
   persist();
 }
 
 /** Replace the active household's data (an import, a bank sync, a restore, or a server copy). */
 export function replaceDataset(ds: Dataset, sync: SyncMeta | null = state.sync) {
-  emit({ status: "ready", dataset: ds, households: withActive((h) => ({ ...h, name: ds.household.name, sync })) });
+  emit({ status: "ready", dataset: ds, households: withActive((h) => ({ ...h, name: ds.household.name, sync, changedAt: new Date().toISOString() })) });
   persist();
 }
 
@@ -152,7 +164,7 @@ export function setAccount(account: ServerAccount | null) {
 export async function addHousehold(ds: Dataset, sync: SyncMeta | null = null): Promise<string> {
   await flush();
   const id = newId("local");
-  emit({ status: "ready", dataset: ds, households: [...state.households, { id, name: ds.household.name, sync }], activeId: id });
+  emit({ status: "ready", dataset: ds, households: [...state.households, { id, name: ds.household.name, sync, addedAt: new Date().toISOString() }], activeId: id });
   persist();
   await flush();
   return id;
@@ -170,7 +182,7 @@ export async function switchHousehold(id: string) {
 /** Remove a household from this device only; a server copy, if any, is kept. */
 export async function removeHousehold(id: string) {
   await flush();
-  await del(datasetKey(id));
+  await platform().kv.write([], [datasetKey(id)]);
   const households = state.households.filter((h) => h.id !== id);
   if (id !== state.activeId) {
     emit({ households });
@@ -194,6 +206,34 @@ export function findSynced(apiUrl: string, householdId: string): HouseholdEntry 
   return state.households.find((h) => h.sync?.apiUrl === apiUrl && h.sync.householdId === householdId);
 }
 
+/** Days without a backup, while the household changes, before Overview asks for one; also how long "Not now" hides it. */
+export const BACKUP_DAYS = 30;
+const DAY_MS = 86_400_000;
+
+/** The phone or browser is the only copy for most people: ask for a backup once the last one is a month old and the household has changed since. */
+export function backupDue(h: HouseholdEntry, now: Date): boolean {
+  const since = h.backedUpAt ?? h.addedAt;
+  if (!since || !h.changedAt || h.changedAt <= since) return false;
+  if (h.backupHiddenUntil && now.toISOString() < h.backupHiddenUntil) return false;
+  return now.getTime() - Date.parse(since) >= BACKUP_DAYS * DAY_MS;
+}
+
+/** The open household's entry on this device. */
+export function useActiveEntry(): HouseholdEntry | undefined {
+  const s = useStore();
+  return s.households.find((h) => h.id === s.activeId);
+}
+
+export function markBackedUp() {
+  emit({ households: withActive((h) => ({ ...h, backedUpAt: new Date().toISOString(), backupHiddenUntil: undefined })) });
+  persist();
+}
+
+export function hideBackupReminder() {
+  emit({ households: withActive((h) => ({ ...h, backupHiddenUntil: new Date(Date.now() + BACKUP_DAYS * DAY_MS).toISOString() })) });
+  persist();
+}
+
 export function startDemo() {
   return addHousehold(createDemoDataset(today()));
 }
@@ -206,6 +246,6 @@ export function startEmpty(name: string, baseCurrency: Currency, first?: { name:
 export async function wipeAll() {
   clearTimeout(saveTimer);
   pendingSave = null;
-  await Promise.all([...state.households.map((h) => del(datasetKey(h.id))), del(INDEX_KEY), del(ACCOUNT_KEY)]);
+  await platform().kv.write([], [...state.households.map((h) => datasetKey(h.id)), INDEX_KEY, ACCOUNT_KEY]);
   emit({ status: "empty", dataset: null, households: [], activeId: null, account: null });
 }

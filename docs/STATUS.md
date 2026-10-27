@@ -25,6 +25,7 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | USA phase 2 | Federal tax 2026 (payroll, FICA, self-employment, child tax credit), retirement and HSA limits, quarterly estimated tax, r/personalfinance ladder, 10 US bank CSV presets, en-US wording, IE–US and UK–US what-if |
 | USA phase 3 | All 50 states and D.C. have provisional 2026 packs with sources and golden tests. Local income taxes are out at launch, except Indiana's 92 county taxes |
 | Guide | Covers US households, state packs and Indiana counties |
+| Mobile apps 1-3 | Platform layer; encrypted SQLite storage in the apps with a one-off copy from IndexedDB; status bar, splash and keyboard; share-sheet exports; statements, rule files and backups opened from anywhere go to the right page; backup reminder. Built and `cap sync`ed, not yet compiled or run on a device |
 | UX phase 6 | Setup checklist on Overview in place of step 0; phone tab bar with + Add and a list view of Transactions; empty states with actions; pages no longer scroll sideways on phones |
 | UX phase 5 | Merchant names cleaned on import; about 400 US merchants in the dictionary; a Review page that files uncategorised rows one merchant at a time, with a rule and undo |
 | UX phase 4 | Several files at once, dropped on any page; account matching by number, bank layout or name; remembered column mappings; a result screen with next steps; tracking counts the last 60 days and Overview falls back to the latest month with spending |
@@ -32,7 +33,7 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | UX phase 2 | Quick add from any page (spent, received, moved, every month → bill), Cash wallet with untracked balance, hand-entered rows merged on import and deletable |
 | UX phase 1 | Onboarding creates the first person with their residence; account countries follow currency; USD kept in OFX/CAMT/bank sync; Irish-only options and text hidden from others; empty chart states; sidebar trimmed with a More section |
 
-Checks on 2026-10-27: 544 Vitest tests and 51 Playwright tests pass (3 skipped); lint and typecheck clean.
+Checks on 2026-10-27: 555 Vitest tests and 57 Playwright tests pass (3 skipped); lint and typecheck clean.
 
 ## Rule packs
 
@@ -50,12 +51,14 @@ Checks on 2026-10-27: 544 Vitest tests and 51 Playwright tests pass (3 skipped);
 
 ## Next
 
-**Pick up here (2026-10-27):** the UX review's six phases are done. Next on the list is the iOS and Android apps, phase 1 in [design/mobile-apps.md](design/mobile-apps.md) (platform layer and storage); the phone layout from its phase 2 is built in the PWA except the native status bar, splash screen and keyboard handling. Items carried forward, all listed under "Progress" in the UX review:
+**Pick up here (2026-10-27):** mobile apps phases 1-3 are built (see Progress in [design/mobile-apps.md](design/mobile-apps.md)). They need a Mac with Xcode and an Android SDK to compile, then the device checklist in that document, before phase 4 (app lock). Carried forward:
+- Run the apps on a device: the IndexedDB copy, an app kill straight after a change, opening a statement from Files, the share sheet, and whether the SQLite key survives an encrypted iPhone backup restore.
+- Android "share to Cúntas" (`SEND` intents) needs a send-intent plugin.
 - The review queue could use the Category column some US exports carry (Chase, Discover, Capital One) as a first guess.
-- A reload within about a third of a second of a change can lose that change; a write-ahead copy (or awaiting the write before navigation) would close it.
+- On the web, a reload within about a third of a second of a change can lose that change; a write-ahead copy (or awaiting the write before navigation) would close it.
 - The "under 3 minutes to a first budget" goal is measured as 13 actions on the checklist path, not yet timed with a person.
 
-1. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
-3. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
-4. Verify provisional packs (P0 in the backlog).
-5. Update the website brief for US support.
+1. iOS and Android apps, phases 4-7 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
+2. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
+3. Verify provisional packs (P0 in the backlog).
+4. Update the website brief for US support.

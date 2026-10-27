@@ -20,13 +20,13 @@ Contents:
 
 Cúntas is a household budgeting and planning app for Ireland, the UK and the US. A household imports bank files (or syncs a bank through a self-hosted server), categorises spending, sets budgets, debts, goals and pensions, and gets one "next step" from a ladder of checks. The Irish ladder follows the r/irishpersonalfinance flowchart; the US ladder follows the r/personalfinance order. Take-home pay and other tax figures come from versioned rule packs: Ireland, the UK (with a Scottish sub-pack), US federal, and all 50 states plus D.C.
 
-The web app is a React PWA. It runs entirely in the browser with data in IndexedDB. A Hono API, a pg-boss worker and Postgres are optional: they add sharing between people, bank sync and server-side FX rates. The same web bundle is wrapped by Capacitor for iOS and Android.
+The web app is a React PWA. It runs entirely on the device, with data in IndexedDB (or, in the iOS and Android apps, an encrypted SQLite database). A Hono API, a pg-boss worker and Postgres are optional: they add sharing between people, bank sync and server-side FX rates. The same web bundle is wrapped by Capacitor for iOS and Android.
 
 Core principles, and where the code enforces them:
 
 | Principle | What it means in code | Enforced by |
 | --- | --- | --- |
-| Local-first | Each household is one JSON document in IndexedDB. No server is needed. Server sync is opt-in per household. | [apps/web/src/lib/store.ts](../apps/web/src/lib/store.ts) |
+| Local-first | Each household is one JSON document in the device's key-value store (IndexedDB on the web, SQLite in the apps). No server is needed. Server sync is opt-in per household. | [apps/web/src/lib/store.ts](../apps/web/src/lib/store.ts), [apps/web/src/lib/platform/](../apps/web/src/lib/platform/index.ts) |
 | Money is integer minor units | Every money field is `*Minor: number` (an integer) with a `currency`. Arithmetic uses `applyRate`, `divideMinor`, `splitEvenly`, `toMinor`. Rates are snapped to parts per million. | [packages/rules/src/money.ts](../packages/rules/src/money.ts), `z.number().int()` in the dataset schema |
 | No tax figures in code | Tax figures live only in `packages/rules/rules/**/*.yaml`. Calculators read them from a pack. | ESLint `no-magic-numbers` on `packages/rules/src/calculators/**` (allows 0, 1, 100, -1), [eslint.config.js](../eslint.config.js) |
 | Versioned, sourced rule packs | Each pack has `version`, `status: provisional | verified`, `effective` dates and `sources`. Each section has its own `source` URL, and may carry its own `status`. | Zod schema in [packages/rules/src/packs/schema.ts](../packages/rules/src/packs/schema.ts); [packages/rules/test/packs.test.ts](../packages/rules/test/packs.test.ts) |
@@ -402,8 +402,8 @@ Reminders are queued only; nothing delivers them yet (no email or push).
 
 [src/main.tsx](../apps/web/src/main.tsx):
 
-1. `initTheme()` and `initNative()` (Android back button inside Capacitor).
-2. `loadRulePacks()` registers the user's rule files, then `loadStore()` reads the household index and the active dataset. Rule files load first so every calculation uses them from the first render.
+1. `initTheme()` and `initNative()` (inside Capacitor: the Android back button, the status bar style, keeping a focused field above the keyboard).
+2. `initPlatform()` picks the storage and files implementation (SQLite and the share sheet in the apps, after copying any earlier IndexedDB data across); then `loadRulePacks()` registers the user's rule files, then `loadStore()` reads the household index and the active dataset. Rule files load first so every calculation uses them from the first render.
 3. With no household: `/join` shows the invite page, anything else shows [Onboarding](../apps/web/src/pages/Onboarding.tsx) (new household, demo, or sign in to a server).
 4. Otherwise the TanStack router renders [Layout](../apps/web/src/components/Layout.tsx) and the page.
 
@@ -445,12 +445,14 @@ Shared UI primitives (`Card`, `PageHeader`, `Button`, `Field`, `MoneyInput`, `Ba
 
 There is no Redux or context store. Two small modules expose state with `useSyncExternalStore`:
 
-| Module | Holds | IndexedDB keys |
+| Module | Holds | Keys (in `platform().kv`) |
 | --- | --- | --- |
 | [lib/store.ts](../apps/web/src/lib/store.ts) | The household index, the active `Dataset`, its `SyncMeta`, the signed-in `ServerAccount` | `cuntas:households:v2` (index and active id), `cuntas:household:<localId>` (one per household), `cuntas:account:v2` |
 | [lib/rulepacks.ts](../apps/web/src/lib/rulepacks.ts) | Loaded rule files, checks, dismissed prompts, `revision` | `cuntas:rulepacks:v1` (per device) |
 
-Writes go through `update(fn, auditAction?)` (a pure `Dataset → Dataset` function) or `replaceDataset(ds)`. Saves are debounced by 150 ms; `flush()` runs before switching households. A local household id is separate from the dataset's own id, so two copies of the demo can coexist. TanStack Query is used only for server calls (connections, institutions, admin lists).
+Both modules read and write through `platform().kv` ([lib/platform/](../apps/web/src/lib/platform/index.ts)): `get`, `keys`, and `write(set, del)`, which the apps apply in one SQLite transaction. Each household's entry in the index also carries `addedAt`, `changedAt`, `backedUpAt` and `backupHiddenUntil` for the backup reminder (`backupDue`). Files dropped on any page or opened in the app from elsewhere go through [lib/opened.ts](../apps/web/src/lib/opened.ts), which queues them by kind for Import, Tax rules or Settings.
+
+Writes go through `update(fn, auditAction?)` (a pure `Dataset → Dataset` function) or `replaceDataset(ds)`. Saves are debounced by 150 ms; `flush()` runs before switching households and when the page or app is hidden. A local household id is separate from the dataset's own id, so two copies of the demo can coexist. TanStack Query is used only for server calls (connections, institutions, admin lists).
 
 ### Derived hooks
 
@@ -465,8 +467,10 @@ Writes go through `update(fn, auditAction?)` (a pure `Dataset → Dataset` funct
 `pnpm --filter @cuntas/web build:native` runs `tsc`, then `CAPACITOR=1 vite build`, then `cap sync`. The differences from the PWA:
 
 - [vite.config.ts](../apps/web/vite.config.ts) leaves out `vite-plugin-pwa` (no service worker), because the app serves files from its bundle.
-- [capacitor.config.ts](../apps/web/capacitor.config.ts): `appId: ie.cuntas.app`, `webDir: dist`, Android scheme `https`.
-- [lib/native.ts](../apps/web/src/lib/native.ts) is the only native code: `isNative` and the Android back button.
+- [capacitor.config.ts](../apps/web/capacitor.config.ts): `appId: ie.cuntas.app`, `webDir: dist`, Android scheme `https`, no iOS content inset (the page pads with the safe areas), SQLite encryption, the splash screen hidden by the app, the keyboard resizing the web view.
+- [lib/platform/native.ts](../apps/web/src/lib/platform/native.ts): the key-value store on `@capacitor-community/sqlite` (table `kv(key, value, updated_at)`, SQLCipher, the key made on first launch and kept by the plugin in the Keychain / Keystore), the one-off copy from IndexedDB ([migrate.ts](../apps/web/src/lib/platform/migrate.ts)), exports written to the cache directory and handed to the share sheet, and files opened in the app (`appUrlOpen`, read as bytes).
+- [lib/native.ts](../apps/web/src/lib/native.ts): the Android back button, the status bar, the keyboard and `hideSplash()`.
+- `ios/App/App/Info.plist` declares the document types the app opens (`.cuntas`, CSV, OFX/QFX, XML, YAML, JSON); `android/app/src/main/AndroidManifest.xml` has the matching `VIEW` intent filter and keeps app data out of backup (`data_extraction_rules.xml`).
 - `apps/web/ios` and `apps/web/android` are generated projects (ignored by ESLint).
 
 Storage, files, app lock, notifications and store submission for the native apps are planned in [design/mobile-apps.md](design/mobile-apps.md).
