@@ -118,8 +118,8 @@ describe("importing several files", () => {
       ["Chase (checking)", "current", "USD", "US", "2026-09-01"],
       ["American Express", "creditCard", "USD", "US", "2026-09-03"],
     ]);
-    expect(r.summary).toMatchObject({ files: 2, added: 6, skipped: 0, merged: 0, transfers: 1, categorised: 2, uncategorised: 2, start: "2026-09-01", end: "2026-10-20" });
-    // Spending: groceries, Netflix and the mystery shop; the card payment is a transfer and pay is income.
+    expect(r.summary).toMatchObject({ files: 2, added: 6, skipped: 0, merged: 0, transfers: 1, categorised: 3, uncategorised: 1, start: "2026-09-01", end: "2026-10-20" });
+    // Spending: Trader Joe's (groceries), Netflix and the mystery shop, which is the one left uncategorised; the card payment is a transfer and pay is income.
     expect(r.summary.spentMinor).toBe(6418 + 4500 + 2500);
     expect(r.accountIds).toHaveLength(2);
     expect(datasetSchema.parse(r.dataset)).toBeTruthy();

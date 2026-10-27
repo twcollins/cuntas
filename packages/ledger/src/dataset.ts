@@ -1,6 +1,7 @@
 import type { ParsedStatement } from "@cuntas/importers";
 import { daysBetween, type Currency, type Jurisdiction } from "@cuntas/rules";
 import { recategorise } from "./categories";
+import { cleanMerchant } from "./merchant";
 import { DEFAULT_CATEGORIES } from "./categories";
 import { FxTable } from "./fx";
 import { newId } from "./ids";
@@ -145,7 +146,7 @@ export function importStatement(ds: Dataset, accountId: string, statement: Parse
       amountMinor: p.amountMinor,
       currency: account.currency,
       fxRateToBase: account.currency === ds.household.baseCurrency ? null : (fx.rate(account.currency, ds.household.baseCurrency, p.bookedAt) ?? null),
-      payee: p.payee,
+      payee: cleanMerchant(p.payee || p.rawDescription),
       rawDescription: p.rawDescription,
       externalId: p.externalId,
       categoryId: null,

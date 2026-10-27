@@ -1,6 +1,6 @@
-import { useSearch } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { reconcile, removeManualTransaction, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
+import { reconcile, removeManualTransaction, reviewCount, suggestRule, type CategoryRule, type Transaction } from "@cuntas/ledger";
 import { openQuickAdd } from "../components/QuickAdd";
 import { Badge, Button, Card, Empty, Input, PageHeader, Select, Table } from "../components/ui";
 import { useCategoryName } from "../lib/derived";
@@ -20,6 +20,7 @@ export function TransactionsPage() {
   const [limit, setLimit] = useState(PAGE);
   const [offer, setOffer] = useState<{ rule: CategoryRule; matches: number } | null>(null);
   const accounts = new Map(ds.accounts.map((a) => [a.id, a]));
+  const toReview = useMemo(() => reviewCount(ds), [ds]);
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -47,6 +48,12 @@ export function TransactionsPage() {
   return (
     <div>
       <PageHeader title="Transactions" subtitle={`${ds.transactions.length} transactions. Transfers between your own accounts are matched automatically and not counted as spending.`} actions={<Button variant="primary" onClick={openQuickAdd}>Add transaction</Button>} />
+      {toReview > 0 && !offer && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-900/20">
+          <span>{toReview} transaction{toReview === 1 ? " needs" : "s need"} a category.</span>
+          <Link to="/review" className="font-medium text-brand-700 underline dark:text-brand-500">Review them by merchant</Link>
+        </div>
+      )}
       {offer && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm dark:border-brand-900 dark:bg-brand-900/30">
           <span>

@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test, type Page } from "@playwright/test";
 
+const CHASE = "Details,Posting Date,Description,Amount,Type,Balance,Check or Slip #\n";
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../../../packages/importers/fixtures");
 
 async function go(page: Page, label: string) {
@@ -48,8 +49,9 @@ test("two statements at once need no choices beyond Import, and say what to do n
 
   await page.getByRole("button", { name: "Import 4 transactions" }).click();
   await expect(page.getByRole("status")).toHaveText("Imported 4 transactions from 2 files");
-  await expect(page.getByText("1 categorised automatically")).toBeVisible();
-  await expect(page.getByText(/3 need a category/)).toBeVisible();
+  // Trader Joe's, the payroll and Delta are known merchants; the card payment is a transfer.
+  await expect(page.getByText("3 categorised automatically")).toBeVisible();
+  await expect(page.getByText(/need a category/)).toHaveCount(0);
   await expect(page.getByText(/Spending Sep 1, 2026 – Sep 20, 2026: \$477/)).toBeVisible();
 
   // Importing the same files again goes to the same accounts and adds nothing.
@@ -60,11 +62,12 @@ test("two statements at once need no choices beyond Import, and say what to do n
   await expect(page.getByRole("status")).toHaveText("Imported 0 transactions from 2 files");
   await expect(page.getByText("4 already imported (skipped)")).toBeVisible();
 
-  // Review now opens Transactions on the uncategorised rows.
-  await page.getByLabel("Statement files").setInputFiles(join(fixtures, "discover.csv"));
-  await page.getByRole("button", { name: /^Import \d+ transactions?$/ }).click();
+  // Review now opens the review queue on the merchants nobody knows.
+  await page.getByLabel("Statement files").setInputFiles({ name: "chase-oct.csv", mimeType: "text/csv", buffer: Buffer.from(`${CHASE}DEBIT,09/21/2026,"LUCIA'S NAIL SALON #1 OAKLAND CA",-45.00,DEBIT_CARD,1000.00,,\n`) });
+  await page.getByRole("button", { name: "Import 1 transaction" }).click();
+  await expect(page.getByText(/1 need a category/)).toBeVisible();
   await page.getByRole("link", { name: "Review now" }).click();
-  await expect(page.getByLabel("Category").first()).toHaveValue("__none");
+  await expect(page.getByRole("heading", { name: "Merchant: Lucia's Nail Salon" })).toBeVisible();
 
   // Last month's statement counts as tracking, and Overview shows its spending with its dates.
   await go(page, "Overview");

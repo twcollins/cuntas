@@ -25,12 +25,13 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | USA phase 2 | Federal tax 2026 (payroll, FICA, self-employment, child tax credit), retirement and HSA limits, quarterly estimated tax, r/personalfinance ladder, 10 US bank CSV presets, en-US wording, IE–US and UK–US what-if |
 | USA phase 3 | All 50 states and D.C. have provisional 2026 packs with sources and golden tests. Local income taxes are out at launch, except Indiana's 92 county taxes |
 | Guide | Covers US households, state packs and Indiana counties |
+| UX phase 5 | Merchant names cleaned on import; about 400 US merchants in the dictionary; a Review page that files uncategorised rows one merchant at a time, with a rule and undo |
 | UX phase 4 | Several files at once, dropped on any page; account matching by number, bank layout or name; remembered column mappings; a result screen with next steps; tracking counts the last 60 days and Overview falls back to the latest month with spending |
 | UX phase 3 | Rough monthly spending estimate stands in for transactions until two months exist; fund targets use essential spending while no pay is recorded; first budget from the estimate |
 | UX phase 2 | Quick add from any page (spent, received, moved, every month → bill), Cash wallet with untracked balance, hand-entered rows merged on import and deletable |
 | UX phase 1 | Onboarding creates the first person with their residence; account countries follow currency; USD kept in OFX/CAMT/bank sync; Irish-only options and text hidden from others; empty chart states; sidebar trimmed with a More section |
 
-Checks on 2026-10-27: 443 Vitest tests and 41 Playwright tests pass (3 skipped); lint and typecheck clean.
+Checks on 2026-10-27: 535 Vitest tests and 45 Playwright tests pass (3 skipped); lint and typecheck clean.
 
 ## Rule packs
 
@@ -48,12 +49,13 @@ Checks on 2026-10-27: 443 Vitest tests and 41 Playwright tests pass (3 skipped);
 
 ## Next
 
-**Pick up here (2026-10-27):** UX phase 5, as designed in [design/ux-review.md](design/ux-review.md) §4 "Review queue for categories": merchant cleaning, a US merchant dictionary, and a review queue that groups payees and makes rules. Import's **Review now** link should open the queue instead of filtered Transactions. Items carried forward from phases 1 to 4, all listed under "Progress" in the review:
-- The setup checklist (phase 6) should ask for date of birth (a placeholder until edited), pay and state.
+**Pick up here (2026-10-27):** UX phase 6, as designed in [design/ux-review.md](design/ux-review.md) §5 and §6: the setup checklist on Overview, the phone Transactions list, and empty states. Items carried forward from phases 1 to 5, all listed under "Progress" in the review:
+- The setup checklist should ask for date of birth (a placeholder until edited), pay and state.
 - It should also offer the spending estimate where step 0 now offers only import.
 - The phone's floating + button moves to the centre of the bottom tab bar when that is built.
+- The review queue could use the Category column some US exports carry (Chase, Discover, Capital One) as a first guess; it doesn't yet.
 
-1. UX phases 5-6 in [design/ux-review.md](design/ux-review.md): review queue, setup checklist. Phases 1 to 4 are done.
+1. UX phase 6 in [design/ux-review.md](design/ux-review.md): setup checklist, phone Transactions, empty states. Phases 1 to 5 are done.
 2. iOS and Android apps, phases 1-6 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
 3. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
 4. Verify provisional packs (P0 in the backlog).

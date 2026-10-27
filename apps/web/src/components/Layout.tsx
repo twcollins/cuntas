@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import type { Dataset } from "@cuntas/ledger";
-import { useEffect, useRef, useState } from "react";
+import { reviewCount, type Dataset } from "@cuntas/ledger";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { today } from "@cuntas/rules";
 import { useRulePrompts } from "../lib/rulepacks";
 import { switchHousehold, useDataset, useStore } from "../lib/store";
@@ -11,12 +11,13 @@ import { DropImportHost } from "./DropImport";
 import { openQuickAdd, QuickAddHost } from "./QuickAdd";
 import { cx } from "./ui";
 
-type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules"; sub?: boolean; when?: (ds: Dataset) => boolean };
+type NavItem = { to: string; label: string; icon: string; adminOnly?: boolean; badge?: "rules" | "review"; sub?: boolean; when?: (ds: Dataset) => boolean };
 
 // The everyday pages first; the rest sits under "More", collapsed until opened or until one of its pages is open.
 const MAIN: NavItem[] = [
   { to: "/", label: "Overview", icon: "◎" },
   { to: "/transactions", label: "Transactions", icon: "≡" },
+  { to: "/review", label: "Review", icon: "✓", sub: true, badge: "review", when: (ds) => reviewCount(ds) > 0 },
   { to: "/import", label: "Import", icon: "⇪" },
   { to: "/accounts", label: "Accounts", icon: "▣" },
   { to: "/budgets", label: "Budgets", icon: "▤" },
@@ -119,6 +120,14 @@ function HouseholdSwitcher({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
+/** Transactions waiting for a category, shown on the Review item. */
+function ReviewBadge() {
+  const ds = useDataset();
+  const n = useMemo(() => reviewCount(ds), [ds]);
+  if (n === 0) return null;
+  return <span aria-label={`${n} to review`} className="ml-auto rounded-full bg-amber-100 px-1.5 text-[11px] font-medium text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">{n}</span>;
+}
+
 /** Count of tax-rule prompts, shown on the Tax rules item. */
 function RulesCount() {
   const { dataset } = useStore();
@@ -153,6 +162,7 @@ function NavList({ items, terms, onNavigate }: { items: NavItem[]; terms: Terms;
           {!n.sub && <span aria-hidden className="w-4 text-center text-stone-400">{n.icon}</span>}
           {n.to === "/pensions" ? terms.pensions : n.label}
           {n.badge === "rules" && <RulesCount />}
+          {n.badge === "review" && <ReviewBadge />}
         </Link>
       ))}
     </div>

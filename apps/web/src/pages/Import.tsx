@@ -204,7 +204,7 @@ function ImportResult({ summary: s }: { summary: ImportSummary }) {
           {s.uncategorised > 0 && (
             <li>
               <span aria-hidden className="text-amber-500">● </span>{s.uncategorised} need a category ·{" "}
-              <Link to="/transactions" search={{ category: "__none" }} className="font-medium text-brand-700 underline dark:text-brand-500">Review now</Link>
+              <Link to="/review" className="font-medium text-brand-700 underline dark:text-brand-500">Review now</Link>
             </li>
           )}
           {s.start && s.end && s.spentMinor > 0 && (

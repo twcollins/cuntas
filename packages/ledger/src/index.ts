@@ -4,6 +4,8 @@ export * from "./fx";
 export * from "./balances";
 export * from "./transfers";
 export * from "./categories";
+export * from "./merchant";
+export * from "./review";
 export * from "./spending";
 export * from "./budgets";
 export * from "./waterfall";

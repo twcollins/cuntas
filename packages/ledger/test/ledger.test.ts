@@ -58,9 +58,9 @@ describe("import", () => {
   it("categorises on import from the merchant dictionary", () => {
     const { dataset } = importStatement(base(), "eur", importFile("aib.csv", fixture("aib.csv")));
     const byPayee = Object.fromEntries(dataset.transactions.map((t) => [t.payee, t.categoryId]));
-    expect(byPayee["DUNNES STORES"]).toBe("cat_groceries");
-    expect(byPayee["SALARY ACME LTD"]).toBe("cat_salary");
-    expect(byPayee["ELECTRIC IRELAND"]).toBe("cat_energy");
+    expect(byPayee["Dunnes Stores"]).toBe("cat_groceries");
+    expect(byPayee["Salary Acme Ltd"]).toBe("cat_salary");
+    expect(byPayee["Electric Ireland"]).toBe("cat_energy");
   });
 });
 

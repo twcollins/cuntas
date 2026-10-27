@@ -6,6 +6,7 @@ import { AdminPage } from "./pages/Admin";
 import { BillsPage } from "./pages/Bills";
 import { InvestingPage } from "./pages/Investing";
 import { RetirementPage } from "./pages/Retirement";
+import { ReviewPage } from "./pages/Review";
 import { WhatIfPage } from "./pages/WhatIf";
 import { BudgetsPage } from "./pages/Budgets";
 import { DebtsPage } from "./pages/Debts";
@@ -29,6 +30,7 @@ const pages = [
   ["/", OverviewPage],
   ["/plan", PlanPage],
   ["/transactions", TransactionsPage],
+  ["/review", ReviewPage],
   ["/budgets", BudgetsPage],
   ["/bills", BillsPage],
   ["/accounts", AccountsPage],
