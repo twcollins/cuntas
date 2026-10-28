@@ -172,6 +172,7 @@ function memberState(ds: Dataset, m: Member, asOf: IsoDate, pack: IePack, fx: Fx
     age,
     employment: m.employmentType,
     residence,
+    usCitizen: m.nationality.includes("US"),
     grossAnnualMinor: fx.tryConvert(m.grossAnnualMinor, pay.currency, base, asOf) ?? m.grossAnnualMinor,
     netMonthlyMinor: fx.tryConvert(netMonthly, pay.currency, base, asOf) ?? netMonthly,
     marginalRate: pay.marginalRate,

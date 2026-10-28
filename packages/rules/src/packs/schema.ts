@@ -178,6 +178,10 @@ const byStatus = <T extends z.ZodTypeAny>(t: T) => z.object({ single: t, married
 /** An income range [from, to] over which something phases out. */
 const range = z.tuple([amount, amount]).refine(([from, to]) => to > from, "The range must end above where it starts");
 
+/** A rate the law states as a fraction, [numerator, denominator]: 5/9 of 1% is [5, 9] percent. */
+const fraction = z.tuple([count, z.number().int().positive()]);
+const assetThreshold = z.object({ yearEnd: amount, anyTime: amount }).strict();
+
 const usPack = z
   .object({
     ...meta,
@@ -227,6 +231,29 @@ const usPack = z
       minimumOwed: amount,
       dueDates: z.array(deadline).min(1),
     }),
+    socialSecurity: section({
+      bendPoints: z.tuple([amount, amount]).refine(([a, b]) => b > a, "The second bend point is above the first"),
+      factors: z.tuple([rate, rate, rate]),
+      computationYears: count,
+      minimumCredits: count,
+      creditsPerYear: z.number().int().positive(),
+      claimAges: z.tuple([count, count]).refine(([a, b]) => b > a, "The latest claiming age is above the earliest"),
+      rounding: z.object({ aime: z.number().positive(), pia: z.number().positive(), benefit: z.number().positive() }).strict(),
+      fullRetirementAge: section({
+        byBirthYear: z
+          .array(z.object({ bornFrom: count, years: count, months: z.number().int().min(0).max(11) }).strict())
+          .min(1)
+          .refine((l) => l.every((e, i) => i === 0 || e.bornFrom > l[i - 1]!.bornFrom), "Birth years must rise"),
+      }),
+      earlyReduction: section({ firstMonths: count, firstPercentPerMonth: fraction, laterPercentPerMonth: fraction }),
+      delayedCredit: section({ percentPerMonth: fraction }),
+    }).optional(),
+    foreignReporting: section({
+      fbar: section({ threshold: amount, due: deadline, extendedDue: deadline }),
+      form8938: z.object({ livingInUS: byStatus(assetThreshold), livingAbroad: byStatus(assetThreshold) }).strict(),
+      returnDueAbroad: section({ due: deadline }),
+      foreignEarnedIncomeExclusion: section({ amount }),
+    }).optional(),
     deadlines: section({ federalReturn: deadline }),
   })
   .strict();

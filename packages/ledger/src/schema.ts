@@ -65,6 +65,10 @@ export const memberSchema = z.object({
   /** Social insurance years so far, for State Pension estimates. */
   ieContributionYears: z.number().int().min(0).max(60).nullable().default(null),
   ukQualifyingYears: z.number().int().min(0).max(60).nullable().default(null),
+  /** US Social Security: years of covered US work so far, the monthly benefit at full retirement age from an SSA statement (dollars, minor units), and the age to claim (62-70). */
+  usCoveredYears: z.number().int().min(0).max(60).nullable().default(null),
+  usSsStatementMinor: minor.nullable().default(null),
+  usClaimAge: z.number().int().min(62).max(70).nullable().default(null),
   /** Self-assessment history, for preliminary tax. */
   selfAssessment: z
     .object({

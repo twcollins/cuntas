@@ -22,6 +22,8 @@ export * from "./calculators/xb/wrappers";
 export * from "./calculators/us/payroll";
 export * from "./calculators/us/limits";
 export * from "./calculators/us/state";
+export * from "./calculators/us/socialSecurity";
+export * from "./calculators/us/foreignReporting";
 
 import * as iePayrollMod from "./calculators/ie/payroll";
 import * as iePension from "./calculators/ie/pensionRelief";
@@ -39,6 +41,8 @@ import * as xbRetire from "./calculators/xb/retirement";
 import * as xbWrap from "./calculators/xb/wrappers";
 import * as usPayrollMod from "./calculators/us/payroll";
 import * as usLimits from "./calculators/us/limits";
+import * as usSs from "./calculators/us/socialSecurity";
+import * as usForeign from "./calculators/us/foreignReporting";
 
 /** Namespaced calculators, as named in the spec: ie.payroll, uk.isaAllowance, xb.classify, ... */
 export const ie = {
@@ -64,5 +68,11 @@ export const uk = {
   payslipCheck: ukPayslip.ukPayslipCheck,
   statePension: xbRetire.ukStatePensionEstimate,
 };
-export const us = { payroll: usPayrollMod.usPayroll, retirementLimits: usLimits.usRetirementLimits, estimatedTax: usLimits.usEstimatedTax };
+export const us = {
+  payroll: usPayrollMod.usPayroll,
+  retirementLimits: usLimits.usRetirementLimits,
+  estimatedTax: usLimits.usEstimatedTax,
+  socialSecurity: usSs.usSocialSecurityEstimate,
+  foreignReporting: usForeign.usForeignReporting,
+};
 export const xb = { classify: xbMod.classify, projectRetirement: xbRetire.projectRetirement, compareWrappers: xbWrap.compareWrappers };

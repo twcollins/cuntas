@@ -34,7 +34,7 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
       { to: "/debts", label: "Debts", body: "List your debts, then compare avalanche (highest rate first) and snowball (smallest balance first) payoff plans." },
       { to: "/goals", label: "Goals", body: "Emergency fund, required purchases and longer goals, each with the monthly amount it needs." },
       { to: "/pensions", label: "Pensions", body: "Every pension in one register, with employer match and the tax relief headroom left for your age band. US households record 401(k)s, IRAs, Roth IRAs and HSAs here." },
-      { to: "/retirement", label: "Retirement", body: "Pots grown to retirement age and turned into income alongside the State Pensions, in today's money, across three scenarios." },
+      { to: "/retirement", label: "Retirement", body: "Pots grown to retirement age and turned into income alongside the Irish and UK State Pensions and US Social Security, in today's money, across three scenarios. For Social Security, enter your years of US work or the figure from your SSA statement, and see the monthly benefit for each claiming age from 62 to 70." },
       { to: "/investing", label: "Compare wrappers", body: "The same yearly amount in each wrapper open to you, compared after tax." },
     ],
   },
@@ -42,7 +42,7 @@ const SECTIONS: { title: string; intro: string; topics: Topic[] }[] = [
     title: "Tax",
     intro: "Calculators built on versioned Irish, UK and US rule packs, with a pack for every US state and D.C. Each figure shows the pack and source it came from.",
     topics: [
-      { to: "/tax", label: "Tax centre", body: "Take-home pay (Irish, UK, or US federal plus state, with Indiana county tax; other local income taxes are noted but not included), a payslip check, self-assessment for the self-employed, US contribution limits and quarterly estimated tax, UK ISA allowance and pension annual allowance, deemed-disposal dates and tax deadlines." },
+      { to: "/tax", label: "Tax centre", body: "Take-home pay (Irish, UK, or US federal plus state, with Indiana county tax; other local income taxes are noted but not included), a payslip check, self-assessment for the self-employed, US contribution limits and quarterly estimated tax, FBAR and Form 8938 checks for US citizens and residents with accounts outside the US, UK ISA allowance and pension annual allowance, deemed-disposal dates and tax deadlines." },
       { to: "/what-if", label: "What if we moved", body: "See what would change tax treatment if someone moved between Ireland, the UK and the US. Your declared residence isn't changed." },
       { to: "/tax-rules", label: "Tax rules", body: "The tax figures behind every result, including each US state in its own group. Download a draft for next year, check each figure against its source, load the file, and tick each section once it matches." },
     ],

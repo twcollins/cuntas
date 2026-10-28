@@ -42,8 +42,8 @@ export interface RetirementMember {
   /** Pension pots and other retirement savings, in the household's base currency. */
   potMinor: number;
   annualContributionMinor: number;
-  /** State pensions in today's money, base currency. */
-  statePensions: { jurisdiction: "IE" | "UK"; annualMinor: number; startAge: number }[];
+  /** State pensions (and US Social Security) in today's money, base currency. */
+  statePensions: { jurisdiction: "IE" | "UK" | "US"; annualMinor: number; startAge: number }[];
 }
 
 export interface RetirementScenario {

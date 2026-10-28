@@ -148,6 +148,71 @@ estimatedTax:
     - { monthDay: "09-15", yearOffset: 0 }
     - { monthDay: "01-15", yearOffset: 1 }
 
+# Social Security retirement benefit. The bend points are for people first eligible (62) in 2026;
+# the formula is 90/32/15% of average indexed monthly earnings (AIME) over the best 35 years,
+# rounded down to the dime, and needs 40 credits (10 years of covered work).
+socialSecurity:
+  source: https://www.ssa.gov/oact/cola/piaformula.html
+  bendPoints: [1286, 7749]
+  factors: [0.90, 0.32, 0.15]
+  computationYears: 35
+  minimumCredits: 40
+  creditsPerYear: 4
+  claimAges: [62, 70]
+  # AIME rounds down to the dollar, the PIA to the dime, the monthly benefit to the dollar.
+  rounding: { aime: 1, pia: 0.1, benefit: 1 }
+  # Full retirement age by year of birth (people born on 1 January use the year before).
+  fullRetirementAge:
+    source: https://www.ssa.gov/benefits/retirement/planner/agereduction.html
+    byBirthYear:
+      - { bornFrom: 1943, years: 66, months: 0 }
+      - { bornFrom: 1955, years: 66, months: 2 }
+      - { bornFrom: 1956, years: 66, months: 4 }
+      - { bornFrom: 1957, years: 66, months: 6 }
+      - { bornFrom: 1958, years: 66, months: 8 }
+      - { bornFrom: 1959, years: 66, months: 10 }
+      - { bornFrom: 1960, years: 67, months: 0 }
+  # Percent of the PIA a month, as a fraction: 5/9 of 1% for each of the first 36 months early,
+  # 5/12 of 1% beyond; delayed credits add 2/3 of 1% a month (8% a year) up to 70.
+  earlyReduction:
+    source: https://www.ssa.gov/benefits/retirement/planner/agereduction.html
+    firstMonths: 36
+    firstPercentPerMonth: [5, 9]
+    laterPercentPerMonth: [5, 12]
+  delayedCredit:
+    source: https://www.ssa.gov/benefits/retirement/planner/delayret.html
+    percentPerMonth: [2, 3]
+
+# Reporting foreign financial assets. FBAR (FinCEN Form 114): the highest balances of all foreign
+# accounts added together exceed 10,000 at any time in the year. Form 8938: specified foreign
+# financial assets over the thresholds at year end or at any time, higher for people living abroad.
+foreignReporting:
+  source: https://www.irs.gov/instructions/i8938
+  fbar:
+    source: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar
+    threshold: 10000
+    due: { monthDay: "04-15", yearOffset: 1 }
+    extendedDue: { monthDay: "10-15", yearOffset: 1 }
+  form8938:
+    livingInUS:
+      single: { yearEnd: 50000, anyTime: 75000 }
+      marriedJoint: { yearEnd: 100000, anyTime: 150000 }
+      marriedSeparate: { yearEnd: 50000, anyTime: 75000 }
+      headOfHousehold: { yearEnd: 50000, anyTime: 75000 }
+    livingAbroad:
+      single: { yearEnd: 200000, anyTime: 300000 }
+      marriedJoint: { yearEnd: 400000, anyTime: 600000 }
+      marriedSeparate: { yearEnd: 200000, anyTime: 300000 }
+      headOfHousehold: { yearEnd: 200000, anyTime: 300000 }
+  # Citizens living abroad get an automatic two months to file (interest still runs from April 15).
+  returnDueAbroad:
+    source: https://www.irs.gov/individuals/international-taxpayers/us-citizens-and-resident-aliens-abroad-automatic-2-month-extension-of-time-to-file
+    due: { monthDay: "06-15", yearOffset: 1 }
+  # Rev. Proc. 2025-32: the foreign earned income exclusion for 2026, per qualifying person.
+  foreignEarnedIncomeExclusion:
+    source: https://www.irs.gov/pub/irs-drop/rp-25-32.pdf
+    amount: 132900
+
 deadlines:
   source: https://www.irs.gov/filing/individuals/when-to-file
   federalReturn: { monthDay: "04-15", yearOffset: 1 }

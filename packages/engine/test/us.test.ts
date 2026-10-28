@@ -109,6 +109,18 @@ describe("US next steps (r/personalfinance order)", () => {
     expect(r.current?.why).toContain("above the Roth IRA limit");
   });
 
+  it("IRA: above or in the Roth phase-out, the card explains the backdoor Roth and the pro-rata rule", () => {
+    const above = evaluateUs(usSnapshot({ members: [usMember({}, { iraContribYtdMinor: 0, magiMinor: toMinor(200000) })] }), pack);
+    expect(above.current?.why).toContain("backdoor");
+    expect(above.current?.why).toContain("pro-rata rule");
+    expect(above.current?.why).toContain("Form 8606");
+    const within = evaluateUs(usSnapshot({ members: [usMember({}, { iraContribYtdMinor: 0, magiMinor: toMinor(160000) })] }), pack);
+    expect(within.current?.why).toContain("phase-out");
+    expect(within.current?.why).toContain("backdoor");
+    const below = evaluateUs(usSnapshot({ members: [usMember({}, { iraContribYtdMinor: 0 })] }), pack);
+    expect(below.current?.why).not.toContain("backdoor");
+  });
+
   it("401(k): raise deferrals toward the year's limit", () => {
     const r = evaluateUs(usSnapshot({ members: [usMember({}, { employeeDeferralMinor: toMinor(10000) })] }), pack);
     expect(r.current?.check).toBe("us.401k");

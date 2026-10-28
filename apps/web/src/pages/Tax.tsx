@@ -11,6 +11,7 @@ import { PayslipCheckCard } from "./tax/PayslipCheck";
 import { SelfAssessmentCard } from "./tax/SelfAssessment";
 import { StudentLoanPicker } from "./tax/StudentLoanPicker";
 import { UsPlanningCard } from "./tax/UsPlanning";
+import { UsPersonCard } from "./tax/UsPerson";
 
 export function TaxPage() {
   const ds = useDataset();
@@ -29,6 +30,7 @@ export function TaxPage() {
           <IsaChecker />
         </div>
         <DeemedDisposal />
+        <UsPersonCard />
         <CrossBorder />
       </div>
       <Disclaimer />

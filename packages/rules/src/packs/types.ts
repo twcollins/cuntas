@@ -178,7 +178,35 @@ export interface UsPack extends PackMeta {
     minimumOwed: number;
     dueDates: DeadlineRule[];
   };
+  socialSecurity?: Sourced &
+    SectionStatus & {
+      bendPoints: [number, number];
+      factors: [number, number, number];
+      computationYears: number;
+      minimumCredits: number;
+      creditsPerYear: number;
+      claimAges: [number, number];
+      rounding: { aime: number; pia: number; benefit: number };
+      fullRetirementAge: Sourced & { byBirthYear: { bornFrom: number; years: number; months: number }[] };
+      /** Percent of the PIA a month as [numerator, denominator]. */
+      earlyReduction: Sourced & { firstMonths: number; firstPercentPerMonth: Fraction; laterPercentPerMonth: Fraction };
+      delayedCredit: Sourced & { percentPerMonth: Fraction };
+    };
+  foreignReporting?: Sourced &
+    SectionStatus & {
+      fbar: Sourced & { threshold: number; due: DeadlineRule; extendedDue: DeadlineRule };
+      form8938: { livingInUS: ByFilingStatus<AssetThreshold>; livingAbroad: ByFilingStatus<AssetThreshold> };
+      returnDueAbroad: Sourced & { due: DeadlineRule };
+      foreignEarnedIncomeExclusion: Sourced & { amount: number };
+    };
   deadlines: Sourced & { federalReturn: DeadlineRule };
+}
+
+/** [numerator, denominator], for rates the law states as fractions (5/9 of 1%). */
+export type Fraction = [number, number];
+export interface AssetThreshold {
+  yearEnd: number;
+  anyTime: number;
 }
 
 export type StudentLoanPlan = "plan1" | "plan2" | "plan4" | "plan5" | "postgraduate";

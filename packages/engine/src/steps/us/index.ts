@@ -2,6 +2,9 @@ import { formatMoney, sumMinor, usRetirementLimits, type UsPack } from "@cuntas/
 import type { EvalContext, MemberState, OptionCard, StepDefinition } from "../../types";
 import { chartRef, fundBasisUsed, fullFundTarget, money, nonMortgageDebts, packRef, pct, starterFundTarget } from "../../helpers";
 
+/** IRS Form 8606 (nondeductible IRAs and Roth conversions), cited when the backdoor Roth note shows. */
+const FORM_8606 = "https://www.irs.gov/forms-pubs/about-form-8606";
+
 // US next steps, in the r/personalfinance order: budget, starter emergency fund, employer match,
 // high-interest debt, full emergency fund, HSA, IRA, 401(k) to the limit, then other goals.
 // Wording stays general: account types, never products or providers.
@@ -251,7 +254,7 @@ const ira: StepDefinition<UsPack> = {
       isMet: (ctx) => us(ctx.member)!.iraContribYtdMinor >= pace(ctx, limitsFor(ctx).iraMinor),
       progress: (ctx) => ({ current: us(ctx.member)!.iraContribYtdMinor, target: limitsFor(ctx).iraMinor, unit: "USD" }),
       headline: "{name}: put {due} more into an IRA to keep pace",
-      explain: "This year's IRA limit is {limit} across all your IRAs; {paid} is in so far. {roth} {deduction}",
+      explain: "This year's IRA limit is {limit} across all your IRAs; {paid} is in so far. {roth} {deduction}{backdoor}",
       vars: (ctx) => {
         const u = us(ctx.member)!;
         const l = limitsFor(ctx);
@@ -267,9 +270,18 @@ const ira: StepDefinition<UsPack> = {
             : l.traditionalIraDeductibleMinor < l.iraMinor
               ? `Up to ${usd(l.traditionalIraDeductibleMinor)} of a traditional IRA contribution is deductible.`
               : "A traditional IRA contribution is deductible now and taxed when withdrawn.";
-        return { name: ctx.member!.name, limit: usd(l.iraMinor), paid: usd(u.iraContribYtdMinor), due: usd(Math.max(0, pace(ctx, l.iraMinor) - u.iraContribYtdMinor)), roth, deduction };
+        // Above or in the phase-out, the usual route to Roth money is a non-deductible contribution converted to Roth.
+        const backdoor =
+          l.rothIraMinor < l.iraMinor
+            ? " Some people above the limit contribute to a traditional IRA without the deduction and then convert it to a Roth IRA (a \"backdoor\" Roth). Any pre-tax money already in a traditional, SEP or SIMPLE IRA makes part of the conversion taxable (the pro-rata rule); the contribution and conversion are reported on Form 8606."
+            : "";
+        return { name: ctx.member!.name, limit: usd(l.iraMinor), paid: usd(u.iraContribYtdMinor), due: usd(Math.max(0, pace(ctx, l.iraMinor) - u.iraContribYtdMinor)), roth, deduction, backdoor };
       },
-      sources: (ctx) => [packRef(ctx, "retirement", ctx.pack.retirement.source), chartRef(ctx, "ira")],
+      sources: (ctx) => [
+        packRef(ctx, "retirement", ctx.pack.retirement.source),
+        chartRef(ctx, "ira"),
+        ...(limitsFor(ctx).rothIraMinor < limitsFor(ctx).iraMinor ? [{ pack: ctx.pack.version, key: "retirement.form8606", source: FORM_8606 }] : []),
+      ],
       actions: [{ id: "pensions", label: "Record IRA contributions", to: "/pensions" }],
     },
   ],

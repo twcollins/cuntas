@@ -15,6 +15,17 @@ describe("next-step engine", () => {
     expect(r.ladder.map((l) => l.order)).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 
+  it("save or invest: a US citizen living here is told Irish and UK funds are PFICs", () => {
+    const plain = evaluate(snapshot(), pack).options.find((o) => o.id === "save-or-invest")!;
+    expect(plain.detail).not.toContain("PFIC");
+    const base = snapshot();
+    const r = evaluate({ ...base, members: base.members.map((m, i) => (i === 0 ? { ...m, usCitizen: true } : m)) }, pack);
+    const card = r.options.find((o) => o.id === "save-or-invest")!;
+    expect(card.detail).toContain(`${base.members[0]!.name} is a US citizen`);
+    expect(card.detail).toContain("PFIC");
+    expect(card.detail).toContain("Form 8621");
+  });
+
   it("step 0: no tracking comes first", () => {
     const r = evaluate(snapshot({ tracking: { hasBudgetThisPeriod: false, transactionsLast60Days: 0, uncategorisedLast60Days: 0 } }), pack);
     expect(r.current?.check).toBe("ie.track-budget.tracking");

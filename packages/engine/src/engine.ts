@@ -72,7 +72,8 @@ function options(ctx: EvalContext): OptionCard[] {
     title: "Savings for near goals, investments for far ones",
     detail: `For goals within ${ctx.chart.goals.savingsHorizonYears} years, deposit savings (DIRT ${formatRate(p.dirt.rate)}); beyond that, investing. ` +
       `Funds and ETFs pay exit tax at ${formatRate(exit)} with deemed disposal every ${p.exitTax.deemedDisposalYears} years; directly held shares pay CGT at ${formatRate(cgt)} after a €${p.cgt.annualExemption} exemption.` +
-      (p.investmentAccount ? ` The Investment Account (from ${p.investmentAccount.from}) charges ${formatRate(p.investmentAccount.annualChargeRate)} a year only on value above €${p.investmentAccount.taxFreeValue.toLocaleString("en-IE")}.` : ""),
+      (p.investmentAccount ? ` The Investment Account (from ${p.investmentAccount.from}) charges ${formatRate(p.investmentAccount.annualChargeRate)} a year only on value above €${p.investmentAccount.taxFreeValue.toLocaleString("en-IE")}.` : "") +
+      pficNote(s.members.filter((m) => m.usCitizen && m.residence !== "US").map((m) => m.name)),
   });
   if (s.housing.ownsHome && s.housing.mortgageMonthlyPaymentMinor) {
     out.push({
@@ -82,6 +83,13 @@ function options(ctx: EvalContext): OptionCard[] {
     });
   }
   return out;
+}
+
+/** US citizens living in Ireland or the UK: funds domiciled there are PFICs for US tax. */
+function pficNote(names: string[]): string {
+  if (names.length === 0) return "";
+  const who = names.length === 1 ? `${names[0]} is a US citizen` : `${names.slice(0, -1).join(", ")} and ${names.at(-1)} are US citizens`;
+  return ` ${who}: for US tax, Irish and UK funds and ETFs are PFICs, which need Form 8621 every year and, without an election, have gains taxed at the top rate plus an interest charge. Shares held directly are not PFICs.`;
 }
 
 /** Evaluates the Irish ladder (also used for UK and mixed households). Output is a pure function of the snapshot, rule pack and chart defaults. */

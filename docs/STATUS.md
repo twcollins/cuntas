@@ -25,6 +25,7 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | USA phase 2 | Federal tax 2026 (payroll, FICA, self-employment, child tax credit), retirement and HSA limits, quarterly estimated tax, r/personalfinance ladder, 10 US bank CSV presets, en-US wording, IE–US and UK–US what-if |
 | USA phase 3 | All 50 states and D.C. have provisional 2026 packs with sources and golden tests. Local income taxes are out at launch, except Indiana's 92 county taxes |
 | Guide | Covers US households, state packs and Indiana counties |
+| USA phase 4 | Social Security estimate and claiming ages on Retirement; backdoor Roth and Roth-conversion notes; a Tax centre card for US citizens and residents with accounts outside the US (FBAR, Form 8938, PFIC, ISA, filing from abroad); PFIC note on the Irish ladder for US citizens |
 | Mobile apps 1-3 | Platform layer; encrypted SQLite storage in the apps with a one-off copy from IndexedDB; status bar, splash and keyboard; share-sheet exports; statements, rule files and backups opened from anywhere go to the right page; backup reminder. Built and `cap sync`ed, not yet compiled or run on a device |
 | UX phase 6 | Setup checklist on Overview in place of step 0; phone tab bar with + Add and a list view of Transactions; empty states with actions; pages no longer scroll sideways on phones |
 | UX phase 5 | Merchant names cleaned on import; about 400 US merchants in the dictionary; a Review page that files uncategorised rows one merchant at a time, with a rule and undo |
@@ -33,7 +34,7 @@ The snapshots were exported on 2026-10-25. Date and mention chips became plain t
 | UX phase 2 | Quick add from any page (spent, received, moved, every month → bill), Cash wallet with untracked balance, hand-entered rows merged on import and deletable |
 | UX phase 1 | Onboarding creates the first person with their residence; account countries follow currency; USD kept in OFX/CAMT/bank sync; Irish-only options and text hidden from others; empty chart states; sidebar trimmed with a More section |
 
-Checks on 2026-10-27: 555 Vitest tests and 57 Playwright tests pass (3 skipped); lint and typecheck clean.
+Checks on 2026-10-28: 598 Vitest tests and 61 Playwright tests pass (3 skipped); lint and typecheck clean.
 
 ## Rule packs
 
@@ -51,7 +52,7 @@ Checks on 2026-10-27: 555 Vitest tests and 57 Playwright tests pass (3 skipped);
 
 ## Next
 
-**Pick up here (2026-10-28):** mobile apps phases 1-3 are built and pushed (`0701016`; see Progress in [design/mobile-apps.md](design/mobile-apps.md)). **Decision 2026-10-28: compiling and testing the apps on devices is deferred.** It needs a Mac with Xcode and an Android SDK (this one has neither), then the device checklist in that document. Do it before app phase 4 (app lock), so phases 4-7 aren't built on untested native code. Until then the web app (PWA) is the product; work that doesn't depend on the apps can go ahead (USA phase 4, verifying packs, the website brief).
+**Pick up here (2026-10-28):** mobile apps phases 1-3 are built and pushed (`0701016`; see Progress in [design/mobile-apps.md](design/mobile-apps.md)). **Decision 2026-10-28: compiling and testing the apps on devices is deferred.** It needs a Mac with Xcode and an Android SDK (this one has neither), then the device checklist in that document. Do it before app phase 4 (app lock), so phases 4-7 aren't built on untested native code. Until then the web app (PWA) is the product; work that doesn't depend on the apps can go ahead (verifying packs, the website brief). USA phase 4 was built on 2026-10-28.
 
 **Design status:** the UX review's six phases are done. In the mobile-apps design, phases 1-3 are built and phase 2's phone layout ships in the PWA. Phases 4-7 (app lock, notifications, store readiness, self-hosted sign-in) are designed, not started. The open questions at the end of that document (publisher, bundle ID, minimum iOS, Account & sync in store builds, price) are still open and block phase 6.
 
@@ -63,6 +64,6 @@ Carried forward:
 - The "under 3 minutes to a first budget" goal is measured as 13 actions on the checklist path, not yet timed with a person.
 
 1. iOS and Android apps, phases 4-7 in [design/mobile-apps.md](design/mobile-apps.md); the US store launch follows phase 6.
-2. USA phase 4: Social Security estimate, Roth notes, US–IE and US–UK cross-border cases (FBAR, FATCA, PFIC).
-3. Verify provisional packs (P0 in the backlog).
-4. Update the website brief for US support.
+2. Verify provisional packs (P0 in the backlog), now including the US Social Security and foreign-reporting sections.
+3. Update the website brief for US support.
+4. USA after phase 4: totalization with Ireland and the UK in the Social Security estimate, spousal benefits, US tax on income earned abroad (exclusion and foreign tax credit calculated, not just named).

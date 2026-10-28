@@ -1171,6 +1171,153 @@ export const RAW_PACKS: Record<string, unknown> = {
         }
       ]
     },
+    "socialSecurity": {
+      "source": "https://www.ssa.gov/oact/cola/piaformula.html",
+      "bendPoints": [
+        1286,
+        7749
+      ],
+      "factors": [
+        0.9,
+        0.32,
+        0.15
+      ],
+      "computationYears": 35,
+      "minimumCredits": 40,
+      "creditsPerYear": 4,
+      "claimAges": [
+        62,
+        70
+      ],
+      "rounding": {
+        "aime": 1,
+        "pia": 0.1,
+        "benefit": 1
+      },
+      "fullRetirementAge": {
+        "source": "https://www.ssa.gov/benefits/retirement/planner/agereduction.html",
+        "byBirthYear": [
+          {
+            "bornFrom": 1943,
+            "years": 66,
+            "months": 0
+          },
+          {
+            "bornFrom": 1955,
+            "years": 66,
+            "months": 2
+          },
+          {
+            "bornFrom": 1956,
+            "years": 66,
+            "months": 4
+          },
+          {
+            "bornFrom": 1957,
+            "years": 66,
+            "months": 6
+          },
+          {
+            "bornFrom": 1958,
+            "years": 66,
+            "months": 8
+          },
+          {
+            "bornFrom": 1959,
+            "years": 66,
+            "months": 10
+          },
+          {
+            "bornFrom": 1960,
+            "years": 67,
+            "months": 0
+          }
+        ]
+      },
+      "earlyReduction": {
+        "source": "https://www.ssa.gov/benefits/retirement/planner/agereduction.html",
+        "firstMonths": 36,
+        "firstPercentPerMonth": [
+          5,
+          9
+        ],
+        "laterPercentPerMonth": [
+          5,
+          12
+        ]
+      },
+      "delayedCredit": {
+        "source": "https://www.ssa.gov/benefits/retirement/planner/delayret.html",
+        "percentPerMonth": [
+          2,
+          3
+        ]
+      }
+    },
+    "foreignReporting": {
+      "source": "https://www.irs.gov/instructions/i8938",
+      "fbar": {
+        "source": "https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar",
+        "threshold": 10000,
+        "due": {
+          "monthDay": "04-15",
+          "yearOffset": 1
+        },
+        "extendedDue": {
+          "monthDay": "10-15",
+          "yearOffset": 1
+        }
+      },
+      "form8938": {
+        "livingInUS": {
+          "single": {
+            "yearEnd": 50000,
+            "anyTime": 75000
+          },
+          "marriedJoint": {
+            "yearEnd": 100000,
+            "anyTime": 150000
+          },
+          "marriedSeparate": {
+            "yearEnd": 50000,
+            "anyTime": 75000
+          },
+          "headOfHousehold": {
+            "yearEnd": 50000,
+            "anyTime": 75000
+          }
+        },
+        "livingAbroad": {
+          "single": {
+            "yearEnd": 200000,
+            "anyTime": 300000
+          },
+          "marriedJoint": {
+            "yearEnd": 400000,
+            "anyTime": 600000
+          },
+          "marriedSeparate": {
+            "yearEnd": 200000,
+            "anyTime": 300000
+          },
+          "headOfHousehold": {
+            "yearEnd": 200000,
+            "anyTime": 300000
+          }
+        }
+      },
+      "returnDueAbroad": {
+        "source": "https://www.irs.gov/individuals/international-taxpayers/us-citizens-and-resident-aliens-abroad-automatic-2-month-extension-of-time-to-file",
+        "due": {
+          "monthDay": "06-15",
+          "yearOffset": 1
+        }
+      },
+      "foreignEarnedIncomeExclusion": {
+        "source": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+        "amount": 132900
+      }
+    },
     "deadlines": {
       "source": "https://www.irs.gov/filing/individuals/when-to-file",
       "federalReturn": {
@@ -7842,7 +7989,7 @@ export const MANIFEST = [
   {
     "key": "us/2026",
     "version": "US-2026.1",
-    "sha256": "ca8701606e4848d808aeab475bb907fe0c4b48a5b58d4729d73e428c109d3079"
+    "sha256": "a325fbab597ccb861e13976dce3d2fcbe6349c43238cfe6dba24608da0ced2ff"
   },
   {
     "key": "us/ak/2026",

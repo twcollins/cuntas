@@ -8,6 +8,8 @@ export interface MemberState {
   age: number;
   employment: Employment;
   residence: Jurisdiction;
+  /** A US citizen, taxed by the US wherever they live (funds held abroad are PFICs, for one). */
+  usCitizen?: boolean;
   grossAnnualMinor: number;
   netMonthlyMinor: number;
   marginalRate: number;
