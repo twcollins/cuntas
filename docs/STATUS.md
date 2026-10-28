@@ -1,6 +1,6 @@
 # Cúntas: where we are
 
-As of 2026-10-27. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents. For how the code fits together, read [ARCHITECTURE.md](ARCHITECTURE.md).
+As of 2026-10-28. This file records the state of the build and the design. `docs/SPEC.md` stays the source of truth for rules and acceptance criteria; `docs/design/` holds snapshots of the design documents. For how the code fits together, read [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Design documents
 
@@ -51,7 +51,11 @@ Checks on 2026-10-27: 555 Vitest tests and 57 Playwright tests pass (3 skipped);
 
 ## Next
 
-**Pick up here (2026-10-27):** mobile apps phases 1-3 are built (see Progress in [design/mobile-apps.md](design/mobile-apps.md)). They need a Mac with Xcode and an Android SDK to compile, then the device checklist in that document, before phase 4 (app lock). Carried forward:
+**Pick up here (2026-10-28):** mobile apps phases 1-3 are built and pushed (`0701016`; see Progress in [design/mobile-apps.md](design/mobile-apps.md)). **Decision 2026-10-28: compiling and testing the apps on devices is deferred.** It needs a Mac with Xcode and an Android SDK (this one has neither), then the device checklist in that document. Do it before app phase 4 (app lock), so phases 4-7 aren't built on untested native code. Until then the web app (PWA) is the product; work that doesn't depend on the apps can go ahead (USA phase 4, verifying packs, the website brief).
+
+**Design status:** the UX review's six phases are done. In the mobile-apps design, phases 1-3 are built and phase 2's phone layout ships in the PWA. Phases 4-7 (app lock, notifications, store readiness, self-hosted sign-in) are designed, not started. The open questions at the end of that document (publisher, bundle ID, minimum iOS, Account & sync in store builds, price) are still open and block phase 6.
+
+Carried forward:
 - Run the apps on a device: the IndexedDB copy, an app kill straight after a change, opening a statement from Files, the share sheet, and whether the SQLite key survives an encrypted iPhone backup restore.
 - Android "share to Cúntas" (`SEND` intents) needs a send-intent plugin.
 - The review queue could use the Category column some US exports carry (Chase, Discover, Capital One) as a first guess.

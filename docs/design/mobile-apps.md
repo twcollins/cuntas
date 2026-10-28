@@ -1,6 +1,6 @@
 # Cúntas: iOS and Android apps
 
-2026-10-25 · Design and implementation plan. Status: phases 1-3 built 2026-10-27, not yet run on a device; phases 4-7 to do.
+2026-10-25 · Design and implementation plan. Status: phases 1-3 built 2026-10-27, not yet run on a device; device build and testing deferred (2026-10-28); phases 4-7 to do.
 
 The iOS and Android apps are the same React app inside a Capacitor shell, with a thin platform layer that swaps in native storage, files, app lock and notifications. All data stays on the phone; signing in to a self-hosted server stays optional. This follows the decisions in [design-and-working-doc.md](design-and-working-doc.md) (Mobile section, decided 2026-10-24).
 
